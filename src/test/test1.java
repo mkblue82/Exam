@@ -65,10 +65,10 @@ public class test1 {
                 "T004_FD2_user VARCHAR(30) NOT NULL, " +
                 "T004_FD3_user VARCHAR(12), " +
                 "T004_FD4_user VARCHAR(60) NOT NULL, " +
-                "T005_FD5_user VARCHAR(30), " +
-                "T006_FD6_user VARCHAR(8), " +
-                "T007_FD7_user BOOLEAN NOT NULL DEFAULT FALSE, " +
-                "FOREIGN KEY (T006_FD6_user) REFERENCES T001_store(T001_PK1_store))";
+                "T004_FD5_user VARCHAR(30), " +
+                "T004_FD6_user VARCHAR(8), " +
+                "T004_FD7_user BOOLEAN NOT NULL DEFAULT FALSE, " +
+                "FOREIGN KEY (T004_FD6_user) REFERENCES T001_store(T001_PK1_store))";
             stmt.execute(createUserTable);
             System.out.println("✓ T004_userテーブル作成完了");
             // T005_bookingテーブル作成（自動採番ID追加、外部キー: ユーザーID、商品ID）
@@ -79,8 +79,8 @@ public class test1 {
                 "T005_FD2_booking VARCHAR(12) NOT NULL, " +
                 "T005_FD3_booking TIMESTAMP NOT NULL, " +
                 "T005_FD4_booking VARCHAR(12) NOT NULL, " +
-                "T006_FD5_booking TIMESTAMP NOT NULL, " +
-                "T007_FD6_booking BOOLEAN NOT NULL DEFAULT FALSE, " +
+                "T005_FD5_booking TIMESTAMP NOT NULL, " +
+                "T005_FD6_booking BOOLEAN NOT NULL DEFAULT FALSE, " +
                 "FOREIGN KEY (T005_FD2_booking) REFERENCES T004_user(T004_PK1_user), " +
                 "FOREIGN KEY (T005_FD4_booking) REFERENCES T002_merchandise(T002_PK1_merchandise))";
             stmt.execute(createBookingTable);
