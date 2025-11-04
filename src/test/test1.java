@@ -6,7 +6,7 @@ public class test1 {
 
     public static void main(String[] args) {
 
-    	//aaaaaaaaaaaaaaaaabbbbbbbb
+    	//aaaaaaaaaaaaaaaaabbbbbbbbcccccc
 
         // PostgreSQL接続情報
         String url = "jdbc:postgresql://localhost:5432/postgres";
