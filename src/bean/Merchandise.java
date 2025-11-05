@@ -5,89 +5,126 @@ import java.sql.Timestamp;
 
 public class Merchandise implements java.io.Serializable {
     private int productId;
-    private String merchandiseCode;
-    private String field1;
-    private String field2;
-    private Date field3;
-    private String field4;
-    private String field5;
-    private String field6;
-    private Timestamp field7;
-    private String storeCode;
-    private String storeName;
-    private boolean field9;
+    private int stock;
+    private int price;
+    private Date useByDate;
+    private String productTag;
+    private String productName;
+    private int employeeId;
+    private Timestamp registrationTime;
+    private int storeId;
+    private boolean bookingStatus;
 
-    public int getId() {
-        return productId;
-    }
-    public String getMerchandiseCode() {
-        return merchandiseCode;
-    }
-    public String getField1() {
-        return field1;
-    }
-    public String getField2() {
-        return field2;
-    }
-    public Date getField3() {
-        return field3;
-    }
-    public String getField4() {
-        return field4;
-    }
-    public String getField5() {
-        return field5;
-    }
-    public String getField6() {
-        return field6;
-    }
-    public Timestamp getField7() {
-        return field7;
-    }
-    public String getStoreCode() {
-        return storeCode;
-    }
-    public String getStoreName() {
-        return storeName;
-    }
-    public boolean isField9() {
-        return field9;
+    // コンストラクタ
+    public Merchandise(){
+    	;
     }
 
-    public void setId(int id) {
-        this.productId = id;
+    public Merchandise(int productId, int stock, int price, Date useByDate,
+    		String productTag, String productName, int employeeId, Timestamp registrationTime,
+    		int storeId, boolean bookingStatus){
+
+    	this.productId = productId;
+    	this.stock = stock;
+    	this.price = price;
+    	this.useByDate = useByDate;
+    	this.productTag = productTag;
+    	this.productName = productName;
+    	this.employeeId = employeeId;
+    	this.registrationTime = registrationTime;
+    	this.storeId = storeId;
+    	this.bookingStatus = bookingStatus;
     }
-    public void setMerchandiseCode(String merchandiseCode) {
-        this.merchandiseCode = merchandiseCode;
+
+    // 商品IDのゲッター・セッター
+    public int getProductId(){
+    	return productId;
     }
-    public void setField1(String field1) {
-        this.field1 = field1;
+
+    public void setProductId(int productId){
+    	this.productId = productId;
     }
-    public void setField2(String field2) {
-        this.field2 = field2;
+
+    // 在庫数のゲッター・セッター
+    public int getStock(){
+    	return stock;
     }
-    public void setField3(Date field3) {
-        this.field3 = field3;
+
+    public void setStock(int stock){
+    	this.stock = stock;
     }
-    public void setField4(String field4) {
-        this.field4 = field4;
+
+    // 価格のゲッター・セッター
+    public int getPrice(){
+    	return price;
     }
-    public void setField5(String field5) {
-        this.field5 = field5;
+
+    public void setPrice(int price){
+    	this.price = price;
     }
-    public void setField6(String field6) {
-        this.field6 = field6;
+
+    // 消費期限のゲッター・セッター
+    public Date getUseByDate(){
+    	return useByDate;
     }
-    public void setField7(Timestamp field7) {
-        this.field7 = field7;
+
+    public void setUseByDate(Date useByDate){
+    	this.useByDate = useByDate;
     }
-    public void setStoreCode(String storeCode) {
-        this.storeCode = storeCode;
+
+    // タグのゲッター・セッター
+    public String getProductTag(){
+    	return productTag;
     }
-    public void setStoreName(String storeName) {
-        this.storeName = storeName;
+
+    public void setProductTag(String productTag){
+    	this.productTag = productTag;
     }
-    public void setField9(boolean field9) {
-        this.field9 = field9;
+
+    // 商品名のゲッター・セッター
+    public String getProductName(){
+    	return productName;
+    }
+
+    public void setProductName(String productName){
+    	this.productName = productName;
+    }
+
+    // 社員番号のゲッター・セッター
+    public int getEmployeeId(){
+    	return employeeId;
+    }
+
+    public void setEmployeeId(int employeeId){
+    	this.employeeId = employeeId;
+    }
+
+    // 登録時刻のゲッター・セッター
+    public Timestamp getRegistrationTime(){
+    	return registrationTime;
+    }
+
+    public void setRegistrationTime(Timestamp registrationTime){
+    	this.registrationTime = registrationTime;
+    }
+
+    // 店舗IDのゲッター・セッター
+    public int getStoreId(){
+    	return storeId;
+    }
+
+    public void setStoreId(int storeId){
+    	this.storeId = storeId;
+    }
+
+    // 予約ステータスのゲッター・セッター
+    public boolean getBookingStatus(){
+    	return bookingStatus;
+    }
+
+    public void setBookingStatus(boolean bookingStatus){
+    	this.bookingStatus = bookingStatus;
     }
 }
+
+
