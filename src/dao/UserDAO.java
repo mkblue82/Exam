@@ -17,7 +17,7 @@ public class UserDAO {
         this.con = con;
     }
 
-    // ユーザー登録
+    // ユーザー登録s
     public void insert(UserBean user) throws SQLException {
         String sql = "INSERT INTO T004_user (氏名, メールアドレス, 電話番号, パスワード, お気に入り店舗, 店舗ID, 通知ON_OFF) "
                    + "VALUES (?, ?, ?, ?, ?, ?, ?)";

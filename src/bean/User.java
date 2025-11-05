@@ -1,6 +1,6 @@
-package model;
+package bean;
 
-public class UserBean {
+public class User {
     private int userId;
     private String name;
     private String email;
