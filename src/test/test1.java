@@ -138,12 +138,6 @@ public class test1 {
     }
 }
 
-//q
-
-
-
-
-
 
 
 

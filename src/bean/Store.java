@@ -76,3 +76,4 @@ public class Store implements java.io.Serializable {
         this.licenseFileName = licenseFileName;
     }
 }
+
