@@ -18,8 +18,7 @@ public class test1 {
             Statement stmt = conn.createStatement();
             // T001_storeテーブル作成（自動採番ID追加）
             String createStoreTable = "CREATE TABLE T001_store (" +
-                "T001_ID_store SERIAL PRIMARY KEY, " +  // 自動採番ID
-                "T001_PK1_store VARCHAR(8) UNIQUE NOT NULL, " +
+                "T001_PK1_store SERIAL PRIMARY KEY, " +  // 自動採番ID
                 "T001_FD1_store VARCHAR(30) NOT NULL, " +
                 "T001_FD2_store VARCHAR(100) NOT NULL, " +
                 "T001_FD3_store VARCHAR(12) NOT NULL, " +
@@ -33,8 +32,7 @@ public class test1 {
             System.out.println("✓ T001_storeテーブル作成完了");
             // T002_merchandiseテーブル作成（自動採番ID追加、外部キー: 店舗ID）
             String createMerchandiseTable = "CREATE TABLE T002_merchandise (" +
-                "T002_ID_merchandise SERIAL PRIMARY KEY, " +  // 自動採番ID
-                "T002_PK1_merchandise VARCHAR(12) UNIQUE NOT NULL, " +
+                "T002_PK1_merchandise SERIAL PRIMARY KEY, " +  // 自動採番ID
                 "T002_FD1_merchandise CHAR(5) NOT NULL DEFAULT '0', " +
                 "T002_FD2_merchandise CHAR(10) NOT NULL DEFAULT '0', " +
                 "T002_FD3_merchandise DATE NOT NULL, " +
@@ -50,7 +48,7 @@ public class test1 {
 
             // T002_1_merchandise_imageテーブル作成（商品画像専用テーブル）
             String createMerchandiseImageTable = "CREATE TABLE T002_1_merchandise_image (" +
-                "T002_1_ID_image SERIAL PRIMARY KEY, " +  // 自動採番ID
+                "T002_1_PK1_image SERIAL PRIMARY KEY, " +  // 自動採番ID
                 "T002_1_FD1_merchandise_id VARCHAR(12) NOT NULL, " +  // 商品ID
                 "T002_1_FD2_image_data BYTEA NOT NULL, " +  // 画像データ
                 "T002_1_FD3_file_name VARCHAR(100) NOT NULL, " +  // ファイル名
@@ -63,8 +61,7 @@ public class test1 {
 
             // T003_employeeテーブル作成（自動採番ID追加、外部キー: 店舗ID）
             String createEmployeeTable = "CREATE TABLE T003_employee (" +
-                "T003_ID_employee SERIAL PRIMARY KEY, " +  // 自動採番ID
-                "T003_PK1_employee CHAR(50) UNIQUE NOT NULL, " +
+                "T003_PK1_employee SERIAL PRIMARY KEY, " +  // 自動採番ID
                 "T003_FD1_employee VARCHAR(30) NOT NULL, " +
                 "T003_FD2_employee VARCHAR(8) NOT NULL, " +
                 "FOREIGN KEY (T003_FD2_employee) REFERENCES T001_store(T001_PK1_store) " +
@@ -74,8 +71,7 @@ public class test1 {
 
             // T004_userテーブル作成（自動採番ID追加、外部キー: 店舗ID）
             String createUserTable = "CREATE TABLE T004_user (" +
-                "T004_ID_user SERIAL PRIMARY KEY, " +  // 自動採番ID
-                "T004_PK1_user VARCHAR(22) UNIQUE NOT NULL, " +
+                "T004_PK1_user SERIAL PRIMARY KEY, " +  // 自動採番ID
                 "T004_FD1_user VARCHAR(50) NOT NULL, " +
                 "T004_FD2_user VARCHAR(30) NOT NULL, " +
                 "T004_FD3_user VARCHAR(12), " +
@@ -88,8 +84,7 @@ public class test1 {
             System.out.println("✓ T004_userテーブル作成完了");
             // T005_bookingテーブル作成（自動採番ID追加、外部キー: ユーザーID、商品ID）
             String createBookingTable = "CREATE TABLE T005_booking (" +
-                "T005_ID_booking SERIAL PRIMARY KEY, " +  // 自動採番ID
-                "T005_PK1_booking VARCHAR(22) UNIQUE NOT NULL, " +
+                "T005_PK1_booking SERIAL PRIMARY KEY, " +  // 自動採番ID
                 "T005_FD1_booking CHAR(7) NOT NULL DEFAULT '0', " +
                 "T005_FD2_booking VARCHAR(12) NOT NULL, " +
                 "T005_FD3_booking TIMESTAMP NOT NULL, " +
@@ -144,3 +139,14 @@ public class test1 {
 }
 
 //q
+
+
+
+
+
+
+
+
+
+
+
