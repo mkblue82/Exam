@@ -10,7 +10,7 @@ public class User {
     private int storeId;
     private boolean notification; // true=ON, false=OFF
 
-    // --- getter/setter ---
+    // --- getter/setter ----
     public int getUserId() {
         return userId;
     }

@@ -7,7 +7,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import bean.UserBean;
+import bean.User;
 
 public class UserDAO {
 
@@ -18,7 +18,7 @@ public class UserDAO {
     }
 
     // ユーザー登録s
-    public void insert(UserBean user) throws SQLException {
+    public void insert(User user) throws SQLException {
         String sql = "INSERT INTO T004_user (氏名, メールアドレス, 電話番号, パスワード, お気に入り店舗, 店舗ID, 通知ON_OFF) "
                    + "VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement pstmt = con.prepareStatement(sql)) {
@@ -34,13 +34,13 @@ public class UserDAO {
     }
 
     // 全件取得
-    public List<UserBean> findAll() throws SQLException {
-        List<UserBean> list = new ArrayList<>();
+    public List<User> findAll() throws SQLException {
+        List<User> list = new ArrayList<>();
         String sql = "SELECT * FROM T004_user ORDER BY ユーザー_ID";
         try (PreparedStatement pstmt = con.prepareStatement(sql);
              ResultSet rs = pstmt.executeQuery()) {
             while (rs.next()) {
-                UserBean user = new UserBean();
+                User user = new User();
                 user.setUserId(rs.getInt("ユーザー_ID"));
                 user.setName(rs.getString("氏名"));
                 user.setEmail(rs.getString("メールアドレス"));
@@ -56,13 +56,13 @@ public class UserDAO {
     }
 
     // IDで検索
-    public UserBean findById(int id) throws SQLException {
+    public User findById(int id) throws SQLException {
         String sql = "SELECT * FROM T004_user WHERE ユーザー_ID = ?";
         try (PreparedStatement pstmt = con.prepareStatement(sql)) {
             pstmt.setInt(1, id);
             ResultSet rs = pstmt.executeQuery();
             if (rs.next()) {
-                UserBean user = new UserBean();
+                User user = new User();
                 user.setUserId(rs.getInt("ユーザー_ID"));
                 user.setName(rs.getString("氏名"));
                 user.setEmail(rs.getString("メールアドレス"));
@@ -78,7 +78,7 @@ public class UserDAO {
     }
 
     // 更新
-    public void update(UserBean user) throws SQLException {
+    public void update(User user) throws SQLException {
         String sql = "UPDATE T004_user SET 氏名=?, メールアドレス=?, 電話番号=?, パスワード=?, "
                    + "お気に入り店舗=?, 店舗ID=?, 通知ON_OFF=? WHERE ユーザー_ID=?";
         try (PreparedStatement pstmt = con.prepareStatement(sql)) {
