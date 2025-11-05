@@ -18,7 +18,7 @@ import javax.servlet.http.HttpSession;
  * ログイン処理を行うサーブレット
  */
 @WebServlet("/login")
-public class LoginServlet extends HttpServlet {
+public class LoginServlet_user extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
     // データベース接続情報
