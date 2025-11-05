@@ -4,7 +4,7 @@ import java.sql.Date;
 import java.sql.Timestamp;
 
 public class Merchandise implements java.io.Serializable {
-    private int id;
+    private int productId;
     private String merchandiseCode;
     private String field1;
     private String field2;
@@ -18,7 +18,7 @@ public class Merchandise implements java.io.Serializable {
     private boolean field9;
 
     public int getId() {
-        return id;
+        return productId;
     }
     public String getMerchandiseCode() {
         return merchandiseCode;
@@ -55,7 +55,7 @@ public class Merchandise implements java.io.Serializable {
     }
 
     public void setId(int id) {
-        this.id = id;
+        this.productId = id;
     }
     public void setMerchandiseCode(String merchandiseCode) {
         this.merchandiseCode = merchandiseCode;
