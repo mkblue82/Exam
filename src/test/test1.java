@@ -6,7 +6,6 @@ public class test1 {
 
     public static void main(String[] args) {
 
-    	//aaaaaaaaaaaaaaaaabbbbbbbbcccccc
 
         // PostgreSQL接続情報
         String url = "jdbc:postgresql://localhost:5432/postgres";
@@ -48,6 +47,20 @@ public class test1 {
                 "FOREIGN KEY (T002_FD8_merchandise) REFERENCES T001_store(T001_PK1_store))";
             stmt.execute(createMerchandiseTable);
             System.out.println("✓ T002_merchandiseテーブル作成完了");
+
+            // T002_1_merchandise_imageテーブル作成（商品画像専用テーブル）
+            String createMerchandiseImageTable = "CREATE TABLE T002_1_merchandise_image (" +
+                "T002_1_ID_image SERIAL PRIMARY KEY, " +  // 自動採番ID
+                "T002_1_FD1_merchandise_id VARCHAR(12) NOT NULL, " +  // 商品ID
+                "T002_1_FD2_image_data BYTEA NOT NULL, " +  // 画像データ
+                "T002_1_FD3_file_name VARCHAR(100) NOT NULL, " +  // ファイル名
+                "T002_1_FD4_display_order INTEGER DEFAULT 0, " +  // 表示順序
+                "T002_1_FD5_uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, " +  // アップロード日時
+                "FOREIGN KEY (T002_1_FD1_merchandise_id) REFERENCES T002_merchandise(T002_PK1_merchandise) " +
+                "ON DELETE CASCADE ON UPDATE CASCADE)";
+            stmt.execute(createMerchandiseImageTable);
+            System.out.println("✓ T002_1_merchandise_imageテーブル作成完了");
+
             // T003_employeeテーブル作成（自動採番ID追加、外部キー: 店舗ID）
             String createEmployeeTable = "CREATE TABLE T003_employee (" +
                 "T003_ID_employee SERIAL PRIMARY KEY, " +  // 自動採番ID
@@ -93,6 +106,7 @@ public class test1 {
             System.out.println("\n【自動採番ID】");
             System.out.println("• T001_store.T001_ID_store (SERIAL)");
             System.out.println("• T002_merchandise.T002_ID_merchandise (SERIAL)");
+            System.out.println("• T002_1_merchandise_image.T002_1_ID_image (SERIAL) ★NEW★");
             System.out.println("• T003_employee.T003_ID_employee (SERIAL)");
             System.out.println("• T004_user.T004_ID_user (SERIAL)");
             System.out.println("• T005_booking.T005_ID_booking (SERIAL)");
@@ -100,12 +114,21 @@ public class test1 {
             System.out.println("• T001_FD7_store: 店舗連絡用メールアドレス (VARCHAR(100))");
             System.out.println("• T001_FD8_store: 営業許可証データ (BYTEA - 画像/PDF)");
             System.out.println("• T001_FD9_store: 営業許可証ファイル名 (VARCHAR(100))");
+            System.out.println("\n【T002_1_merchandise_imageテーブル（商品画像）★NEW★】");
+            System.out.println("• T002_1_ID_image: 画像ID (SERIAL PRIMARY KEY)");
+            System.out.println("• T002_1_FD1_merchandise_id: 商品ID (外部キー)");
+            System.out.println("• T002_1_FD2_image_data: 画像データ (BYTEA)");
+            System.out.println("• T002_1_FD3_file_name: ファイル名 (VARCHAR(100))");
+            System.out.println("• T002_1_FD4_display_order: 表示順序 (INTEGER)");
+            System.out.println("• T002_1_FD5_uploaded_at: アップロード日時 (TIMESTAMP)");
+            System.out.println("→ 1つの商品に対して複数の画像を登録可能");
             System.out.println("\n【設定された外部キー】");
             System.out.println("1. T002_merchandise.T002_FD8_merchandise → T001_store.T001_PK1_store");
-            System.out.println("2. T003_employee.T003_FD2_employee → T001_store.T001_PK1_store (CASCADE)");
-            System.out.println("3. T004_user.T006_FD6_user → T001_store.T001_PK1_store");
-            System.out.println("4. T005_booking.T005_FD2_booking → T004_user.T004_PK1_user");
-            System.out.println("5. T005_booking.T005_FD4_booking → T002_merchandise.T002_PK1_merchandise");
+            System.out.println("2. T002_1_merchandise_image.T002_1_FD1_merchandise_id → T002_merchandise.T002_PK1_merchandise (CASCADE) ★NEW★");
+            System.out.println("3. T003_employee.T003_FD2_employee → T001_store.T001_PK1_store (CASCADE)");
+            System.out.println("4. T004_user.T006_FD6_user → T001_store.T001_PK1_store");
+            System.out.println("5. T005_booking.T005_FD2_booking → T004_user.T004_PK1_user");
+            System.out.println("6. T005_booking.T005_FD4_booking → T002_merchandise.T002_PK1_merchandise");
             stmt.close();
             conn.close();
         } catch (ClassNotFoundException e) {
