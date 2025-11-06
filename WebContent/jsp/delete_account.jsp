@@ -1,18 +1,18 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-
 <!DOCTYPE html>
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>新規ユーザー登録 </title>
+    <title>アカウント削除</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
     <style>
+        /* アカウント削除ページ専用CSS */
         body {
             background: #f5f5f5;
         }
 
-        .register-container {
+        .delete-account-container {
             max-width: 450px;
             margin: 80px auto;
             padding: 2rem;
@@ -21,13 +21,24 @@
             box-shadow: 0 5px 20px rgba(0,0,0,0.1);
         }
 
-        .register-container h1 {
+        .delete-account-container h1 {
             color: #c07148;
             text-align: center;
             margin-bottom: 2rem;
             font-size: 2rem;
             border-bottom: 2px solid #c07148;
             padding-bottom: 1rem;
+        }
+
+        .warning-message {
+            background: #fff3cd;
+            color: #856404;
+            padding: 1rem;
+            border-radius: 5px;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid #ffc107;
+            font-size: 0.9rem;
+            line-height: 1.6;
         }
 
         .error-message {
@@ -51,16 +62,14 @@
             color: #555;
         }
 
-        .form-group input[type="text"],
-        .form-group input[type="email"],
         .form-group input[type="password"] {
             width: 100%;
             padding: 0.8rem;
             border: 1px solid #ccc;
             border-radius: 5px;
             font-size: 1rem;
-            box-sizing: border-box;
             transition: 0.3s;
+            box-sizing: border-box;
         }
 
         .form-group input:focus {
@@ -69,9 +78,15 @@
             box-shadow: 0 0 0 3px rgba(192, 113, 72, 0.1);
         }
 
-        .btn-submit,
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .btn-delete,
         .btn-cancel {
-            width: 100%;
+            flex: 1;
             padding: 0.8rem;
             border: none;
             border-radius: 5px;
@@ -79,76 +94,71 @@
             cursor: pointer;
             transition: 0.3s;
             font-weight: bold;
-            margin-bottom: 0.8rem;
         }
 
-        .btn-submit {
+        .btn-delete {
             background: #c07148;
             color: #fff;
             box-shadow: 0 3px 10px rgba(192, 113, 72, 0.3);
         }
 
-        .btn-submit:hover {
+        .btn-delete:hover {
             background: #a85d38;
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(192, 113, 72, 0.4);
         }
 
         .btn-cancel {
-            background: #fff;
-            color: #c07148;
-            border: 2px solid #c07148;
+            background: #6c757d;
+            color: #fff;
+            box-shadow: 0 3px 10px rgba(108, 117, 125, 0.3);
         }
 
         .btn-cancel:hover {
-            background: #c07148;
-            color: #fff;
+            background: #5a6268;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(108, 117, 125, 0.4);
         }
 
         @media screen and (max-width: 600px) {
-            .register-container {
+            .delete-account-container {
                 margin: 40px 20px;
                 padding: 1.5rem;
             }
 
-            .register-container h1 {
+            .delete-account-container h1 {
                 font-size: 1.5rem;
+            }
+
+            .button-group {
+                flex-direction: column;
             }
         }
     </style>
 </head>
 <body>
-<div class="register-container">
-    <h1>新規ユーザー登録</h1>
+    <div class="delete-account-container">
+        <h1>アカウント削除</h1>
 
+        <form method="POST" action="${pageContext.request.contextPath}/delete-account" id="deleteForm">
+            <input type="hidden" name="action" value="verify">
 
-    <form action="${pageContext.request.contextPath}/UserRegisterServlet" method="post" id="userRegisterForm">
-        <input type="hidden" name="csrfToken" value="${sessionScope.csrfToken}">
+            <div class="form-group">
+                <label for="password">パスワード</label>
+                <input type="password"
+                       id="password"
+                       name="password"
+                       required
+                       minlength="8"
+                       placeholder="パスワードを入力"
+                       aria-required="true">
+            </div>
 
-        <div class="form-group">
-            <label for="name">氏名</label>
-            <input type="text" id="name" name="name" required
-                   placeholder="名前を入力してください"
-                   value="${param.name}">
-        </div>
-
-        <div class="form-group">
-            <label for="email">メールアドレス</label>
-            <input type="email" id="email" name="email" required
-                   placeholder="example@mail.com"
-                  value="${param.email}">
-        </div>
-
-        <div class="form-group">
-            <label for="password">パスワード</label>
-            <input type="password" id="password" name="password" required minlength="8"
-                   placeholder="8文字以上で入力してください">
-        </div>
-
-        <button type="submit" class="btn-submit">新規登録</button>
-        <button type="button" class="btn-cancel"
-                onclick="location.href='${pageContext.request.contextPath}/jsp/login_user.jsp'">ログインに戻る</button>
-    </form>
-</div>
+            <div class="button-group">
+                <button type="button" class="btn-cancel" onclick="location.href='${pageContext.request.contextPath}/mypage'">キャンセル</button>
+                <button type="submit" class="btn-delete">次へ</button>
+            </div>
+        </form>
+    </div>
 </body>
 </html>

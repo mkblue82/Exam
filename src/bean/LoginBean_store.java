@@ -25,7 +25,7 @@ import javax.servlet.http.HttpSession;
  * 5. 店舗管理画面へ遷移
  */
 @WebServlet("/shop/login")
-public class LoginServlet_store extends HttpServlet {
+public class LoginBean_store extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
     // データベース接続情報
@@ -150,7 +150,7 @@ public class LoginServlet_store extends HttpServlet {
                     request.setAttribute("errorMessage",
                         "この店舗アカウントは無効化されています。サポートセンターにお問い合わせください。");
                     request.setAttribute("shopId", shopId);
-                    request.getRequestDispatcher("/login_shop.jsp").forward(request, response);
+                    request.getRequestDispatcher("/login_store.jsp").forward(request, response);
                     return;
                 }
 
@@ -159,7 +159,7 @@ public class LoginServlet_store extends HttpServlet {
                     request.setAttribute("errorMessage",
                         "現在審査中です。審査完了までお待ちください。");
                     request.setAttribute("shopId", shopId);
-                    request.getRequestDispatcher("/login_shop.jsp").forward(request, response);
+                    request.getRequestDispatcher("/login_store.jsp").forward(request, response);
                     return;
                 }
 
@@ -168,7 +168,7 @@ public class LoginServlet_store extends HttpServlet {
                     request.setAttribute("errorMessage",
                         "出店が一時停止されています。詳細はサポートセンターまでお問い合わせください。");
                     request.setAttribute("shopId", shopId);
-                    request.getRequestDispatcher("/login_shop.jsp").forward(request, response);
+                    request.getRequestDispatcher("/login_store.jsp").forward(request, response);
                     return;
                 }
 
@@ -235,7 +235,7 @@ public class LoginServlet_store extends HttpServlet {
 
                 request.setAttribute("errorMessage", errorMsg);
                 request.setAttribute("shopId", shopId);
-                request.getRequestDispatcher("/login_shop.jsp").forward(request, response);
+                request.getRequestDispatcher("/login_store.jsp").forward(request, response);
             }
 
         } catch (ClassNotFoundException e) {
@@ -243,14 +243,14 @@ public class LoginServlet_store extends HttpServlet {
             request.setAttribute("errorMessage",
                 "データベースドライバが見つかりません。");
             request.setAttribute("shopId", shopId);
-            request.getRequestDispatcher("/login_shop.jsp").forward(request, response);
+            request.getRequestDispatcher("/login_store.jsp").forward(request, response);
 
         } catch (SQLException e) {
             e.printStackTrace();
             request.setAttribute("errorMessage",
                 "データベース接続エラーが発生しました。");
             request.setAttribute("shopId", shopId);
-            request.getRequestDispatcher("/login_shop.jsp").forward(request, response);
+            request.getRequestDispatcher("/login_store.jsp").forward(request, response);
 
         } finally {
             // リソースのクローズ

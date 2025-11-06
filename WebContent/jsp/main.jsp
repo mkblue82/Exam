@@ -82,6 +82,23 @@
 </section>
 
 
+<<<<<<< HEAD
+=======
+</div>
+<!--/.main-contents-->
+
+<div class="sub-contents">
+  <p class="btn1"><a href="login_user.jsp">ログイン</a></p>
+
+  <h3>カテゴリ</h3>
+  <nav>
+    <ul class="submenu">
+      <li><a href="foods.jsp">食べ物</a></li>
+      <li><a href="goods.jsp">雑貨</a></li>
+    </ul>
+  </nav>
+</div>
+>>>>>>> branch 'master' of https://github.com/mkblue82/Exam.git
 
 </main>
 

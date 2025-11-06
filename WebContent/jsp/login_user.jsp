@@ -4,7 +4,7 @@
 	<head>
 	    <meta charset="UTF-8">
 	    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-	    <title>ログイン - Sample Online Mall</title>
+	    <title>ログイン</title>
 	    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
 	    <style>
 	        /* ログインページ専用CSS */
@@ -169,7 +169,7 @@
 
 	            <button type="submit" class="btn-login">ログイン</button>
 	            <button type="button" class="btn-register"
-	                    onclick="location.href='${pageContext.request.contextPath}/signup_user.jsp'">
+	                    onclick="location.href='${pageContext.request.contextPath}/jsp/signup_user.jsp'">
 	                新規登録
 	            </button>
 	        </form>
