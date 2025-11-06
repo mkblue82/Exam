@@ -20,8 +20,7 @@ public class StoreDAO extends DAO {
 
         while (rs.next()) {
             Store s = new Store();
-            s.setId(rs.getInt("T001_ID_store"));
-            s.setStoreCode(rs.getString("T001_PK1_store"));
+            s.setStoreId(rs.getInt("T001_PK1_store"));
             s.setStoreName(rs.getString("T001_FD1_store"));
             s.setAddress(rs.getString("T001_FD2_store"));
             s.setPhone(rs.getString("T001_FD3_store"));
@@ -40,18 +39,17 @@ public class StoreDAO extends DAO {
     }
 
     // 店舗コードで検索
-    public Store selectByCode(String storeCode) throws Exception {
+    public Store selectByCode(String storeId) throws Exception {
         Connection con = getConnection();
         PreparedStatement st = con.prepareStatement(
             "select * from T001_store where T001_PK1_store = ?");
-        st.setString(1, storeCode);
+        st.setString(1, storeId);
         ResultSet rs = st.executeQuery();
 
         Store s = null;
         if (rs.next()) {
             s = new Store();
-            s.setId(rs.getInt("T001_ID_store"));
-            s.setStoreCode(rs.getString("T001_PK1_store"));
+            s.setStoreId(rs.getInt("T001_PK1_store"));
             s.setStoreName(rs.getString("T001_FD1_store"));
             s.setAddress(rs.getString("T001_FD2_store"));
             s.setPhone(rs.getString("T001_FD3_store"));
@@ -79,8 +77,7 @@ public class StoreDAO extends DAO {
         Store s = null;
         if (rs.next()) {
             s = new Store();
-            s.setId(rs.getInt("T001_ID_store"));
-            s.setStoreCode(rs.getString("T001_PK1_store"));
+            s.setStoreId(rs.getInt("T001_PK1_store"));
             s.setStoreName(rs.getString("T001_FD1_store"));
             s.setAddress(rs.getString("T001_FD2_store"));
             s.setPhone(rs.getString("T001_FD3_store"));
@@ -106,7 +103,7 @@ public class StoreDAO extends DAO {
             "T001_FD7_store, T001_FD8_store, T001_FD9_store) " +
             "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
-        st.setString(1, store.getStoreCode());
+        st.setInt(1, store.getStoreId());
         st.setString(2, store.getStoreName());
         st.setString(3, store.getAddress());
         st.setString(4, store.getPhone());
@@ -141,7 +138,7 @@ public class StoreDAO extends DAO {
         st.setString(7, store.getEmail());
         st.setBytes(8, store.getLicense());
         st.setString(9, store.getLicenseFileName());
-        st.setString(10, store.getStoreCode());
+        st.setInt(10, store.getStoreId());
 
         int line = st.executeUpdate();
         st.close();
@@ -162,3 +159,4 @@ public class StoreDAO extends DAO {
         return line;
     }
 }
+

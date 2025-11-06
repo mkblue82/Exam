@@ -3,8 +3,7 @@ package bean;
 import java.sql.Time;
 
 public class Store implements java.io.Serializable {
-    private int id;
-    private String storeCode;
+    private int storeId;
     private String storeName;
     private String address;
     private String phone;
@@ -15,11 +14,8 @@ public class Store implements java.io.Serializable {
     private byte[] license;
     private String licenseFileName;
 
-    public int getId() {
-        return id;
-    }
-    public String getStoreCode() {
-        return storeCode;
+    public int getStoreId() {
+        return storeId;
     }
     public String getStoreName() {
         return storeName;
@@ -49,11 +45,8 @@ public class Store implements java.io.Serializable {
         return licenseFileName;
     }
 
-    public void setId(int id) {
-        this.id = id;
-    }
-    public void setStoreCode(String storeCode) {
-        this.storeCode = storeCode;
+    public void setStoreId(int storeId) {
+        this.storeId = storeId;
     }
     public void setStoreName(String storeName) {
         this.storeName = storeName;
@@ -83,3 +76,4 @@ public class Store implements java.io.Serializable {
         this.licenseFileName = licenseFileName;
     }
 }
+
