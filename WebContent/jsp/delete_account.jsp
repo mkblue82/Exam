@@ -7,7 +7,6 @@
     <title>アカウント削除</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
     <style>
-        /* アカウント削除ページ専用CSS */
         body {
             background: #f5f5f5;
         }
