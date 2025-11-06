@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>新規ユーザー登録 - Sample Online Mall</title>
+    <title>新規ユーザー登録 </title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
     <style>
         body {
@@ -121,11 +121,6 @@
 <div class="register-container">
     <h1>新規ユーザー登録</h1>
 
-    <c:if test="${not empty errorMessage}">
-        <div class="error-message" role="alert">
-            <c:out value="${errorMessage}"/>
-        </div>
-    </c:if>
 
     <form action="${pageContext.request.contextPath}/UserRegisterServlet" method="post" id="userRegisterForm">
         <input type="hidden" name="csrfToken" value="${sessionScope.csrfToken}">
@@ -133,7 +128,7 @@
         <div class="form-group">
             <label for="name">氏名</label>
             <input type="text" id="name" name="name" required
-                   placeholder="山田 太郎"
+                   placeholder="名前を入力してください"
                    value="${param.name}">
         </div>
 
