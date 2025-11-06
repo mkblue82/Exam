@@ -177,7 +177,7 @@
 
         <button type="submit" class="btn-submit">申請する</button>
         <button type="button" class="btn-cancel"
-                onclick="location.href='${pageContext.request.contextPath}/login.jsp'">ログインに戻る</button>
+                onclick="location.href='${pageContext.request.contextPath}/login_store.jsp'">ログインに戻る</button>
     </form>
 </div>
 </body>
