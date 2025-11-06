@@ -137,7 +137,7 @@
 
         <c:if test="${not empty errorMessage}">
             <div class="error-message" role="alert">
-                <c:out value="${errorMessage}"/>
+
             </div>
         </c:if>
 
@@ -151,9 +151,9 @@
                        name="email"
                        required
                        autocomplete="email"
-                       placeholder="example@mail.com"
+                       placeholder=""
                        aria-required="true"
-                       value="<c:out value='${param.email}'/>">
+                       >
             </div>
 
             <div class="form-group">
@@ -173,7 +173,6 @@
                 新規登録
             </button>
         </form>
-
 
     </div>
 
