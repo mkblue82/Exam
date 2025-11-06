@@ -15,6 +15,6 @@ public class LoginAction extends Action{
 			session.invalidate();
 		}
 
-		req.getRequestDispatcher("jsp/logout_done.jsp").forward(req, res);
+		req.getRequestDispatcher("jsp/loginBean.jsp").forward(req, res);
 	}
 }
