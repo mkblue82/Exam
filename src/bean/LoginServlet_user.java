@@ -89,20 +89,20 @@ public class LoginServlet_user extends HttpServlet {
                 // ログイン失敗
                 request.setAttribute("errorMessage",
                     "メールアドレスまたはパスワードが正しくありません。");
-                request.getRequestDispatcher("/login.jsp").forward(request, response);
+                request.getRequestDispatcher("/login_user.jsp").forward(request, response);
             }
 
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
             request.setAttribute("errorMessage",
                 "データベースドライバが見つかりません。");
-            request.getRequestDispatcher("/login.jsp").forward(request, response);
+            request.getRequestDispatcher("/login_user.jsp").forward(request, response);
 
         } catch (SQLException e) {
             e.printStackTrace();
             request.setAttribute("errorMessage",
                 "データベース接続エラーが発生しました。");
-            request.getRequestDispatcher("/login.jsp").forward(request, response);
+            request.getRequestDispatcher("/login_user.jsp").forward(request, response);
 
         } finally {
             // リソースのクローズ
@@ -122,6 +122,6 @@ public class LoginServlet_user extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         // ログイン画面へフォワード
-        request.getRequestDispatcher("/login.jsp").forward(request, response);
+        request.getRequestDispatcher("/login_user.jsp").forward(request, response);
     }
 }
