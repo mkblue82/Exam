@@ -1,39 +1,35 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
 <head>
-    <title>新規ユーザー登録 - Sample Online Mall</title>
-    <link rel="stylesheet" href="css/style.css">
+    <meta charset="UTF-8">
+    <title>新規ユーザー登録</title>
 </head>
 <body>
-<div class="login-container">
-    <h1>新規ユーザー登録</h1>
+    <h2>新規ユーザー登録</h2>
 
-    <% if (request.getAttribute("errorMessage") != null) { %>
-        <div class="error-message">
-            <%= request.getAttribute("errorMessage") %>
-        </div>
-    <% } %>
+    <form action="StoreRegisterServlet" method="post" enctype="multipart/form-data">
+        <table>
+            <tr>
+                <td>氏名：</td>
+                <td><input type="text" name="name"></td>
+            </tr>
+            <tr>
+                <td>メールアドレス：</td>
+                <td><input type="email" name="email"></td>
+            </tr>
+            <tr>
+                <td>パスワード：</td>
+                <td><input type="password" name="password"></td>
+            </tr>
 
-    <form action="register" method="post" id="registerForm">
-        <div class="form-group">
-            <label for="name">氏名</label>
-            <input type="text" id="name" name="name" required placeholder="山田 太郎">
-        </div>
+        </table>
 
-        <div class="form-group">
-            <label for="email">メールアドレス</label>
-            <input type="email" id="email" name="email" required placeholder="example@mail.com">
-        </div>
-
-        <div class="form-group">
-            <label for="password">パスワード</label>
-            <input type="password" id="password" name="password" required minlength="8">
-        </div>
-
-        <button type="submit" class="btn-register">新規登録</button>
-        <button type="button" class="btn-login" onclick="location.href='login.jsp'">ログインに戻る</button>
+        <br>
+        <input type="submit" value="登録">
     </form>
-</div>
+
+    <br>
+    <a href="login.jsp">ログイン画面に戻る</a>
 </body>
 </html>
