@@ -98,7 +98,7 @@
 <!--/.main-contents-->
 
 <div class="sub-contents">
-  <p class="btn1"><a href="login.jsp">ログイン</a></p>
+  <p class="btn1"><a href="login_user.jsp">ログイン</a></p>
 
   <h3>カテゴリ</h3>
   <nav>
