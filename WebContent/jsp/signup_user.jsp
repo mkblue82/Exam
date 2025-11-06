@@ -152,7 +152,7 @@
 
         <button type="submit" class="btn-submit">新規登録</button>
         <button type="button" class="btn-cancel"
-                onclick="location.href='${pageContext.request.contextPath}/login.jsp'">ログインに戻る</button>
+                onclick="location.href='${pageContext.request.contextPath}/jsp/login_user.jsp'">ログインに戻る</button>
     </form>
 </div>
 </body>
