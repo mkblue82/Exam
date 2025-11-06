@@ -14,7 +14,7 @@
 <div id="container">
 
 <header>
-  <h1 id="logo"><a href="index.jsp"><img src="images/logo.png" alt="Food Loss Reduction System"></a></h1>
+  <h1 id="logo"><a href="index.jsp"><img src="images/logo.png" alt="タイトル"></a></h1>
   <div id="f-size">
     <p>文字サイズ</p>
     <ul>
@@ -29,10 +29,9 @@
   <nav>
     <ul>
       <li class="current"><a href="index.jsp">ホーム<span>Home</span></a></li>
-      <li><a href="foods.jsp">食べ物<span>Foods</span></a></li>
-      <li><a href="goods.jsp">雑貨<span>Goods</span></a></li>
-      <li><a href="open.jsp">出店募集<span>Open Shop</span></a></li>
-      <li><a href="faq.jsp">よくある質問<span>FAQ</span></a></li>
+      <li><a href="foods.jsp">マイページ<span>Foods</span></a></li>
+      <li><a href="goods.jsp">予約リスト<span>Goods</span></a></li>
+      <li><a href="open.jsp">通知設定<span>Open Shop</span></a></li>
     </ul>
   </nav>
 </div>
@@ -100,13 +99,7 @@
 <div class="sub-contents">
   <p class="btn1"><a href="login.jsp">ログイン</a></p>
 
-  <h3>カテゴリ</h3>
-  <nav>
-    <ul class="submenu">
-      <li><a href="foods.jsp">食べ物</a></li>
-      <li><a href="goods.jsp">雑貨</a></li>
-    </ul>
-  </nav>
+
 </div>
 
 </main>
