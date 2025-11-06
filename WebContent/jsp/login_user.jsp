@@ -174,9 +174,7 @@
             </button>
         </form>
 
-        <div class="additional-links">
-            <a href="${pageContext.request.contextPath}/forgot-password.jsp">パスワードをお忘れですか?</a>
-        </div>
+
     </div>
 
     <script src="${pageContext.request.contextPath}/js/validation.js"></script>
