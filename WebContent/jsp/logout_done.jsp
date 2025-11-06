@@ -76,7 +76,7 @@
         <h1>ログアウト完了</h1>
         <p class="logout-message">ログアウトしました。<br>また次回のご利用をお待ちしております。</p>
         <form method="GET" action="${pageContext.request.contextPath}/login">
-            <button type="submit" class="btn-login">ログイン画面へ</button>
+            <button type="submit" class="btn-login">TOP画面へ</button>
         </form>
     </div>
 </body>
