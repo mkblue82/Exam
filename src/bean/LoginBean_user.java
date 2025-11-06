@@ -6,7 +6,7 @@ import java.io.Serializable;
  * ログイン情報を保持するBeanクラス
  * ログインフォームからの入力値を受け取る用
  */
-public class LoginBenn_user implements Serializable {
+public class LoginBean_user implements Serializable {
     private static final long serialVersionUID = 1L;
 
     // フィールド
@@ -22,13 +22,13 @@ public class LoginBenn_user implements Serializable {
     /**
      * デフォルトコンストラクタ
      */
-    public LoginBenn_user() {
+    public LoginBean_user() {
     }
 
     /**
      * メールアドレスとパスワードを設定するコンストラクタ
      */
-    public LoginBenn_user(String email, String password) {
+    public LoginBean_user(String email, String password) {
         this.email = email;
         this.password = password;
     }
