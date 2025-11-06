@@ -44,7 +44,7 @@ public class LoginServlet_user extends HttpServlet {
         if (emailAddress == null || emailAddress.trim().isEmpty() ||
             password == null || password.trim().isEmpty()) {
             request.setAttribute("errorMessage", "メールアドレスとパスワードを入力してください。");
-            request.getRequestDispatcher("/login.jsp").forward(request, response);
+            request.getRequestDispatcher("/login_user.jsp").forward(request, response);
             return;
         }
 
