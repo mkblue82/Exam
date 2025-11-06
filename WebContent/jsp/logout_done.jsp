@@ -7,7 +7,6 @@
     <title>ログアウト完了 - Sample Online Mall</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
     <style>
-        /* ログアウト完了ページ専用CSS */
         body {
             background: #f5f5f5;
         }
@@ -28,6 +27,7 @@
             font-size: 2rem;
             border-bottom: 2px solid #c07148;
             padding-bottom: 1rem;
+            text-align: center;
         }
 
         .logout-message {
@@ -37,11 +37,7 @@
             line-height: 1.6;
         }
 
-        .success-icon {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-            color: #c07148;
-        }
+
 
         .btn-login {
             width: 100%;
@@ -72,16 +68,11 @@
             .logout-complete-container h1 {
                 font-size: 1.5rem;
             }
-
-            .success-icon {
-                font-size: 2.5rem;
-            }
         }
     </style>
 </head>
 <body>
     <div class="logout-complete-container">
-        <div class="success-icon">✓</div>
         <h1>ログアウト完了</h1>
         <p class="logout-message">ログアウトしました。<br>また次回のご利用をお待ちしております。</p>
         <form method="GET" action="${pageContext.request.contextPath}/login">
