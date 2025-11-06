@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>新規ユーザー登録 - Sample Online Mall</title>
+    <title>新規店舗申請 - Sample Online Mall</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
     <style>
         body {
@@ -13,7 +13,7 @@
         }
 
         .register-container {
-            max-width: 450px;
+            max-width: 500px;
             margin: 80px auto;
             padding: 2rem;
             background: #fff;
@@ -53,7 +53,9 @@
 
         .form-group input[type="text"],
         .form-group input[type="email"],
-        .form-group input[type="password"] {
+        .form-group input[type="tel"],
+        .form-group input[type="password"],
+        .form-group input[type="file"] {
             width: 100%;
             padding: 0.8rem;
             border: 1px solid #ccc;
@@ -119,7 +121,7 @@
 </head>
 <body>
 <div class="register-container">
-    <h1>新規ユーザー登録</h1>
+    <h1>新規店舗申請</h1>
 
     <c:if test="${not empty errorMessage}">
         <div class="error-message" role="alert">
@@ -127,21 +129,38 @@
         </div>
     </c:if>
 
-    <form action="${pageContext.request.contextPath}/UserRegisterServlet" method="post" id="userRegisterForm">
+    <!-- enctypeでファイルアップロードを許可 -->
+    <form action="${pageContext.request.contextPath}/StoreRegisterServlet"
+          method="post" enctype="multipart/form-data" id="storeRegisterForm">
+
         <input type="hidden" name="csrfToken" value="${sessionScope.csrfToken}">
 
         <div class="form-group">
-            <label for="name">氏名</label>
-            <input type="text" id="name" name="name" required
-                   placeholder="山田 太郎"
-                   value="${param.name}">
+            <label for="storeName">店舗名</label>
+            <input type="text" id="storeName" name="storeName" required
+                   placeholder="例：Sample Bakery"
+                   value="${param.storeName}">
         </div>
 
         <div class="form-group">
-            <label for="email">メールアドレス</label>
+            <label for="address">店舗住所</label>
+            <input type="text" id="address" name="address" required
+                   placeholder="例：東京都新宿区〇〇1-2-3"
+                   value="${param.address}">
+        </div>
+
+        <div class="form-group">
+            <label for="phone">店舗電話番号</label>
+            <input type="tel" id="phone" name="phone" required
+                   placeholder="例：03-1234-5678"
+                   value="${param.phone}">
+        </div>
+
+        <div class="form-group">
+            <label for="email">店舗メールアドレス</label>
             <input type="email" id="email" name="email" required
-                   placeholder="example@mail.com"
-                  value="${param.email}">
+                   placeholder="例：store@mail.com"
+                   value="${param.email}">
         </div>
 
         <div class="form-group">
@@ -150,9 +169,15 @@
                    placeholder="8文字以上で入力してください">
         </div>
 
-        <button type="submit" class="btn-submit">新規登録</button>
+        <div class="form-group">
+            <label for="permitFile">営業許可書（画像またはPDF）</label>
+            <input type="file" id="permitFile" name="permitFile"
+                   accept=".jpg,.jpeg,.png,.pdf" required>
+        </div>
+
+        <button type="submit" class="btn-submit">申請する</button>
         <button type="button" class="btn-cancel"
-                onclick="location.href='${pageContext.request.contextPath}/login.jsp'">ログインに戻る</button>
+                onclick="location.href='${pageContext.request.contextPath}/WebContent/jsp/login_store.jsp'">ログインに戻る</button>
     </form>
 </div>
 </body>
