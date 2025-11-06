@@ -41,15 +41,6 @@
 
 
 
-<section>
-  <h2>お知らせ</h2>
-  <dl class="new">
-    <c:forEach var="news" items="${newsList}">
-      <dt>${news.date}<span>${news.category}</span></dt>
-      <dd>${news.content}</dd>
-    </c:forEach>
-  </dl>
-</section>
 
 <section>
   <h2 class="ribon"><span>販売中の商品</span></h2>
