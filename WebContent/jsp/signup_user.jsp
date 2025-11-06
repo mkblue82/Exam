@@ -134,14 +134,14 @@
             <label for="name">氏名</label>
             <input type="text" id="name" name="name" required
                    placeholder="山田 太郎"
-                   value="<c:out value='${param.name}'/>">
+                   value="${param.name}">
         </div>
 
         <div class="form-group">
             <label for="email">メールアドレス</label>
             <input type="email" id="email" name="email" required
                    placeholder="example@mail.com"
-                   value="<c:out value='${param.email}'/>">
+                  value="${param.email}">
         </div>
 
         <div class="form-group">
