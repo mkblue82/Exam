@@ -2,6 +2,7 @@
 
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
 <meta charset="UTF-8">
 <title>フードロス削減システム</title>
@@ -14,7 +15,7 @@
 <div id="container">
 
 <header>
-  <h1 id="logo"><a href="index.jsp"><img src="images/logo.png" alt="タイトル"></a></h1>
+  <h1 id="logo"><a href="index.jsp"><alt="タイトル募集"></a></h1>
   <div id="f-size">
     <p>文字サイズ</p>
     <ul>
@@ -29,23 +30,29 @@
   <nav>
     <ul>
       <li class="current"><a href="index.jsp">ホーム<span>Home</span></a></li>
-      <li><a href="foods.jsp">マイページ<span>Foods</span></a></li>
-      <li><a href="goods.jsp">予約リスト<span>Goods</span></a></li>
-      <li><a href="open.jsp">通知設定<span>Open Shop</span></a></li>
+      <li><a href="foods.jsp">マイページ<span>MyPage</span></a></li>
+      <li><a href="goods.jsp">予約リスト<span>Reservation List</span></a></li>
+      <li><a href="open.jsp">通知設定<span>Notification Settings</span></a></li>
     </ul>
   </nav>
 </div>
 <!--/#menubar-->
 
-<!-- スライドショー -->
-<aside class="mainimg-slick">
-  <div><img src="images/1.jpg" alt=""></div>
-  <div><img src="images/2.jpg" alt=""></div>
-  <div><img src="images/3.jpg" alt=""></div>
-</aside>
+
+
 
 <section>
-  <h2 class="ribon"><span>今月のお買い得情報</span></h2>
+  <h2>お知らせ</h2>
+  <dl class="new">
+    <c:forEach var="news" items="${newsList}">
+      <dt>${news.date}<span>${news.category}</span></dt>
+      <dd>${news.content}</dd>
+    </c:forEach>
+  </dl>
+</section>
+
+<section>
+  <h2 class="ribon"><span>販売中の商品</span></h2>
 
   <div class="thumbnail-slide">
     <c:forEach var="product" items="${productList}">
@@ -61,7 +68,7 @@
 <div class="main-contents">
 
 <section>
-  <h2>今月の出店店舗</h2>
+  <h2>出店店舗</h2>
 
   <div class="list-grid1">
     <c:forEach var="shop" items="${shopList}">
@@ -83,24 +90,7 @@
   </div>
 </section>
 
-<section>
-  <h2>お知らせ</h2>
-  <dl class="new">
-    <c:forEach var="news" items="${newsList}">
-      <dt>${news.date}<span>${news.category}</span></dt>
-      <dd>${news.content}</dd>
-    </c:forEach>
-  </dl>
-</section>
 
-</div>
-<!--/.main-contents-->
-
-<div class="sub-contents">
-  <p class="btn1"><a href="login.jsp">ログイン</a></p>
-
-
-</div>
 
 </main>
 
@@ -112,12 +102,10 @@
 
 </div>
 <!--/#container-->
-
 <!-- JS -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
 <script src="../js/slick.js"></script>
 <script src="../js/main.js"></script>
-
 </body>
 </html>
