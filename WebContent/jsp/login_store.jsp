@@ -237,7 +237,7 @@
                 </button>
 
                 <!-- ④新規店舗申請ボタン -->
-                <button type="button" name="application" class="application-button" onclick="location.href='foodloss/jsp/signup_store.jsp'">
+                <button type="button" name="application" class="application-button" onclick="location.href='/jsp/signup_store.jsp'">
                     新規店舗申請
                     <span class="button-number">④</span>
                 </button>
