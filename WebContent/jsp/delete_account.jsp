@@ -25,6 +25,16 @@
             padding-bottom: 1rem;
         }
 
+        .error-message {
+            background: #ffebee;
+            color: #c62828;
+            padding: 1rem;
+            border-radius: 5px;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid #c62828;
+            font-size: 0.9rem;
+        }
+
         .form-group {
             margin-bottom: 1.5rem;
         }
@@ -100,7 +110,6 @@
     <!-- ヘッダー読み込み -->
     <jsp:include page="header.jsp" />
 
-    <!-- アカウント削除コンテンツ -->
     <main class="column">
         <div class="main-contents">
             <div class="delete-account-container">
@@ -117,7 +126,8 @@
                                required
                                minlength="8"
                                placeholder="パスワードを入力"
-                               aria-required="true">
+                               aria-required="true"
+                               value="${not empty password ? password : ''}">
                     </div>
 
                     <div class="button-group">
