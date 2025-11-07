@@ -1,43 +1,28 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>アカウント削除</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
     <style>
-        body {
-            background: #f5f5f5;
-        }
-
         .delete-account-container {
             max-width: 450px;
-            margin: 80px auto;
+            margin: 40px auto;
             padding: 2rem;
             background: #fff;
             border-radius: 10px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
 
         .delete-account-container h1 {
             color: #c07148;
             text-align: center;
             margin-bottom: 2rem;
-            font-size: 2rem;
+            font-size: 1.8rem;
             border-bottom: 2px solid #c07148;
             padding-bottom: 1rem;
-        }
-
-        .warning-message {
-            background: #fff3cd;
-            color: #856404;
-            padding: 1rem;
-            border-radius: 5px;
-            margin-bottom: 1.5rem;
-            border-left: 4px solid #ffc107;
-            font-size: 0.9rem;
-            line-height: 1.6;
         }
 
         .error-message {
@@ -118,46 +103,50 @@
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(108, 117, 125, 0.4);
         }
-
-        @media screen and (max-width: 600px) {
-            .delete-account-container {
-                margin: 40px 20px;
-                padding: 1.5rem;
-            }
-
-            .delete-account-container h1 {
-                font-size: 1.5rem;
-            }
-
-            .button-group {
-                flex-direction: column;
-            }
-        }
     </style>
 </head>
 <body>
-    <div class="delete-account-container">
-        <h1>アカウント削除</h1>
+<div id="container">
+    <!-- ヘッダー読み込み -->
+    <jsp:include page="header.jsp" />
 
-        <form method="POST" action="${pageContext.request.contextPath}/delete-account" id="deleteForm">
-            <input type="hidden" name="action" value="verify">
+    <main class="column">
+        <div class="main-contents">
+            <div class="delete-account-container">
+                <h1>アカウント削除</h1>
 
-            <div class="form-group">
-                <label for="password">パスワード</label>
-                <input type="password"
-                       id="password"
-                       name="password"
-                       required
-                       minlength="8"
-                       placeholder="パスワードを入力"
-                       aria-required="true">
+                <form method="POST" action="${pageContext.request.contextPath}/foodloss/DeleteAccount.action" id="deleteForm">
+                    <input type="hidden" name="action" value="verify">
+
+                    <div class="form-group">
+                        <label for="password">パスワード</label>
+                        <input type="password"
+                               id="password"
+                               name="password"
+                               required
+                               minlength="8"
+                               placeholder="パスワードを入力"
+                               aria-required="true"
+                               value="${not empty password ? password : ''}">
+                    </div>
+
+                    <div class="button-group">
+                        <button type="button" class="btn-cancel" onclick="location.href='${pageContext.request.contextPath}/foodloss/MyPage.action'">キャンセル</button>
+                        <button type="submit" class="btn-delete">次へ</button>
+                    </div>
+                </form>
             </div>
+        </div>
+    </main>
 
-            <div class="button-group">
-                <button type="button" class="btn-cancel" onclick="location.href='${pageContext.request.contextPath}/mypage'">キャンセル</button>
-                <button type="submit" class="btn-delete">次へ</button>
-            </div>
-        </form>
-    </div>
+    <!-- フッター読み込み -->
+    <jsp:include page="footer.jsp" />
+</div>
+
+<!-- JS -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
+<script src="../js/slick.js"></script>
+<script src="../js/main.js"></script>
 </body>
 </html>

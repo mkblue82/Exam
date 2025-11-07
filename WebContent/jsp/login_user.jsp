@@ -1,4 +1,6 @@
 	<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+
+
 	<!DOCTYPE html>
 	<html lang="ja">
 	<head>
@@ -8,18 +10,30 @@
 	    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
 	    <style>
 	        /* ログインページ専用CSS */
-	        body {
-	            background: #f5f5f5;
-	        }
+	                * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-	        .login-container {
-	            max-width: 450px;
-	            margin: 80px auto;
-	            padding: 2rem;
-	            background: #fff;
-	            border-radius: 10px;
-	            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-	        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .login-container {
+            max-width: 450px;
+            width: 90%;
+            padding: 2.5rem;
+            background: #fff;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
 
 	        .login-container h1 {
 	            color: #c07148;
@@ -135,11 +149,6 @@
 	    <div class="login-container">
 	        <h1>ログイン</h1>
 
-		<c:if test="${not empty errorMessage}">
-		    <div class="error-message" role="alert">
-		        ${errorMessage}
-		    </div>
-		</c:if>
 
 	        <form action="${pageContext.request.contextPath}/login" method="post" id="loginForm">
 	            <input type="hidden" name="csrfToken" value="${sessionScope.csrfToken}">
@@ -176,6 +185,18 @@
 
 	    </div>
 
-	    <script src="${pageContext.request.contextPath}/js/validation.js"></script>
+
 	</body>
 	</html>
+	 <jsp:include page="footer.jsp" />
+
+</div>
+
+<!-- JS -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
+<script src="../js/slick.js"></script>
+<script src="../js/main.js"></script>
+	    <script src="${pageContext.request.contextPath}/js/validation.js"></script>
+</body>
+</html>
