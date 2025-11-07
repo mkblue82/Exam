@@ -12,10 +12,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import dao.UserDAO;
+import dao.StoreDAO;
 
-@WebServlet("/signup_user")
-public class SignupAction_user extends HttpServlet {
+@WebServlet("/signup_store")
+public class SignupAction_store extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse res)
@@ -23,42 +23,37 @@ public class SignupAction_user extends HttpServlet {
 
         req.setCharacterEncoding("UTF-8");
 
-        // CSRFトークンチェック（例）
         HttpSession session = req.getSession();
         String token = req.getParameter("csrfToken");
         String sessionToken = (String) session.getAttribute("csrfToken");
         if (sessionToken == null || !sessionToken.equals(token)) {
             req.setAttribute("errorMessage", "不正なアクセスです。");
-            req.getRequestDispatcher("/jsp/signup_user.jsp").forward(req, res);
+            req.getRequestDispatcher("/jsp/signup_store.jsp").forward(req, res);
             return;
         }
 
-        // 入力値取得
-        String name = req.getParameter("name");
+        String storeName = req.getParameter("storeName");
         String email = req.getParameter("email");
         String phone = req.getParameter("phone");
         String password = hashPassword(req.getParameter("password"));
 
-        User user = new User();
-        user.setName(name);
-        user.setEmail(email);
-        user.setPhone(phone);
-        user.setPassword(password);
-        user.setFavoriteStore(null);
-        user.setStoreId(0);
-        user.setNotification(false);
+        Store store = new Store();
+        store.setStoreName(storeName);
+        store.setEmail(email);
+        store.setPhone(phone);
+        store.setPassword(password);
 
         try (Connection conn = DBManager.getConnection()) {
-            UserDAO dao = new UserDAO(conn);
-            dao.insert(user);
+            StoreDAO dao = new StoreDAO(conn);
+            dao.insert(store);
 
             session.removeAttribute("csrfToken");
-            req.getRequestDispatcher("/jsp/signupsuccess_user.jsp").forward(req, res);
+            req.getRequestDispatcher("/jsp/signupsuccess_store.jsp").forward(req, res);
 
         } catch (SQLException e) {
             e.printStackTrace();
             req.setAttribute("errorMessage", "システムエラーが発生しました。");
-            req.getRequestDispatcher("/jsp/signup_user.jsp").forward(req, res);
+            req.getRequestDispatcher("/jsp/signup_store.jsp").forward(req, res);
         }
     }
 

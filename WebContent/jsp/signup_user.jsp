@@ -118,37 +118,43 @@
     </style>
 </head>
 <body>
-<div class="register-container">
-    <h1>新規ユーザー登録</h1>
+
+	 <jsp:include page="header.jsp" />
+
+	<div class="register-container">
+	    <h1>新規ユーザー登録</h1>
 
 
-    <form action="${pageContext.request.contextPath}/UserRegisterServlet" method="post" id="userRegisterForm">
-        <input type="hidden" name="csrfToken" value="${sessionScope.csrfToken}">
+	    <form action="${pageContext.request.contextPath}/UserRegisterServlet" method="post" id="userRegisterForm">
+	        <input type="hidden" name="csrfToken" value="${sessionScope.csrfToken}">
 
-        <div class="form-group">
-            <label for="name">氏名</label>
-            <input type="text" id="name" name="name" required
-                   placeholder="名前を入力してください"
-                   value="${param.name}">
-        </div>
+	        <div class="form-group">
+	            <label for="name">氏名</label>
+	            <input type="text" id="name" name="name" required
+	                   placeholder="名前を入力してください"
+	                   value="${param.name}">
+	        </div>
 
-        <div class="form-group">
-            <label for="email">メールアドレス</label>
-            <input type="email" id="email" name="email" required
-                   placeholder="example@mail.com"
-                  value="${param.email}">
-        </div>
+	        <div class="form-group">
+	            <label for="email">メールアドレス</label>
+	            <input type="email" id="email" name="email" required
+	                   placeholder="example@mail.com"
+	                  value="${param.email}">
+	        </div>
 
-        <div class="form-group">
-            <label for="password">パスワード</label>
-            <input type="password" id="password" name="password" required minlength="8"
-                   placeholder="8文字以上で入力してください">
-        </div>
+	        <div class="form-group">
+	            <label for="password">パスワード</label>
+	            <input type="password" id="password" name="password" required minlength="8"
+	                   placeholder="8文字以上で入力してください">
+	        </div>
 
-        <button type="submit" class="btn-submit">新規登録</button>
-        <button type="button" class="btn-cancel"
-                onclick="location.href='${pageContext.request.contextPath}/jsp/login_user.jsp'">ログインに戻る</button>
-    </form>
-</div>
+	        <button type="submit" class="btn-submit">新規登録</button>
+	        <button type="button" class="btn-cancel"
+	                onclick="location.href='${pageContext.request.contextPath}/jsp/login_user.jsp'">ログインに戻る</button>
+	    </form>
+	</div>
+	 <jsp:include page="footer.jsp" />
+
+
 </body>
 </html>
