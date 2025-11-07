@@ -1139,6 +1139,52 @@ ul.slick-dots li.slick-active button {
 }
 
 
+/* 検索フォーム */
+#search-form {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: 2rem; /* タイトルとの余白 */
+}
+
+#search-form input[type="text"] {
+  padding: 8px 14px;
+  border: 1px solid #ccc;
+  border-radius: 30px;
+  width: 280px; /* ← 広く変更！ */
+  font-size: 1rem;
+  transition: all 0.3s;
+}
+
+/* 入力中のフォーカス効果 */
+#search-form input[type="text"]:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 5px rgba(192, 113, 72, 0.4);
+}
+
+/* 検索ボタン */
+#search-form button {
+  background: var(--primary-color);
+  color: var(--primary-inverse-color);
+  border: none;
+  border-radius: 50%;
+  padding: 8px 10px;
+  cursor: pointer;
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#search-form button:hover {
+  filter: brightness(1.1);
+}
+
+
+
+
 /*その他
 ---------------------------------------------------------------------------*/
 .clearfix::after {content: "";display: block;clear: both;}
@@ -1164,4 +1210,3 @@ ul.slick-dots li.slick-active button {
 	.pc {display: block;}
 
 	}/*追加指定ここまで*/
-}
