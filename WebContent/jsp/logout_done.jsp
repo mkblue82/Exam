@@ -71,6 +71,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="logout-complete-container">
         <h1>ログアウト完了</h1>
@@ -79,5 +80,8 @@
             <button type="submit" class="btn-login">TOP画面へ</button>
         </form>
     </div>
+
+    <jsp:include page="footer.jsp" />
+
 </body>
 </html>
