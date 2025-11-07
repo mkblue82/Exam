@@ -1,5 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
+
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -124,10 +125,11 @@
 	    <h1>新規店舗申請</h1>
 
 	    <c:if test="${not empty errorMessage}">
-	        <div class="error-message" role="alert">
-	            <c:out value="${errorMessage}"/>
-	        </div>
-	    </c:if>
+    		<div class="error-message" role="alert">
+        		<c:out value="${errorMessage}" />
+		    </div>
+		</c:if>
+
 
 	    <!-- enctypeでファイルアップロードを許可 -->
 	    <form action="${pageContext.request.contextPath}/StoreRegisterServlet"
