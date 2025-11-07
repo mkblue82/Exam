@@ -1,150 +1,146 @@
 package foodloss;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.PasswordAuthentication;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
+import java.util.Properties;
 
-import javax.activation.DataHandler;
+import javax.mail.Multipart;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import javax.servlet.http.Part;
 
 import com.sun.xml.internal.messaging.saaj.packaging.mime.internet.MimeBodyPart;
 import com.sun.xml.internal.messaging.saaj.packaging.mime.internet.MimeMultipart;
 
-import dao.StoreDAO;
+import bean.Store;
 import sun.rmi.transport.Transport;
-
-@WebServlet("/store/register")
-@MultipartConfig
+@WebServlet("/signup_store")
+@MultipartConfig(maxFileSize = 10 * 1024 * 1024) // 最大10MB
 public class SignupAction_store extends HttpServlet {
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+    protected void doPost(HttpServletRequest req, HttpServletResponse res)
             throws ServletException, IOException {
 
-        request.setCharacterEncoding("UTF-8");
+        req.setCharacterEncoding("UTF-8");
 
-        // フォームからの入力を取得
-        String storeName = request.getParameter("storeName");
-        String address = request.getParameter("address");
-        String phone = request.getParameter("phone");
-        String email = request.getParameter("email");
-        String password = request.getParameter("password");
-        Part licensePart = request.getPart("license");
-
-        // 未入力チェック
-        if (storeName == null || storeName.isEmpty() ||
-            address == null || address.isEmpty() ||
-            phone == null || phone.isEmpty() ||
-            email == null || email.isEmpty() ||
-            password == null || password.isEmpty()) {
-
-            request.setAttribute("error", "未入力の項目があります。");
-            request.getRequestDispatcher("/store/register.jsp").forward(request, response);
+        HttpSession session = req.getSession();
+        String token = req.getParameter("csrfToken");
+        String sessionToken = (String) session.getAttribute("csrfToken");
+        if (sessionToken == null || !sessionToken.equals(token)) {
+            req.setAttribute("errorMessage", "不正なアクセスです。");
+            req.getRequestDispatcher("/jsp/signup_store.jsp").forward(req, res);
             return;
         }
 
-        // 電話番号バリデーション
+        // 入力値取得
+        String storeName = req.getParameter("storeName");
+        String address = req.getParameter("address");
+        String phone = req.getParameter("phone");
+        String email = req.getParameter("email");
+        String password = req.getParameter("password");
+        Part licensePart = req.getPart("license");
+
+        // 入力チェック
+        if (storeName.isEmpty() || address.isEmpty() || phone.isEmpty() ||
+            email.isEmpty() || password.isEmpty() || licensePart == null) {
+            req.setAttribute("errorMessage", "未入力の項目があります。");
+            req.getRequestDispatcher("/jsp/signup_store.jsp").forward(req, res);
+            return;
+        }
+
         if (!phone.matches("\\d+")) {
-            request.setAttribute("error", "電話番号は数字のみで入力してください。");
-            request.getRequestDispatcher("/store/register.jsp").forward(request, response);
+            req.setAttribute("errorMessage", "電話番号には数字のみを入力してください。");
+            req.getRequestDispatcher("/jsp/signup_store.jsp").forward(req, res);
             return;
         }
 
-        // Storeオブジェクト作成
+        // Store オブジェクト作成（DB保存はしない）
         Store store = new Store();
         store.setStoreName(storeName);
         store.setAddress(address);
         store.setPhone(phone);
         store.setEmail(email);
-        store.setPassword(password);
 
-        try {
-            // DB登録
-            StoreDAO dao = new StoreDAO(DBConnection.getConnection());
-            dao.insert(store);
-
-            // --- メール送信処理 ---
-            sendMailToAdmin(store, licensePart);
-
-            // 完了画面へ
-            request.getRequestDispatcher("/store/register_complete.jsp").forward(request, response);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            request.setAttribute("error", "登録中にエラーが発生しました。");
-            request.getRequestDispatcher("/store/register.jsp").forward(request, response);
+        // 一時フォルダに営業許可証を保存
+        String tempDir = System.getProperty("java.io.tmpdir");
+        String fileName = licensePart.getSubmittedFileName();
+        File tempFile = new File(tempDir, fileName);
+        try (InputStream is = licensePart.getInputStream()) {
+            Files.copy(is, tempFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
         }
+
+        // メール送信（運営側へ）
+        sendMailWithAttachment(store, password, tempFile);
+
+        // 一時ファイル削除
+        tempFile.delete();
+
+        session.removeAttribute("csrfToken");
+        req.getRequestDispatcher("/jsp/signupsuccess_store.jsp").forward(req, res);
     }
 
-    /**
-     * 運営に新規店舗申請メールを送信
-     */
-    private void sendMailToAdmin(Store store, Part licensePart) {
-        final String from = "noreply@example.com";  // システム送信用アドレス
-        final String to = "admin@example.com";      // 運営側のメールアドレス
-        final String host = "smtp.gmail.com";       // SMTPサーバー
-        final String username = "yourmail@gmail.com"; // 送信元メール(Gmailなら)
-        final String password = "アプリパスワードをここに"; // Gmailアプリパスワード
+    // メール送信（運営側へ）
+    private void sendMailWithAttachment(Store store, String password, File attachment) {
+        final String from = "noreply@foodloss.com";
+        final String to = "mklblue82@gmail.com"; // 運営側メール
+        final String host = "smtp.example.com"; // SMTPサーバ
+        final String username = "noreply@foodloss.com";
+        final String pass = "yourpassword";
 
         Properties props = new Properties();
         props.put("mail.smtp.host", host);
-        props.put("mail.smtp.port", "587");
         props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.starttls.enable", "true");
+        props.put("mail.smtp.port", "587");
 
         Session session = Session.getInstance(props, new javax.mail.Authenticator() {
             protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication(username, password);
+                return new PasswordAuthentication(username, pass);
             }
         });
 
         try {
             MimeMessage message = new MimeMessage(session);
-            message.setFrom(new InternetAddress(from, "FoodLoss運営"));
+            message.setFrom(new InternetAddress(from, "FoodLoss System"));
             message.addRecipient(Message.RecipientType.TO, new InternetAddress(to));
-            message.setSubject("【新規店舗申請】" + store.getStoreName() + " 様より申請がありました");
+            message.setSubject("【新規店舗申請】" + store.getStoreName() + " 様からの申請");
 
-            // メール本文
-            String text = String.format(
-                "以下の内容で新規店舗申請がありました。\n\n" +
-                "店舗名：%s\n住所：%s\n電話番号：%s\nメール：%s\n\n営業許可証を添付しています。",
-                store.getStoreName(),
-                store.getAddress(),
-                store.getPhone(),
-                store.getEmail()
+            // 本文
+            String body = String.format(
+                "新しい店舗申請がありました。\n\n" +
+                "【店舗名】%s\n【住所】%s\n【電話番号】%s\n【メールアドレス】%s\n【パスワード】%s\n",
+                store.getStoreName(), store.getAddress(), store.getPhone(), store.getEmail(), password
             );
 
-            // 添付付きメール構築
             MimeBodyPart textPart = new MimeBodyPart();
-            textPart.setText(text, "UTF-8");
+            textPart.setText(body, "UTF-8");
+
+            MimeBodyPart attachPart = new MimeBodyPart();
+            attachPart.attachFile(attachment);
 
             Multipart multipart = new MimeMultipart();
             multipart.addBodyPart(textPart);
-
-            // 添付ファイルを追加
-            if (licensePart != null && licensePart.getSize() > 0) {
-                MimeBodyPart attachmentPart = new MimeBodyPart();
-                try (InputStream is = licensePart.getInputStream()) {
-                    attachmentPart.setFileName(licensePart.getSubmittedFileName());
-                    attachmentPart.setDataHandler(new DataHandler(
-                        new ByteArrayDataSource(is, licensePart.getContentType())));
-                }
-                multipart.addBodyPart(attachmentPart);
-            }
+            multipart.addBodyPart(attachPart);
 
             message.setContent(multipart);
 
             Transport.send(message);
-            System.out.println("運営宛に新規店舗申請メールを送信しました。");
 
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.println("メール送信に失敗しました。");
+            throw new RuntimeException("メール送信に失敗しました: " + e.getMessage());
         }
     }
 }
