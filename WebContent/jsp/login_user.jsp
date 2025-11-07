@@ -1,4 +1,6 @@
 	<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+	
+	
 	<!DOCTYPE html>
 	<html lang="ja">
 	<head>
@@ -14,9 +16,15 @@
             box-sizing: border-box;
         }
 
-	        body {
-	            background: #f5f5f5;
-	        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
 
         .login-container {
             max-width: 450px;
@@ -141,11 +149,6 @@
 	    <div class="login-container">
 	        <h1>ログイン</h1>
 
-		<c:if test="${not empty errorMessage}">
-		    <div class="error-message" role="alert">
-		        ${errorMessage}
-		    </div>
-		</c:if>
 
 	        <form action="${pageContext.request.contextPath}/login" method="post" id="loginForm">
 	            <input type="hidden" name="csrfToken" value="${sessionScope.csrfToken}">
