@@ -1,5 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
+
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -120,65 +121,67 @@
     </style>
 </head>
 <body>
-<div class="register-container">
-    <h1>新規店舗申請</h1>
+	<div class="register-container">
+	    <h1>新規店舗申請</h1>
 
-    <c:if test="${not empty errorMessage}">
-        <div class="error-message" role="alert">
-            <c:out value="${errorMessage}"/>
-        </div>
-    </c:if>
+	    <c:if test="${not empty errorMessage}">
+    		<div class="error-message" role="alert">
+        		<c:out value="${errorMessage}" />
+		    </div>
+		</c:if>
 
-    <!-- enctypeでファイルアップロードを許可 -->
-    <form action="${pageContext.request.contextPath}/StoreRegisterServlet"
-          method="post" enctype="multipart/form-data" id="storeRegisterForm">
 
-        <input type="hidden" name="csrfToken" value="${sessionScope.csrfToken}">
+	    <!-- enctypeでファイルアップロードを許可 -->
+	    <form action="${pageContext.request.contextPath}/StoreRegisterServlet"
+	          method="post" enctype="multipart/form-data" id="storeRegisterForm">
 
-        <div class="form-group">
-            <label for="storeName">店舗名</label>
-            <input type="text" id="storeName" name="storeName" required
-                   placeholder="例：Sample Bakery"
-                   value="${param.storeName}">
-        </div>
+	        <input type="hidden" name="csrfToken" value="${sessionScope.csrfToken}">
 
-        <div class="form-group">
-            <label for="address">店舗住所</label>
-            <input type="text" id="address" name="address" required
-                   placeholder="例：東京都新宿区〇〇1-2-3"
-                   value="${param.address}">
-        </div>
+	        <div class="form-group">
+	            <label for="storeName">店舗名</label>
+	            <input type="text" id="storeName" name="storeName" required
+	                   placeholder="例：Sample Bakery"
+	                   value="${param.storeName}">
+	        </div>
 
-        <div class="form-group">
-            <label for="phone">店舗電話番号</label>
-            <input type="tel" id="phone" name="phone" required
-                   placeholder="例：03-1234-5678"
-                   value="${param.phone}">
-        </div>
+	        <div class="form-group">
+	            <label for="address">店舗住所</label>
+	            <input type="text" id="address" name="address" required
+	                   placeholder="例：東京都新宿区〇〇1-2-3"
+	                   value="${param.address}">
+	        </div>
 
-        <div class="form-group">
-            <label for="email">店舗メールアドレス</label>
-            <input type="email" id="email" name="email" required
-                   placeholder="例：store@mail.com"
-                   value="${param.email}">
-        </div>
+	        <div class="form-group">
+	            <label for="phone">店舗電話番号</label>
+	            <input type="tel" id="phone" name="phone" required
+	                   placeholder="例：03-1234-5678"
+	                   value="${param.phone}">
+	        </div>
 
-        <div class="form-group">
-            <label for="password">パスワード</label>
-            <input type="password" id="password" name="password" required minlength="8"
-                   placeholder="8文字以上で入力してください">
-        </div>
+	        <div class="form-group">
+	            <label for="email">店舗メールアドレス</label>
+	            <input type="email" id="email" name="email" required
+	                   placeholder="例：store@mail.com"
+	                   value="${param.email}">
+	        </div>
 
-        <div class="form-group">
-            <label for="permitFile">営業許可書（画像またはPDF）</label>
-            <input type="file" id="permitFile" name="permitFile"
-                   accept=".jpg,.jpeg,.png,.pdf" required>
-        </div>
+	        <div class="form-group">
+	            <label for="password">パスワード</label>
+	            <input type="password" id="password" name="password" required minlength="8"
+	                   placeholder="8文字以上で入力してください">
+	        </div>
 
-        <button type="submit" class="btn-submit">申請する</button>
-        <button type="button" class="btn-cancel"
-                onclick="location.href='${pageContext.request.contextPath}/jsp/login_store.jsp'">ログインに戻る</button>
-    </form>
-</div>
+	        <div class="form-group">
+	            <label for="permitFile">営業許可書（画像またはPDF）</label>
+	            <input type="file" id="permitFile" name="permitFile"
+	                   accept=".jpg,.jpeg,.png,.pdf" required>
+	        </div>
+
+	        <button type="submit" class="btn-submit">申請する</button>
+	        <button type="button" class="btn-cancel"
+	                onclick="location.href='${pageContext.request.contextPath}/jsp/login_store.jsp'">ログインに戻る</button>
+	    </form>
+	</div>
+	 <jsp:include page="footer.jsp" />
 </body>
 </html>
