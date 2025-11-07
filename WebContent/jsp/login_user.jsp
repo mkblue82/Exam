@@ -185,7 +185,7 @@
 
 	    </div>
 
-	    <script src="${pageContext.request.contextPath}/js/validation.js"></script>
+
 	</body>
 	</html>
 	 <jsp:include page="footer.jsp" />
@@ -197,6 +197,6 @@
 <script src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
 <script src="../js/slick.js"></script>
 <script src="../js/main.js"></script>
-
+	    <script src="${pageContext.request.contextPath}/js/validation.js"></script>
 </body>
 </html>
