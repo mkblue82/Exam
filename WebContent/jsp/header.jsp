@@ -15,6 +15,7 @@
 <div id="menubar">
   <nav>
     <ul>
+      <li class="current"><a href="${pageContext.request.contextPath}/jsp/main.jsp">ホーム<span>Home</span></a></li>
       <li><a href="${pageContext.request.contextPath}/jsp/mypage.jsp">マイページ<span>MyPage</span></a></li>
       <li><a href="${pageContext.request.contextPath}/jsp/booking_list.jsp">予約リスト<span>Reservation List</span></a></li>
       <li><a href="${pageContext.request.contextPath}/jsp/open.jsp">通知設定<span>Notification Settings</span></a></li>
