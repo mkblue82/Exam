@@ -77,9 +77,7 @@ header, footer {
 
 <body>
 
-<header>
-  <h1>ログイン選択</h1>
-</header>
+
 
 <main>
   <div class="login-box">

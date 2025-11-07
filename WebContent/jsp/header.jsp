@@ -22,11 +22,19 @@
 <div id="menubar">
   <nav>
     <ul>
-      <li class="current"><a href="${pageContext.request.contextPath}/jsp/main.jsp">ホーム<span>Home</span></a></li>
-      <li><a href="${pageContext.request.contextPath}/jsp/foods.jsp">マイページ<span>MyPage</span></a></li>
-      <li><a href="${pageContext.request.contextPath}/jsp/goods.jsp">予約リスト<span>Reservation List</span></a></li>
-      <li><a href="${pageContext.request.contextPath}/jsp/open.jsp">通知設定<span>Notification Settings</span></a></li>
+      <li class="current">
+        <a href="${pageContext.request.contextPath}/jsp/main.jsp">ホーム<span>Home</span></a>
+      </li>
+      <li>
+        <a href="${pageContext.request.contextPath}/jsp/foods.jsp">マイページ<span>MyPage</span></a>
+      </li>
+      <li>
+        <a href="${pageContext.request.contextPath}/jsp/goods.jsp">予約リスト<span>Reservation List</span></a>
+      </li>
+      <li>
+        <a href="${pageContext.request.contextPath}/jsp/open.jsp">通知設定<span>Notification Settings</span></a>
+      </li>
     </ul>
   </nav>
 </div>
-<!--/#menubar-->
+
