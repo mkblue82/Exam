@@ -3,6 +3,7 @@ package foodloss;
 import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.sql.Connection;
 import java.sql.SQLException;
 
 import javax.servlet.ServletException;
@@ -12,7 +13,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import bean.User;
 import dao.UserDAO;
+import tool.DBManager;
 
 @WebServlet("/signup_user")
 public class SignupAction_user extends HttpServlet {
