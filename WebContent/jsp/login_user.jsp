@@ -8,6 +8,11 @@
 	    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
 	    <style>
 	        /* ログインページ専用CSS */
+	                * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
 	        body {
 	            background: #f5f5f5;
