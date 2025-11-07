@@ -149,7 +149,10 @@
 	    <div class="login-container">
 	        <h1>ログイン</h1>
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> branch 'master' of https://github.com/mkblue82/Exam.git
 	        <form action="${pageContext.request.contextPath}/login" method="post" id="loginForm">
 	            <input type="hidden" name="csrfToken" value="${sessionScope.csrfToken}">
 

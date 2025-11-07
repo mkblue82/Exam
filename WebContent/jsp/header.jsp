@@ -9,13 +9,6 @@
     <button type="submit"><i class="fa fa-search"></i></button>
   </form>
 
-  <div id="f-size">
-    <p>文字サイズ</p>
-    <ul>
-      <li id="f-small"></li>
-      <li id="f-large"></li>
-    </ul>
-  </div>
 </header>
 
 <!-- メニューバー -->
@@ -23,8 +16,8 @@
   <nav>
     <ul>
       <li class="current"><a href="${pageContext.request.contextPath}/jsp/main.jsp">ホーム<span>Home</span></a></li>
-      <li><a href="${pageContext.request.contextPath}/jsp/foods.jsp">マイページ<span>MyPage</span></a></li>
-      <li><a href="${pageContext.request.contextPath}/jsp/goods.jsp">予約リスト<span>Reservation List</span></a></li>
+      <li><a href="${pageContext.request.contextPath}/jsp/mypage.jsp">マイページ<span>MyPage</span></a></li>
+      <li><a href="${pageContext.request.contextPath}/jsp/booking_list.jsp">予約リスト<span>Reservation List</span></a></li>
       <li><a href="${pageContext.request.contextPath}/jsp/open.jsp">通知設定<span>Notification Settings</span></a></li>
     </ul>
   </nav>
