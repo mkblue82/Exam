@@ -190,7 +190,7 @@ a.ddmenu {cursor: default;}
 }
 /*２つ目のメニューのアイコン*/
 #menubar > nav > ul > li:nth-of-type(2) > a::before {
-	content: "\f2e7";	/*使いたいアイコン名をここで指定。Font Awesomeに記載されています。詳しくは当テンプレートのマニュアルを読んで下さい。*/
+	content: "\f007";	/*使いたいアイコン名をここで指定。Font Awesomeに記載されています。詳しくは当テンプレートのマニュアルを読んで下さい。*/
 }
 /*３つ目のメニューのアイコン*/
 #menubar > nav > ul > li:nth-of-type(3) > a::before {
