@@ -83,38 +83,28 @@
 </section>
 
 
-<<<<<<< HEAD
-=======
 </div>
 <!--/.main-contents-->
 
-<div class="sub-contents">
-  <p class="btn1"><a href="login_user.jsp">ログイン</a></p>
 
-  <h3>カテゴリ</h3>
-  <nav>
-    <ul class="submenu">
-      <li><a href="foods.jsp">食べ物</a></li>
-      <li><a href="goods.jsp">雑貨</a></li>
-    </ul>
-  </nav>
 </div>
->>>>>>> branch 'master' of https://github.com/mkblue82/Exam.git
 
 </main>
 
-<footer>
-  <div id="copyright">
-    <small>Copyright &copy; フードロス削減システム All Rights Reserved.</small>
-  </div>
+<footer> <div id="copyright">
+<small>Copyright &copy; フードロス削減システム All Rights Reserved.</small>
+</div>
 </footer>
-
 </div>
 <!--/#container-->
-<!-- JS -->
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
-<script src="../js/slick.js"></script>
-<script src="../js/main.js"></script>
+
+ <!-- JS --> <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js">
+</script>
+ <script src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js">
+</script>
+ <script src="../js/slick.js">
+</script>
+<script src="../js/main.js">
+</script>
 </body>
 </html>
