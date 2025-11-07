@@ -38,6 +38,24 @@
 </div>
 <!--/#menubar-->
 
+<section>
+
+  <!-- 🔍 検索フォーム -->
+  <form action="${pageContext.request.contextPath}/SearchProductServlet" method="get" class="search-form">
+    <input type="text" name="keyword" placeholder="商品名を検索" value="${param.keyword}">
+    <button type="submit">検索</button>
+  </form>
+
+  <!-- 検索結果 -->
+  <div class="thumbnail-slide">
+    <c:forEach var="product" items="${productList}">
+      <a href="item.jsp?id=${product.id}">
+        <img src="../images/${product.image}" alt="${product.name}">
+      </a>
+      <p>${product.name}</p>
+    </c:forEach>
+  </div>
+</section>
 
 
 <section>
