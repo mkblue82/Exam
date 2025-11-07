@@ -108,7 +108,7 @@
                     <input type="hidden" name="action" value="execute">
 
                     <div class="button-group">
-                        <button type="button" class="btn-cancel" onclick="history.back()">キャンセル</button>
+                        <button type="button" class="btn-cancel" onclick="location.href='${pageContext.request.contextPath}/foodloss/DeleteAccount.action'">キャンセル</button>
                         <button type="submit" class="btn-confirm-delete">削除する</button>
                     </div>
                 </form>
@@ -120,10 +120,11 @@
     <jsp:include page="footer.jsp" />
 </div>
 
+
+</body>
 <!-- JS -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
 <script src="../js/slick.js"></script>
 <script src="../js/main.js"></script>
-</body>
 </html>
