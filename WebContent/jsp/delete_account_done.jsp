@@ -77,5 +77,8 @@
             <button type="submit" class="btn-login">TOP画面へ</button>
         </form>
     </div>
+
+    <jsp:include page="footer.jsp" />
+
 </body>
 </html>

@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>アカウント削除確認 - Sample Online Mall</title>
+    <title>アカウント削除確認</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
     <style>
         /* アカウント削除確認ページ専用CSS */
@@ -137,5 +137,8 @@
             </div>
         </form>
     </div>
+
+    <jsp:include page="footer.jsp" />
+
 </body>
 </html>

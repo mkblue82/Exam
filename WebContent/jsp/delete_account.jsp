@@ -136,7 +136,9 @@
     </style>
 </head>
 <body>
+
     <div class="delete-account-container">
+
         <h1>アカウント削除</h1>
 
         <form method="POST" action="${pageContext.request.contextPath}/delete-account" id="deleteForm">
