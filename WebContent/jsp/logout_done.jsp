@@ -72,10 +72,6 @@
     </style>
 </head>
 <body>
-
-<!-- ヘッダー読み込み -->
-  <jsp:include page="header.jsp" />
-
     <div class="logout-complete-container">
         <h1>ログアウト完了</h1>
         <p class="logout-message">ログアウトしました。<br>また次回のご利用をお待ちしております。</p>
