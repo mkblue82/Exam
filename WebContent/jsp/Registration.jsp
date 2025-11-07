@@ -19,15 +19,13 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
             background: #f5f5f5;
             min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             padding: 20px;
         }
 
         .register-wrapper {
             width: 100%;
             max-width: 500px;
+            margin: 3rem auto;
         }
 
         .register-container {
@@ -275,7 +273,6 @@
         </div>
     </div>
 
-    <jsp:include page="footer.jsp" />
 
     <script>
         // 画像プレビュー機能
@@ -333,4 +330,3 @@
 	<script src="${pageContext.request.contextPath}/js/validation.js"></script>
 </body>
 </html>
->
