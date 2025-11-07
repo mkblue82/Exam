@@ -89,7 +89,7 @@
 <div class="button-group">
   <a href="${pageContext.request.contextPath}/jsp/delete_account.jsp">アカウント削除</a>
   <a href="${pageContext.request.contextPath}/jsp/edit_info.jsp">情報変更</a>
-  <a href="${pageContext.request.contextPath}/jsp/logout.jsp">ログアウト</a>
+  <a href="${pageContext.request.contextPath}/jsp/logout_done.jsp">ログアウト</a>
 </div>
 
 
