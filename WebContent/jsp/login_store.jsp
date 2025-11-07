@@ -1,6 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
-
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -20,72 +19,52 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
             background: #f5f5f5;
             min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             padding: 20px;
         }
 
-
+        .login-wrapper {
+            width: 100%;
+            max-width: 440px;
+            margin: 3rem auto;
+        }
 
         .login-container {
             background: #fff;
-            border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
             padding: 3rem 2.5rem;
-            animation: fadeIn 0.5s ease;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
         }
 
         .login-header {
             text-align: center;
-            margin-bottom: 2.5rem;
-        }
-
-        .store-badge {
-            display: inline-block;
-            background: #c77c4a;
-            color: #fff;
-            padding: 0.5rem 1.5rem;
-            border-radius: 50px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            margin-bottom: 1.5rem;
-            letter-spacing: 0.5px;
+            margin-bottom: 2rem;
         }
 
         .login-header h1 {
             color: #c77c4a;
-            font-size: 1.8rem;
+            font-size: 2rem;
             font-weight: 700;
-            margin: 0;
-            padding-bottom: 1rem;
-            border-bottom: 3px solid #c77c4a;
+            margin: 0 0 1rem 0;
+        }
+
+        .login-header::after {
+            content: '';
+            display: block;
+            width: 70%;
+            height: 3px;
+            background: #c77c4a;
+            margin: 0 auto;
         }
 
         .error-message {
             background: #ffebee;
             color: #c62828;
-            padding: 1rem 1.2rem;
-            border-radius: 12px;
+            padding: 1rem;
+            border-radius: 4px;
             margin-bottom: 1.5rem;
             border-left: 4px solid #c62828;
             font-size: 0.9rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
             word-wrap: break-word;
-            word-break: break-word;
         }
 
         .form-group {
@@ -94,32 +73,26 @@
 
         .form-group label {
             display: block;
-            margin-bottom: 0.6rem;
+            margin-bottom: 0.5rem;
             font-weight: 600;
-            color: #444;
-            font-size: 0.95rem;
+            color: #333;
+            font-size: 1rem;
         }
 
         .form-group input[type="text"],
         .form-group input[type="password"] {
             width: 100%;
-            padding: 1rem;
-            border: 2px solid #e0e0e0;
-            border-radius: 12px;
+            padding: 0.8rem;
+            border: 2px solid #ddd;
+            border-radius: 4px;
             font-size: 1rem;
-            transition: all 0.3s ease;
-            background: #fafafa;
+            transition: border-color 0.3s ease;
+            background: #fff;
         }
 
         .form-group input:focus {
             outline: none;
             border-color: #c77c4a;
-            background: #fff;
-            box-shadow: 0 0 0 4px rgba(199, 124, 74, 0.1);
-        }
-
-        .form-group input::placeholder {
-            color: #999;
         }
 
         .btn-login,
@@ -127,28 +100,21 @@
             width: 100%;
             padding: 1rem;
             border: none;
-            border-radius: 12px;
+            border-radius: 4px;
             font-size: 1rem;
             cursor: pointer;
             transition: all 0.3s ease;
             font-weight: 600;
-            margin-bottom: 0.8rem;
+            margin-bottom: 1rem;
         }
 
         .btn-login {
             background: #c77c4a;
             color: #fff;
-            box-shadow: 0 2px 8px rgba(199, 124, 74, 0.3);
         }
 
         .btn-login:hover {
             background: #b56c3a;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(199, 124, 74, 0.4);
-        }
-
-        .btn-login:active {
-            transform: translateY(0);
         }
 
         .btn-register {
@@ -164,35 +130,19 @@
 
         .user-login-link {
             text-align: center;
-            margin-top: 2rem;
+            margin-top: 1.5rem;
             padding-top: 1.5rem;
-            border-top: 1px solid #e0e0e0;
+            border-top: 1px solid #ddd;
         }
 
         .user-login-link a {
             color: #666;
             text-decoration: none;
             font-size: 0.9rem;
-            transition: color 0.3s ease;
         }
 
         .user-login-link a:hover {
             color: #c77c4a;
-        }
-
-        @media screen and (max-width: 600px) {
-            .login-container {
-                padding: 2rem 1.5rem;
-            }
-
-            .login-header h1 {
-                font-size: 1.5rem;
-            }
-
-            .btn-login,
-            .btn-register {
-                padding: 0.9rem;
-            }
         }
     </style>
 </head>
@@ -200,7 +150,6 @@
     <div class="login-wrapper">
         <div class="login-container">
             <div class="login-header">
-                <span class="store-badge">店舗管理者</span>
                 <h1>店舗ログイン</h1>
             </div>
 
@@ -214,7 +163,6 @@
                            id="storeId"
                            name="storeId"
                            required
-                           placeholder="店舗IDを入力"
                            aria-required="true"
                            value="${storeId}">
                 </div>
@@ -226,7 +174,6 @@
                            name="password"
                            required
                            minlength="8"
-                           placeholder="パスワードを入力"
                            autocomplete="current-password"
                            aria-required="true">
                 </div>
@@ -234,7 +181,7 @@
                 <button type="submit" class="btn-login">ログイン</button>
                 <button type="button" class="btn-register"
                         onclick="location.href='${pageContext.request.contextPath}/jsp/signup_store.jsp'">
-                    新規店舗登録
+                    新規登録
                 </button>
             </form>
 
@@ -244,19 +191,13 @@
         </div>
     </div>
 
+    <jsp:include page="footer.jsp" />
 
-</body>
-</html>
-	 <jsp:include page="footer.jsp" />
-
-</div>
-
-<!-- JS -->
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
-<script src="../js/slick.js"></script>
-<script src="../js/main.js"></script>
-<script src="${pageContext.request.contextPath}/js/validation.js"></script>
-
+    <!-- JS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
+    <script src="../js/slick.js"></script>
+    <script src="../js/main.js"></script>
+    <script src="${pageContext.request.contextPath}/js/validation.js"></script>
 </body>
 </html>
