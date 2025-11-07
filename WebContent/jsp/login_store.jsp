@@ -86,11 +86,8 @@
             display: flex;
             align-items: center;
             gap: 0.5rem;
-        }
-
-        .error-message::before {
-            content: "⚠";
-            font-size: 1.2rem;
+            word-wrap: break-word;
+            word-break: break-word;
         }
 
         .form-group {
