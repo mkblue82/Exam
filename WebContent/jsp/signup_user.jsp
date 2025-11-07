@@ -119,8 +119,6 @@
 </head>
 <body>
 
-	 <jsp:include page="header.jsp" />
-
 	<div class="register-container">
 	    <h1>新規ユーザー登録</h1>
 
