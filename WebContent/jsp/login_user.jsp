@@ -135,12 +135,6 @@
 	    <div class="login-container">
 	        <h1>ログイン</h1>
 
-		<c:if test="${not empty errorMessage}">
-		    <div class="error-message" role="alert">
-		        ${errorMessage}
-		    </div>
-		</c:if>
-
 	        <form action="${pageContext.request.contextPath}/login" method="post" id="loginForm">
 	            <input type="hidden" name="csrfToken" value="${sessionScope.csrfToken}">
 

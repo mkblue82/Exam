@@ -124,12 +124,6 @@
 	<div class="register-container">
 	    <h1>新規店舗申請</h1>
 
-	    <c:if test="${not empty errorMessage}">
-    		<div class="error-message" role="alert">
-        		<c:out value="${errorMessage}" />
-		    </div>
-		</c:if>
-
 
 	    <!-- enctypeでファイルアップロードを許可 -->
 	    <form action="${pageContext.request.contextPath}/StoreRegisterServlet"
