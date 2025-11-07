@@ -1,5 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
+
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -206,11 +207,6 @@
                 <h1>店舗ログイン</h1>
             </div>
 
-            <c:if test="${not empty errorMessage}">
-                <div class="error-message" role="alert">
-                    ${errorMessage}
-                </div>
-            </c:if>
 
             <form action="${pageContext.request.contextPath}/login_store" method="post" id="loginForm">
                 <input type="hidden" name="csrfToken" value="${sessionScope.csrfToken}">
