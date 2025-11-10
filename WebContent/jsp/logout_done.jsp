@@ -15,6 +15,7 @@
             border-radius: 10px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
             text-align: center;
+            margin-top: 150px;
         }
 
         .logout-complete-container h1 {
@@ -63,13 +64,13 @@
                 <h1>ログアウト完了</h1>
                 <p class="logout-message">ログアウトしました。<br>また次回のご利用をお待ちしております。</p>
                 <form method="GET" action="${pageContext.request.contextPath}/login">
-                    <button type="submit" class="btn-login">TOP画面へ</button>
+                    <button type="submit" class="btn-login">ログイン画面へ</button>
                 </form>
             </div>
         </div>
     </main>
 
-    <!-- フッター読み込み -->
+    <!-- フッター -->
     <jsp:include page="footer.jsp" />
 </div>
 

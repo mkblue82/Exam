@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>マイページ - フードロス削減システム</title>
+    <title>マイページ</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
     <style>
         .main-content {
@@ -60,10 +60,10 @@
 </head>
 <body>
 <div id="container">
-    <!-- ✅ 共通ヘッダー -->
+    <!-- ヘッダー -->
     <jsp:include page="header.jsp" />
 
-    <!-- ✅ メインエリア -->
+    <!-- メインエリア -->
     <main class="column">
         <div class="main-contents">
             <div class="main-content">
@@ -72,15 +72,15 @@
                     <p>${user.point} P</p>
                 </div>
                 <div class="button-group">
-                    <a href="${pageContext.request.contextPath}/foodloss/DeleteAccount.action">アカウント削除</a>
-                    <a href="${pageContext.request.contextPath}/jsp/edit_info_user.jsp">情報変更</a>
+                    <a href="${pageContext.request.contextPath}/jsp/edit_info.jsp">情報変更</a>
                     <a href="${pageContext.request.contextPath}/foodloss/Logout.action">ログアウト</a>
+                    <a href="${pageContext.request.contextPath}/foodloss/DeleteAccount.action">アカウント削除</a>
                 </div>
             </div>
         </div>
     </main>
 
-    <!-- ✅ 共通フッター -->
+    <!-- フッター -->
     <jsp:include page="footer.jsp" />
 </div>
 

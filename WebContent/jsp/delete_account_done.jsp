@@ -4,10 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>ログアウト完了</title>
+    <title>アカウント削除完了</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
     <style>
-        .logout-complete-container {
+        .delete-account-complete-container {
             max-width: 450px;
             margin: 40px auto;
             padding: 2rem;
@@ -18,7 +18,7 @@
             margin-top: 150px;
         }
 
-        .logout-complete-container h1 {
+        .delete-account-complete-container h1 {
             color: #c07148;
             margin-bottom: 1.5rem;
             font-size: 1.8rem;
@@ -27,7 +27,7 @@
             text-align: center;
         }
 
-        .logout-message {
+        .complete-message {
             color: #555;
             font-size: 1rem;
             margin-bottom: 2rem;
@@ -57,14 +57,15 @@
 </head>
 <body>
 <div id="container">
-    <!-- ログアウト完了コンテンツ -->
+
+    <!-- アカウント削除完了コンテンツ -->
     <main class="column">
         <div class="main-contents">
-            <div class="logout-complete-container">
-                <h1>ログアウト完了</h1>
-                <p class="logout-message">ログアウトしました。<br>また次回のご利用をお待ちしております。</p>
-                <form method="GET" action="${pageContext.request.contextPath}/login">
-                    <button type="submit" class="btn-login">ログイン画面へ</button>
+            <div class="delete-account-complete-container">
+                <h1>削除完了</h1>
+                <p class="complete-message">アカウント削除が完了しました。<br>ご利用ありがとうございました。</p>
+                <form method="GET" action="${pageContext.request.contextPath}/foodloss/Index.action">
+                    <button type="submit" class="btn-login">TOP画面へ</button>
                 </form>
             </div>
         </div>
@@ -77,7 +78,7 @@
 <!-- JS -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
-<script src="${pageContext.request.contextPath}/js/slick.js"></script>
-<script src="${pageContext.request.contextPath}/js/main.js"></script>
+<script src="../js/slick.js"></script>
+<script src="../js/main.js"></script>
 </body>
 </html>
