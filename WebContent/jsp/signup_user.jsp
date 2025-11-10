@@ -123,7 +123,7 @@
 	    <h1>新規ユーザー登録</h1>
 
 
-	    <form action="${pageContext.request.contextPath}/singupUser" method="post" id="userRegisterForm">
+	    <form action="${pageContext.request.contextPath}/signupUser" method="post" id="userRegisterForm">
 	        <input type="hidden" name="csrfToken" value="${sessionScope.csrfToken}">
 
 	        <div class="form-group">
