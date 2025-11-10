@@ -53,6 +53,7 @@
 
         .form-group input[type="text"],
         .form-group input[type="email"],
+        .form-group input[type="tel"],
         .form-group input[type="password"] {
             width: 100%;
             padding: 0.8rem;
@@ -141,14 +142,12 @@
 	        </div>
 
 			<div class="form-group">
-                <label for="phone">電話番号</label>
-                <input type="tel" id="phone" name="phone" required
-                       placeholder="09012345678"
-                       pattern="[0-9]{10,11}"
-                       value="${param.phone}">
-
-            </div>
-
+	            <label for="phone">電話番号</label>
+	            <input type="tel" id="phone" name="phone" required
+	                  placeholder="09012345678"
+         			  pattern="[0-9]{10,11}"
+	                  value="${param.phone}">
+	        </div>
 
 
 	        <div class="form-group">
