@@ -69,7 +69,7 @@ public class LoginAction extends Action {
             } else {
                 // ログイン失敗
                 req.setAttribute("error", "メールアドレスまたはパスワードが正しくありません");
-                req.getRequestDispatcher("jsp/login.jsp").forward(req, res);
+                req.getRequestDispatcher("jsp/login_user.jsp").forward(req, res);
             }
         }
     }
