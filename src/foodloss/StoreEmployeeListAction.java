@@ -11,9 +11,9 @@ import tool.Action;
 
 public class StoreEmployeeListAction extends Action {
     @Override
-    public String execute(HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public void execute(HttpServletRequest request, HttpServletResponse response) throws Exception {
         EmployeeDAO dao = new EmployeeDAO();
-        List<Employee> list = dao.findAll();
+        List<Employee> list = dao.selectAll();
         request.setAttribute("employeeList", list);
         return "/jsp/employee_list.jsp";
     }

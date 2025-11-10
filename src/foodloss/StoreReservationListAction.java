@@ -11,9 +11,9 @@ import tool.Action;
 
 public class StoreReservationListAction extends Action {
     @Override
-    public String execute(HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public void execute(HttpServletRequest request, HttpServletResponse response) throws Exception {
         BookingDAO dao = new BookingDAO();
-        List<Booking> list = dao.findAll();
+        List<Booking> list = dao.selectAll();
         request.setAttribute("reservationList", list);
         return "/jsp/reservation_list.jsp";
     }
