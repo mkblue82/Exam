@@ -190,7 +190,7 @@ a.ddmenu {cursor: default;}
 }
 /*２つ目のメニューのアイコン*/
 #menubar > nav > ul > li:nth-of-type(2) > a::before {
-	content: "\f2e7";	/*使いたいアイコン名をここで指定。Font Awesomeに記載されています。詳しくは当テンプレートのマニュアルを読んで下さい。*/
+	content: "\f007";	/*使いたいアイコン名をここで指定。Font Awesomeに記載されています。詳しくは当テンプレートのマニュアルを読んで下さい。*/
 }
 /*３つ目のメニューのアイコン*/
 #menubar > nav > ul > li:nth-of-type(3) > a::before {
@@ -499,29 +499,29 @@ main p {
 		justify-content: space-between;	/*並びかたの種類の指定*/
 		gap: 2rem;						/*main-contentsとsub-contentsの間のマージン的な隙間*/
 	}
-	
+
 	/*main-contentsブロック*/
 	.main-contents {
 		margin-bottom: 0;
 		order: 2;		/*並び順。数字の小さい順番に表示されます。*/
 		flex: 1;
 	}
-	
+
 	/*sub-contentsブロック共通*/
 	.sub-contents {
 		width: 230px;	/*幅*/
 	}
-	
+
 	/*1つ目のsub-contents*/
 	.sub-contents:nth-child(2) {
 		order: 1;	/*並び順。数字の小さい順番に表示されます。*/
 	}
-	
+
 	/*2つ目のsub-contents*/
 	.sub-contents:nth-child(3) {
 		order: 3;	/*並び順。数字の小さい順番に表示されます。３番目という意味なので一番右側に表示されます。*/
 	}
-	
+
 	}/*追加指定ここまで*/
 
 
@@ -962,14 +962,14 @@ ul.icons li {
 	.step .list {
 		display: flex;	/*テキストブロックと画像を横並びにする*/
 	}
-	
+
 	/*ボックス内のfigure画像*/
 	.step figure {
 		width: 25%;			/*幅*/
 		margin-left: 2vw;	/*左に空けるスペース。文字との間の隙間です。100vwが画面幅100%のことです。*/
 		align-self: center;	/*画像はボックスの天地中央に配置。この行を削除すれば上に寄ります。*/
 	}
-	
+
 	/*textブロック*/
 	.step .text {
 		flex: 1;
@@ -1040,7 +1040,7 @@ ul.slick-dots li button {
 	height: 12px;			/*ボタンの高さ*/
 	border-radius: 50%;		/*丸くする指定*/
 	cursor: pointer;		/*クリックで画像へジャンプするので、わかりやすいようhover時にpointerになるように。*/
-	background: #ccc;		/*背景色。白。*/	
+	background: #ccc;		/*背景色。白。*/
 }
 
 /*buttonのアクティブ時（現在表示されている画像を示すボタン）*/
@@ -1137,6 +1137,52 @@ ul.slick-dots li.slick-active button {
 .color-check {
 	background: linear-gradient(transparent 70%, yellow 70%);
 }
+
+
+/* 検索フォーム */
+#search-form {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: 2rem; /* タイトルとの余白 */
+}
+
+#search-form input[type="text"] {
+  padding: 8px 14px;
+  border: 1px solid #ccc;
+  border-radius: 30px;
+  width: 280px; /* ← 広く変更！ */
+  font-size: 1rem;
+  transition: all 0.3s;
+}
+
+/* 入力中のフォーカス効果 */
+#search-form input[type="text"]:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 5px rgba(192, 113, 72, 0.4);
+}
+
+/* 検索ボタン */
+#search-form button {
+  background: var(--primary-color);
+  color: var(--primary-inverse-color);
+  border: none;
+  border-radius: 50%;
+  padding: 8px 10px;
+  cursor: pointer;
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#search-form button:hover {
+  filter: brightness(1.1);
+}
+
+
 
 
 /*その他
