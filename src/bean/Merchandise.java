@@ -4,12 +4,12 @@ import java.sql.Date;
 import java.sql.Timestamp;
 
 public class Merchandise implements java.io.Serializable {
-    private int productId;
+    private int merchandiseId;
     private int stock;
     private int price;
     private Date useByDate;
-    private String productTag;
-    private String productName;
+    private String merchandiseTag;
+    private String merchandiseName;
     private int employeeId;
     private Timestamp registrationTime;
     private int storeId;
@@ -20,15 +20,15 @@ public class Merchandise implements java.io.Serializable {
         ;
     }
 
-    public Merchandise(int productId, int stock, int price, Date useByDate,
-            String productTag, String productName, int employeeId, Timestamp registrationTime,
+    public Merchandise(int merchandiseId, int stock, int price, Date useByDate,
+            String merchandiseTag, String merchandiseName, int employeeId, Timestamp registrationTime,
             int storeId, boolean bookingStatus){
-        this.productId = productId;
+        this.merchandiseId = merchandiseId;
         this.stock = stock;
         this.price = price;
         this.useByDate = useByDate;
-        this.productTag = productTag;
-        this.productName = productName;
+        this.merchandiseTag = merchandiseTag;
+        this.merchandiseName = merchandiseName;
         this.employeeId = employeeId;
         this.registrationTime = registrationTime;
         this.storeId = storeId;
@@ -37,10 +37,11 @@ public class Merchandise implements java.io.Serializable {
 
     // 商品IDのゲッター・セッター
     public int getProductId(){
-        return productId;
+        return merchandiseId;
     }
-    public void setProductId(int productId){
-        this.productId = productId;
+    public void setMerchandiseId(int merchandiseId){
+
+        this.merchandiseId = merchandiseId;
     }
 
     // 在庫数のゲッター・セッター
@@ -68,19 +69,19 @@ public class Merchandise implements java.io.Serializable {
     }
 
     // タグのゲッター・セッター
-    public String getProductTag(){
-        return productTag;
+    public String getMerchandiseTag(){
+        return merchandiseTag;
     }
-    public void setProductTag(String productTag){
-        this.productTag = productTag;
+    public void setMerchandiseTag(String merchandiseTag){
+        this.merchandiseTag = merchandiseTag;
     }
 
     // 商品名のゲッター・セッター
-    public String getProductName(){
-        return productName;
+    public String getMerchandiseName(){
+        return merchandiseName;
     }
-    public void setProductName(String productName){
-        this.productName = productName;
+    public void setMerchandiseName(String merchandiseName){
+        this.merchandiseName = merchandiseName;
     }
 
     // 社員番号のゲッター・セッター
