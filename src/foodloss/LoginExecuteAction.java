@@ -1,4 +1,4 @@
-package action;
+package foodloss;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -34,7 +34,7 @@ public class LoginExecuteAction extends Action {
                 return "/jsp/main.jsp";
 
             } else {
-                // ❌ ログイン失敗
+                //  ログイン失敗
                 request.setAttribute("error", "メールアドレスまたはパスワードが違います。");
                 return "/jsp/login_user.jsp";
             }
