@@ -8,9 +8,9 @@ public class test1 {
 
 
         // PostgreSQL接続情報
-        String url = "jdbc:postgresql://localhost:5432/postgres";
-        String user = "postgres";  // PostgreSQLのユーザー名
-        String password = "20060318";  // PostgreSQLのパスワード
+        String url = "jdbc:postgresql://ep-rapid-surf-a100ysmf-pooler.ap-southeast-1.aws.neon.tech:5432/neondb";
+        String user = "neondb_owner";  // PostgreSQLのユーザー名
+        String password = "npg_fpWk07TEejNO";  // PostgreSQLのパスワード
         try {
             // PostgreSQLドライバのロード
             Class.forName("org.postgresql.Driver");
