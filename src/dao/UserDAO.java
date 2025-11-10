@@ -20,7 +20,7 @@ public class UserDAO {
     // ユーザー登録
     public void insert(User user) throws SQLException {
         String sql = "INSERT INTO T004_user (氏名, メールアドレス, 電話番号, パスワード, お気に入り店舗, 店舗ID, 通知ON_OFF) "
-                   + "VALUES (?, ?, ?, ?, ?, ?, ?)";
+                   + "VALUES (?, ?, ?, ?, ?, ?, ?)RETURNING ユーザー_ID";
         try (PreparedStatement pstmt = con.prepareStatement(sql)) {
             pstmt.setString(1, user.getName());
             pstmt.setString(2, user.getEmail());
@@ -29,7 +29,14 @@ public class UserDAO {
             pstmt.setString(5, user.getFavoriteStore());
             pstmt.setInt(6, user.getStoreId());
             pstmt.setBoolean(7, user.isNotification());
-            pstmt.executeUpdate();
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()){
+                    user.setUserId(rs.getInt(1));
+            	}
+
+            }
+
         }
     }
 
@@ -59,7 +66,7 @@ public class UserDAO {
     public User findById(int id) throws SQLException {
         String sql = "SELECT * FROM T004_user WHERE ユーザー_ID = ?";
         try (PreparedStatement pstmt = con.prepareStatement(sql)) {
-            pstmt.setInt(1, id);
+        	pstmt.setInt(1, id);
             ResultSet rs = pstmt.executeQuery();
             if (rs.next()) {
                 User user = new User();
