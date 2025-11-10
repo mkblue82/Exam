@@ -114,7 +114,7 @@ public class ProductRegisterAction extends HttpServlet {
                     request.getRequestDispatcher("/jsp/product_register.jsp").forward(request, response);
                     return;
                 }
-            } catch (NumberFormatException | IllegalArgumentException e) {
+            } catch (IllegalArgumentException e) {
                 request.setAttribute("errorMessage", "入力形式が正しくありません。");
                 request.getRequestDispatcher("/jsp/product_register.jsp").forward(request, response);
                 return;
