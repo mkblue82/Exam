@@ -1,4 +1,4 @@
-package foodloss;
+package action;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -18,25 +18,41 @@ public class LoginExecuteAction extends Action {
         String email = request.getParameter("email");
         String password = request.getParameter("password");
 
-        try (Connection con = getConnection()) {
+        Connection con = null;
+        try {
+            // DB接続（既存の getConnection() を利用）
+            con = getConnection();
             UserDAO dao = new UserDAO(con);
+
+            // ユーザー認証
             User user = dao.findByEmailAndPassword(email, password);
 
             if (user != null) {
+                // ログイン成功
                 HttpSession session = request.getSession();
                 session.setAttribute("user", user);
+
+                // ✅ メインメニューにリダイレクト
                 response.sendRedirect(request.getContextPath() + "/jsp/main.jsp");
+
             } else {
-                request.setAttribute("error", "メールアドレスまたはパスワードが違います。");
-                request.getRequestDispatcher("/jsp/login.jsp").forward(request, response);
+                // ログイン失敗
+                request.setAttribute("errors", java.util.Arrays.asList("メールアドレスまたはパスワードが違います。"));
+                try {
+                    request.getRequestDispatcher("/jsp/login.jsp").forward(request, response);
+                } catch (Exception ex) { ex.printStackTrace(); }
             }
 
         } catch (Exception e) {
             e.printStackTrace();
-            request.setAttribute("error", "サーバーエラーが発生しました。");
+            request.setAttribute("errors", java.util.Arrays.asList("サーバーエラーが発生しました。"));
             try {
                 request.getRequestDispatcher("/jsp/login.jsp").forward(request, response);
             } catch (Exception ex) { ex.printStackTrace(); }
+
+        } finally {
+            // DB接続クローズ
+            if (con != null) try { con.close(); } catch (Exception ignore) {}
         }
     }
 }

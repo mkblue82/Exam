@@ -1,5 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -39,7 +39,8 @@ body { font-family:Arial,sans-serif; background:#f5f5f5; min-height:100vh; paddi
             <div class="error-message">${error}</div>
         </c:if>
 
-        <form action="${pageContext.request.contextPath}/LoginExecute" method="post">
+        <form action="${pageContext.request.contextPath}/LoginExecute.action" method="post">
+
             <div class="form-group">
                 <label for="email">メールアドレス</label>
                 <input type="email" id="email" name="email" value="${param.email != null ? param.email : ''}" required>
