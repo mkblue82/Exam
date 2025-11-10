@@ -11,7 +11,7 @@ import tool.Action;
 import bean.User;
 import dao.ConnectionManager;
 
-@WebServlet("/login_user")
+@WebServlet("/login")
 public class LoginAction extends Action {
 
     public void execute(HttpServletRequest req, HttpServletResponse res) throws Exception {
