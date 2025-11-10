@@ -109,4 +109,28 @@ public class UserDAO {
             pstmt.executeUpdate();
         }
     }
+
+ // メールアドレスとパスワードで検索（ログイン認証用）
+    public User findByEmailAndPassword(String email, String password) throws SQLException {
+        String sql = "SELECT * FROM T004_user WHERE メールアドレス=? AND パスワード=?";
+        try (PreparedStatement pstmt = con.prepareStatement(sql)) {
+            pstmt.setString(1, email);
+            pstmt.setString(2, password);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                User user = new User();
+                user.setUserId(rs.getInt("ユーザー_ID"));
+                user.setName(rs.getString("氏名"));
+                user.setEmail(rs.getString("メールアドレス"));
+                user.setPhone(rs.getString("電話番号"));
+                user.setPassword(rs.getString("パスワード"));
+                user.setFavoriteStore(rs.getString("お気に入り店舗"));
+                user.setStoreId(rs.getInt("店舗ID"));
+                user.setNotification(rs.getBoolean("通知ON_OFF"));
+                return user;
+            }
+        }
+        return null;
+    }
+
 }

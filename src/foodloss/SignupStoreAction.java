@@ -13,12 +13,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import bean.User;
-import dao.UserDAO;
-import tool.DBManager;
+import bean.Store;
+import dao.StoreDAO;
 
-@WebServlet("/signup_user")
-public class SignupAction_user extends HttpServlet {
+@WebServlet("/signup_store")
+public class SignupStoreAction extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse res)
@@ -26,49 +25,40 @@ public class SignupAction_user extends HttpServlet {
 
         req.setCharacterEncoding("UTF-8");
 
-        // --- CSRFトークンチェック ---
         HttpSession session = req.getSession();
         String token = req.getParameter("csrfToken");
         String sessionToken = (String) session.getAttribute("csrfToken");
         if (sessionToken == null || !sessionToken.equals(token)) {
             req.setAttribute("errorMessage", "不正なアクセスです。");
-            req.getRequestDispatcher("/jsp/signup_user.jsp").forward(req, res);
+            req.getRequestDispatcher("/jsp/signup_store.jsp").forward(req, res);
             return;
         }
 
-        // --- 入力値取得 ---
-        String name = req.getParameter("name");
+        String storeName = req.getParameter("storeName");
         String email = req.getParameter("email");
         String phone = req.getParameter("phone");
         String password = hashPassword(req.getParameter("password"));
 
-        // --- Userオブジェクト作成 ---
-        User user = new User();
-        user.setName(name);
-        user.setEmail(email);
-        user.setPhone(phone);
-        user.setPassword(password);
-        user.setFavoriteStore(null);
-        user.setStoreId(0);
-        user.setNotification(false);
+        Store store = new Store();
+        store.setStoreName(storeName);
+        store.setEmail(email);
+        store.setPhone(phone);
+        store.setPassword(password);
 
-        // --- DB登録 ---
         try (Connection conn = DBManager.getConnection()) {
-            UserDAO dao = new UserDAO(conn);
-            dao.insert(user); // SERIAL IDに対応、挿入後 userId がセットされる
+            StoreDAO dao = new StoreDAO(conn);
+            dao.insert(store);
 
-            // 成功時：CSRFトークンを削除して完了ページへ
             session.removeAttribute("csrfToken");
-            req.getRequestDispatcher("/jsp/signupsuccess_user.jsp").forward(req, res);
+            req.getRequestDispatcher("/jsp/signupsuccess_store.jsp").forward(req, res);
 
         } catch (SQLException e) {
             e.printStackTrace();
             req.setAttribute("errorMessage", "システムエラーが発生しました。");
-            req.getRequestDispatcher("/jsp/signup_user.jsp").forward(req, res);
+            req.getRequestDispatcher("/jsp/signup_store.jsp").forward(req, res);
         }
     }
 
-    // --- パスワードハッシュ化 ---
     private String hashPassword(String password) {
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-256");
