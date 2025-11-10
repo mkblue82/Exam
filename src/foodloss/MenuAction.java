@@ -10,6 +10,6 @@ public class MenuAction extends Action {
 	@Override
 	public void execute(HttpServletRequest req, HttpServletResponse res) throws Exception {
 
-		req.getRequestDispatcher("/jsp/main.jsp").forward(req, res);
+		req.getRequestDispatcher("/jsp/mypage.jsp").forward(req, res);
 	}
 }

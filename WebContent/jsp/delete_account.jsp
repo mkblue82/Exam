@@ -131,7 +131,7 @@
                     </div>
 
                     <div class="button-group">
-                        <button type="button" class="btn-cancel" onclick="location.href='${pageContext.request.contextPath}/foodloss/MyPage.action'">キャンセル</button>
+                        <button type="button" class="btn-cancel" onclick="location.href='${pageContext.request.contextPath}/foodloss/Menu.action'">キャンセル</button>
                         <button type="submit" class="btn-delete">次へ</button>
                     </div>
                 </form>
