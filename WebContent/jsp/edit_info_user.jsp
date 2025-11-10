@@ -4,9 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>マイページ - フードロス削減システム</title>
+    <title>情報変更 - フードロス削減システム</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
+
     <style>
+        /* ======= 情報変更ページ専用 ======= */
         .main-content {
             max-width: 600px;
             margin: 40px auto;
@@ -16,19 +18,35 @@
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
 
-        .point-section h2 {
-            font-size: 1.6rem;
+        .edit-section h2 {
+            font-size: 1.8rem;
             color: #333;
-            margin-bottom: 10px;
             text-align: center;
+            margin-bottom: 30px;
         }
 
-        .point-section p {
-            font-size: 2.4rem;
+        form label {
+            display: block;
             font-weight: bold;
-            color: #c07148;
-            margin-bottom: 60px;
-            text-align: center;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        form input[type="text"],
+        form input[type="email"],
+        form input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+
+        form input:focus {
+            border-color: #c07148;
+            outline: none;
         }
 
         .button-group {
@@ -36,9 +54,10 @@
             justify-content: center;
             gap: 40px;
             flex-wrap: wrap;
-            margin-top: 40px;
+            margin-top: 30px;
         }
 
+        .button-group button,
         .button-group a {
             display: block;
             width: 220px;
@@ -49,9 +68,12 @@
             text-decoration: none;
             color: #333;
             font-weight: bold;
+            border: none;
+            cursor: pointer;
             transition: background 0.3s;
         }
 
+        .button-group button:hover,
         .button-group a:hover {
             background-color: #c07148;
             color: #fff;
@@ -60,6 +82,7 @@
 </head>
 <body>
 <div id="container">
+
     <!-- ✅ 共通ヘッダー -->
     <jsp:include page="header.jsp" />
 
@@ -67,14 +90,24 @@
     <main class="column">
         <div class="main-contents">
             <div class="main-content">
-                <div class="point-section">
-                    <h2>所有ポイント</h2>
-                    <p>${user.point} P</p>
-                </div>
-                <div class="button-group">
-                    <a href="${pageContext.request.contextPath}/foodloss/DeleteAccount.action">アカウント削除</a>
-                    <a href="${pageContext.request.contextPath}/jsp/edit_info_user.jsp">情報変更</a>
-                    <a href="${pageContext.request.contextPath}/foodloss/Logout.action">ログアウト</a>
+                <div class="edit-section">
+                    <h2>登録情報の変更</h2>
+
+                    <form action="${pageContext.request.contextPath}/foodloss/EditInfo.action" method="post">
+                        <label for="username">ユーザー名</label>
+                        <input type="text" id="username" name="username" value="${user.name}" required>
+
+                        <label for="email">メールアドレス</label>
+                        <input type="email" id="email" name="email" value="${user.email}" required>
+
+                        <label for="password">新しいパスワード</label>
+                        <input type="password" id="password" name="password" placeholder="変更しない場合は空欄">
+
+                        <div class="button-group">
+                            <button type="submit">変更を保存</button>
+                            <a href="${pageContext.request.contextPath}/jsp/foods.jsp">戻る</a>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
