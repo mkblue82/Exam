@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>商品登録 - Sample Online Mall</title>
+    <title>商品登録</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
     <style>
         /* リセット */
@@ -198,18 +198,6 @@
                 <h1>商品登録</h1>
             </div>
 
-            <c:if test="${not empty errorMessage}">
-                <div class="error-message" role="alert">
-                    ${errorMessage}
-                </div>
-            </c:if>
-
-            <c:if test="${not empty successMessage}">
-                <div class="success-message" role="alert">
-                    ${successMessage}
-                </div>
-            </c:if>
-
 
 
             <form action="${pageContext.request.contextPath}/product_register"
@@ -278,6 +266,8 @@
             </form>
         </div>
     </div>
+
+    <jsp:include page="/jsp/footer.jsp" />
 
 
     <script>
