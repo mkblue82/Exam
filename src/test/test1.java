@@ -8,9 +8,15 @@ public class test1 {
 
 
         // PostgreSQL接続情報
+<<<<<<< HEAD
+        String url = "jdbc:postgresql://ep-rapid-surf-a100ysmf-pooler.ap-southeast-1.aws.neon.tech:5432/neondb";
+        String user = "neondb_owner";  // PostgreSQLのユーザー名
+        String password = "npg_fpWk07TEejNO";  // PostgreSQLのパスワード
+=======
     	String url = "jdbc:postgresql://ep-rapid-surf-a100ysmf-pooler.ap-southeast-1.aws.neon.tech/neondb";
 		String user = "neondb_owner";
 		String password = "npg_fpWk07TEejNO";
+>>>>>>> branch 'master' of https://github.com/mkblue82/Exam.git
         try {
             // PostgreSQLドライバのロード
             Class.forName("org.postgresql.Driver");

@@ -9,7 +9,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import tool.Action;
 import bean.User;
-import dao.ConnectionManager;
 
 @WebServlet("/login")
 public class LoginAction extends Action {
@@ -62,7 +61,6 @@ public class LoginAction extends Action {
             }
         }
     }
-
     private User authenticateUser(String email, String password) {
         User user = null;
         Connection conn = null;
@@ -70,7 +68,6 @@ public class LoginAction extends Action {
         ResultSet rs = null;
 
         try {
-            conn = ConnectionManager.getConnection();
             String sql = "SELECT user_id, name, email, phone, password, favorite_store, store_id, notification " +
                         "FROM users WHERE email = ? AND password = ?";
 

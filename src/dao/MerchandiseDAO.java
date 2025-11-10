@@ -211,4 +211,24 @@ public class MerchandiseDAO extends DAO {
         con.close();
         return list;
     }
+
+    // 同一店舗内で同じ商品名が存在するか確認
+    public boolean isDuplicateProduct(int storeId, String productName) throws Exception {
+        Connection con = getConnection();
+        PreparedStatement st = con.prepareStatement(
+            "SELECT COUNT(*) FROM T002_merchandise WHERE T002_FD8_merchandise = ? AND T002_FD5_merchandise = ?");
+        st.setInt(1, storeId);
+        st.setString(2, productName);
+        ResultSet rs = st.executeQuery();
+
+        boolean exists = false;
+        if (rs.next() && rs.getInt(1) > 0) {
+            exists = true;
+        }
+
+        rs.close();
+        st.close();
+        con.close();
+        return exists;
+    }
 }
