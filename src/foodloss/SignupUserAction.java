@@ -15,7 +15,7 @@ import javax.servlet.http.HttpSession;
 import dao.UserDAO;
 
 @WebServlet("/signup_user")
-public class SignupAction_user extends HttpServlet {
+public class SignupUserAction extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse res)
