@@ -42,7 +42,7 @@ public class LoginAction extends Action {
             // CSRFトークンの検証
             if (csrfToken == null || !csrfToken.equals(sessionToken)) {
                 req.setAttribute("error", "不正なリクエストです");
-                req.getRequestDispatcher("jsp/login_user.jsp").forward(req, res);
+                req.getRequestDispatcher("/jsp/login_user.jsp").forward(req, res);
                 return;
             }
 
@@ -50,7 +50,7 @@ public class LoginAction extends Action {
             if (email == null || email.trim().isEmpty() ||
                 password == null || password.trim().isEmpty()) {
                 req.setAttribute("error", "メールアドレスとパスワードを入力してください");
-                req.getRequestDispatcher("jsp/login_user.jsp").forward(req, res);
+                req.getRequestDispatcher("/jsp/login_user.jsp").forward(req, res);
                 return;
             }
 
@@ -69,7 +69,7 @@ public class LoginAction extends Action {
             } else {
                 // ログイン失敗
                 req.setAttribute("error", "メールアドレスまたはパスワードが正しくありません");
-                req.getRequestDispatcher("jsp/login_user.jsp").forward(req, res);
+                req.getRequestDispatcher("/jsp/login_user.jsp").forward(req, res);
             }
         }
     }
