@@ -191,7 +191,7 @@
         </div>
     </div>
 
-    <jsp:include page="footer.jsp" />
+    <jsp:include page="/jsp/footer.jsp" />
 
     <!-- JS -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>

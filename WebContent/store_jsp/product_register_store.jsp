@@ -194,18 +194,6 @@
                 <h1>商品登録</h1>
             </div>
 
-            <c:if test="${not empty errorMessage}">
-                <div class="error-message" role="alert">
-                    ${errorMessage}
-                </div>
-            </c:if>
-
-            <c:if test="${not empty successMessage}">
-                <div class="success-message" role="alert">
-                    ${successMessage}
-                </div>
-            </c:if>
-
 
             <form action="${pageContext.request.contextPath}/product_register"
                   method="post"
@@ -273,6 +261,8 @@
             </form>
         </div>
     </div>
+
+    <jsp:include page="/jsp/footer.jsp" />
 
 
     <script>
