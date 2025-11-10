@@ -36,13 +36,13 @@ public class LoginExecuteAction extends Action {
             } else {
                 //  ログイン失敗
                 request.setAttribute("error", "メールアドレスまたはパスワードが違います。");
-                return "/jsp/login.jsp";
+                return "/jsp/login_user.jsp";
             }
 
         } catch (Exception e) {
             e.printStackTrace();
             request.setAttribute("error", "サーバーエラーが発生しました。");
-            return "/jsp/login.jsp";
+            return "/jsp/login_user.jsp";
         }
     }
 }
