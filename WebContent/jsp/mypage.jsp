@@ -15,14 +15,14 @@
             border-radius: 10px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
-
         .point-section h2 {
-            font-size: 1.6rem;
-            color: #333;
-            margin-bottom: 10px;
+            color: #c07148;
             text-align: center;
+            font-size: 1.8rem;
+            border-bottom: 2px solid #c07148;
+            padding-bottom: 1rem;
+            margin-bottom: 2rem;
         }
-
         .point-section p {
             font-size: 2.4rem;
             font-weight: bold;
@@ -30,7 +30,6 @@
             margin-bottom: 60px;
             text-align: center;
         }
-
         .button-group {
             display: flex;
             justify-content: center;
@@ -38,7 +37,6 @@
             flex-wrap: wrap;
             margin-top: 40px;
         }
-
         .button-group a {
             display: block;
             width: 220px;
@@ -51,7 +49,6 @@
             font-weight: bold;
             transition: background 0.3s;
         }
-
         .button-group a:hover {
             background-color: #c07148;
             color: #fff;
@@ -62,7 +59,6 @@
 <div id="container">
     <!-- ヘッダー -->
     <jsp:include page="header.jsp" />
-
     <!-- メインエリア -->
     <main class="column">
         <div class="main-contents">
@@ -79,16 +75,13 @@
             </div>
         </div>
     </main>
-
     <!-- フッター -->
     <jsp:include page="footer.jsp" />
 </div>
-
 <!-- JS -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
 <script src="../js/slick.js"></script>
 <script src="../js/main.js"></script>
-
 </body>
 </html>
