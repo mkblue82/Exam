@@ -17,7 +17,7 @@ import bean.Store;
 import dao.StoreDAO;
 
 @WebServlet("/signup_store")
-public class SignupAction_store extends HttpServlet {
+public class SignupStoreAction extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse res)

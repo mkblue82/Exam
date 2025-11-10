@@ -20,7 +20,6 @@ public class DeleteAccountAction extends Action {
 		else if ("verify".equals(action)) {
 			String password = req.getParameter("password");
 			HttpSession session = req.getSession(false);
-			// パスワード検証ロジック
 			// DBからユーザー情報を取得してパスワードを確認
 			boolean isPasswordCorrect = verifyPassword(session, password);
 			if (isPasswordCorrect) {
