@@ -10,6 +10,7 @@ import dao.UserDAO;
 import tool.Action;
 import tool.DBManager;
 
+
 public class DeleteAccountAction extends Action {
 	@Override
 	public void execute(HttpServletRequest req, HttpServletResponse res) throws Exception {
