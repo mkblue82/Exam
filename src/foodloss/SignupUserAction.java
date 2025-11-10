@@ -15,6 +15,7 @@ import javax.servlet.http.HttpSession;
 
 import bean.User;
 import dao.UserDAO;
+import tool.DBManager;
 
 @WebServlet("/signup_user")
 public class SignupUserAction extends HttpServlet {
