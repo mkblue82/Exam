@@ -1,7 +1,9 @@
-package action;
+package foodloss;
 
-import java.io.IOException;
 import java.sql.Connection;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -13,46 +15,48 @@ import tool.Action;
 
 public class LoginExecuteAction extends Action {
 
+    private static final Logger logger = Logger.getLogger(LoginExecuteAction.class.getName());
+
     @Override
-    public void execute(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        String email = request.getParameter("email");
-        String password = request.getParameter("password");
+    public void execute(HttpServletRequest req, HttpServletResponse res)
+            throws Exception {
 
-        Connection con = null;
-        try {
-            // DB接続（既存の getConnection() を利用）
-            con = getConnection();
+        // パラメータ取得
+        String email = req.getParameter("email");
+        String password = req.getParameter("password");
+
+        logger.info("Login attempt: " + email);
+
+        // DB接続
+        try (Connection con = getConnection()) {
             UserDAO dao = new UserDAO(con);
-
-            // ユーザー認証
-            User user = dao.findByEmailAndPassword(email, password);
+            User user = dao.login(email, password);
 
             if (user != null) {
-                // ログイン成功
-                HttpSession session = request.getSession();
+                // ✅ ログイン成功
+                logger.info("Login successful: " + email);
+
+                HttpSession session = req.getSession(true);
                 session.setAttribute("user", user);
 
-                // ✅ メインメニューにリダイレクト
-                response.sendRedirect(request.getContextPath() + "/jsp/main.jsp");
+                // メインメニューへ遷移
+                res.sendRedirect(req.getContextPath() + "/jsp/main_user.jsp");
 
             } else {
-                // ログイン失敗
-                request.setAttribute("errors", java.util.Arrays.asList("メールアドレスまたはパスワードが違います。"));
-                try {
-                    request.getRequestDispatcher("/jsp/login.jsp").forward(request, response);
-                } catch (Exception ex) { ex.printStackTrace(); }
+                // ❌ ログイン失敗
+                logger.warning("Login failed: " + email);
+                List<String> errors = new ArrayList<>();
+                errors.add("メールアドレスまたはパスワードが違います。");
+                req.setAttribute("errors", errors);
+                req.getRequestDispatcher("/jsp/login_user.jsp").forward(req, res);
             }
 
         } catch (Exception e) {
             e.printStackTrace();
-            request.setAttribute("errors", java.util.Arrays.asList("サーバーエラーが発生しました。"));
-            try {
-                request.getRequestDispatcher("/jsp/login.jsp").forward(request, response);
-            } catch (Exception ex) { ex.printStackTrace(); }
-
-        } finally {
-            // DB接続クローズ
-            if (con != null) try { con.close(); } catch (Exception ignore) {}
+            List<String> errors = new ArrayList<>();
+            errors.add("サーバーエラーが発生しました。");
+            req.setAttribute("errors", errors);
+            req.getRequestDispatcher("/jsp/login_user.jsp").forward(req, res);
         }
     }
 }
