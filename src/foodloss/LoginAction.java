@@ -26,7 +26,7 @@ public class LoginAction extends Action {
             if (session != null) {
                 session.invalidate();
             }
-            req.getRequestDispatcher("jsp/login.jsp").forward(req, res);
+            req.getRequestDispatcher("/jsp/login.jsp").forward(req, res);
             return;
         }
 
