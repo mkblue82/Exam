@@ -56,25 +56,10 @@
             margin: 0 auto;
         }
 
-        .error-message {
-            background: #ffebee;
-            color: #c62828;
-            padding: 1rem;
-            border-radius: 4px;
-            margin-bottom: 1.5rem;
-            border-left: 4px solid #c62828;
-            font-size: 0.9rem;
-            word-wrap: break-word;
-        }
-
+        /* ✅ メッセージを完全に非表示にする */
+        .error-message,
         .success-message {
-            background: #e8f5e9;
-            color: #2e7d32;
-            padding: 1rem;
-            border-radius: 4px;
-            margin-bottom: 1.5rem;
-            border-left: 4px solid #2e7d32;
-            font-size: 0.9rem;
+            display: none !important;
         }
 
         .form-group {
@@ -273,58 +258,10 @@
         </div>
     </div>
 
-
     <script>
         // 画像プレビュー機能
         function previewImage(input) {
             const preview = document.getElementById('preview');
             const previewContainer = document.getElementById('imagePreview');
 
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-
-                reader.onload = function(e) {
-                    preview.src = e.target.result;
-                    previewContainer.style.display = 'block';
-                }
-
-                reader.readAsDataURL(input.files[0]);
-            } else {
-                previewContainer.style.display = 'none';
-            }
-        }
-
-        // フォームバリデーション
-        document.getElementById('productRegisterForm').addEventListener('submit', function(e) {
-            const expirationDate = new Date(document.getElementById('expirationDate').value);
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-
-            if (expirationDate < today) {
-                e.preventDefault();
-                alert('消費期限は今日以降の日付を指定してください。');
-                return false;
-            }
-
-            const fileInput = document.getElementById('productImage');
-            if (fileInput.files.length > 0) {
-                const fileSize = fileInput.files[0].size;
-                const maxSize = 5 * 1024 * 1024; // 5MB
-
-                if (fileSize > maxSize) {
-                    e.preventDefault();
-                    alert('画像ファイルのサイズは5MB以下にしてください。');
-                    return false;
-                }
-            }
-        });
-    </script>
-
-	<!-- JS -->
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-	<script src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
-	<script src="../js/slick.js"></script>
-	<script src="../js/main.js"></script>
-	<script src="${pageContext.request.contextPath}/js/validation.js"></script>
-</body>
-</html>
+            i
