@@ -107,7 +107,7 @@
 </head>
 <body>
 <div id="container">
-    <!-- ヘッダー読み込み -->
+    <!-- ヘッダー -->
     <jsp:include page="header.jsp" />
 
     <main class="column">
@@ -139,7 +139,7 @@
         </div>
     </main>
 
-    <!-- フッター読み込み -->
+    <!-- フッター -->
     <jsp:include page="footer.jsp" />
 </div>
 
