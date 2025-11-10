@@ -24,7 +24,7 @@ import javax.servlet.http.HttpSession;
  * 4. セッション作成
  * 5. 店舗管理画面へ遷移
  */
-@WebServlet("/shop/login")
+@WebServlet("/shop/login_user")
 public class LoginBean_store extends HttpServlet {
     private static final long serialVersionUID = 1L;
 

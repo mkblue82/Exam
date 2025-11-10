@@ -34,7 +34,7 @@ public class LoginExecuteAction extends Action {
                 return "/jsp/main.jsp";
 
             } else {
-                // ❌ ログイン失敗
+                //  ログイン失敗
                 request.setAttribute("error", "メールアドレスまたはパスワードが違います。");
                 return "/jsp/login.jsp";
             }
