@@ -8,9 +8,6 @@ import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.Properties;
 
-import javax.mail.Multipart;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
@@ -20,11 +17,13 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.Part;
 
+import com.sun.xml.internal.messaging.saaj.packaging.mime.MessagingException;
 import com.sun.xml.internal.messaging.saaj.packaging.mime.internet.MimeBodyPart;
 import com.sun.xml.internal.messaging.saaj.packaging.mime.internet.MimeMultipart;
 
 import bean.Store;
 import sun.rmi.transport.Transport;
+
 @WebServlet("/signup_store")
 @MultipartConfig(maxFileSize = 10 * 1024 * 1024) // 最大10MB
 public class SignupAction_store extends HttpServlet {
@@ -81,7 +80,7 @@ public class SignupAction_store extends HttpServlet {
             Files.copy(is, tempFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
         }
 
-        // メール送信（運営側へ）
+        // メール送信
         sendMailWithAttachment(store, password, tempFile);
 
         // 一時ファイル削除
@@ -91,21 +90,23 @@ public class SignupAction_store extends HttpServlet {
         req.getRequestDispatcher("/jsp/signupsuccess_store.jsp").forward(req, res);
     }
 
-    // メール送信（運営側へ）
+    // メール送信メソッド（Jakarta Mail版）
     private void sendMailWithAttachment(Store store, String password, File attachment) {
         final String from = "noreply@foodloss.com";
-        final String to = "mklblue82@gmail.com"; // 運営側メール
-        final String host = "smtp.example.com"; // SMTPサーバ
+        final String to = "mklblue82@gmail.com"; // 運営側メールアドレス
+        final String host = "smtp.example.com";  // SMTPサーバー名
         final String username = "noreply@foodloss.com";
-        final String pass = "yourpassword";
+        final String pass = "yourpassword"; // 実際のアプリでは環境変数などで管理してください
 
+        // SMTP設定
         Properties props = new Properties();
         props.put("mail.smtp.host", host);
         props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.starttls.enable", "true");
         props.put("mail.smtp.port", "587");
 
-        Session session = Session.getInstance(props, new javax.mail.Authenticator() {
+        // 認証付きセッション作成
+        Session session = Session.getInstance(props, new Authenticator() {
             protected PasswordAuthentication getPasswordAuthentication() {
                 return new PasswordAuthentication(username, pass);
             }
@@ -136,9 +137,11 @@ public class SignupAction_store extends HttpServlet {
 
             message.setContent(multipart);
 
+            // メール送信
             Transport.send(message);
+            System.out.println("メール送信成功");
 
-        } catch (Exception e) {
+        } catch (MessagingException | IOException e) {
             e.printStackTrace();
             throw new RuntimeException("メール送信に失敗しました: " + e.getMessage());
         }

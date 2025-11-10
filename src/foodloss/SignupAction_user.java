@@ -5,6 +5,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.UUID;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -26,7 +27,7 @@ public class SignupAction_user extends HttpServlet {
 
         req.setCharacterEncoding("UTF-8");
 
-        // CSRFトークンチェック（例）
+        // --- CSRFトークンチェック ---
         HttpSession session = req.getSession();
         String token = req.getParameter("csrfToken");
         String sessionToken = (String) session.getAttribute("csrfToken");
@@ -36,13 +37,18 @@ public class SignupAction_user extends HttpServlet {
             return;
         }
 
-        // 入力値取得
+        // --- 入力値取得 ---
         String name = req.getParameter("name");
         String email = req.getParameter("email");
         String phone = req.getParameter("phone");
         String password = hashPassword(req.getParameter("password"));
 
+        // --- ランダムなユーザーIDを生成 ---
+        String userId = UUID.randomUUID().toString();
+
+        // --- Userオブジェクト作成 ---
         User user = new User();
+        user.setUserId(userId);
         user.setName(name);
         user.setEmail(email);
         user.setPhone(phone);
@@ -51,10 +57,12 @@ public class SignupAction_user extends HttpServlet {
         user.setStoreId(0);
         user.setNotification(false);
 
+        // --- DB登録 ---
         try (Connection conn = DBManager.getConnection()) {
             UserDAO dao = new UserDAO(conn);
             dao.insert(user);
 
+            // 成功時：CSRFトークンを削除して完了ページへ
             session.removeAttribute("csrfToken");
             req.getRequestDispatcher("/jsp/signupsuccess_user.jsp").forward(req, res);
 
@@ -65,6 +73,7 @@ public class SignupAction_user extends HttpServlet {
         }
     }
 
+    // --- パスワードハッシュ化 ---
     private String hashPassword(String password) {
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-256");

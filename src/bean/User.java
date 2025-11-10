@@ -1,7 +1,7 @@
 package bean;
 
 public class User {
-    private int userId;
+    private String  userId;
     private String name;
     private String email;
     private String phone;
@@ -11,10 +11,10 @@ public class User {
     private boolean notification; // true=ON, false=OFF
 
     // --- getter/setter ---
-    public int getUserId() {
+    public String getUserId() {
         return userId;
     }
-    public void setUserId(int userId) {
+    public void setUserId(String userId) {
         this.userId = userId;
     }
 
