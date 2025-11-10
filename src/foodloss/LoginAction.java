@@ -3,15 +3,13 @@ package foodloss;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-
+import tool.Action;
 import bean.User;
 import dao.ConnectionManager;
-import tool.Action;
 
 @WebServlet("/login")
 public class LoginAction extends Action {
@@ -21,11 +19,11 @@ public class LoginAction extends Action {
 
         // GETリクエスト: ログインページを表示
         if ("GET".equals(method)) {
-            // 既存のセッションを無効化
             HttpSession session = req.getSession(false);
             if (session != null) {
                 session.invalidate();
             }
+            // login_user.jspにフォワード
             req.getRequestDispatcher("/jsp/login_user.jsp").forward(req, res);
             return;
         }
@@ -34,17 +32,8 @@ public class LoginAction extends Action {
         if ("POST".equals(method)) {
             String email = req.getParameter("email");
             String password = req.getParameter("password");
-            String csrfToken = req.getParameter("csrfToken");
 
             HttpSession session = req.getSession();
-            String sessionToken = (String) session.getAttribute("csrfToken");
-
-            // CSRFトークンの検証
-            if (csrfToken == null || !csrfToken.equals(sessionToken)) {
-                req.setAttribute("error", "不正なリクエストです");
-                req.getRequestDispatcher("/jsp/login_user.jsp").forward(req, res);
-                return;
-            }
 
             // 入力値の検証
             if (email == null || email.trim().isEmpty() ||
@@ -74,9 +63,6 @@ public class LoginAction extends Action {
         }
     }
 
-    /**
-     * ユーザー認証
-     */
     private User authenticateUser(String email, String password) {
         User user = null;
         Connection conn = null;
@@ -90,7 +76,7 @@ public class LoginAction extends Action {
 
             pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, email);
-            pstmt.setString(2, password); // 本番環境ではハッシュ化したパスワードを使用
+            pstmt.setString(2, password);
 
             rs = pstmt.executeQuery();
 
@@ -111,11 +97,3 @@ public class LoginAction extends Action {
                 if (rs != null) rs.close();
                 if (pstmt != null) pstmt.close();
                 if (conn != null) conn.close();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-
-        return user;
-    }
-}
