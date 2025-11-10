@@ -1,7 +1,7 @@
 package bean;
 
 public class User {
-    private int userId;
+    private int  userId;
     private String name;
     private String email;
     private String phone;
