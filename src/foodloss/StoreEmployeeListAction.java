@@ -17,5 +17,4 @@ public class StoreEmployeeListAction extends Action {
         request.setAttribute("employeeList", list);
         return "/jsp/employee_list.jsp";
     }
-
 }
