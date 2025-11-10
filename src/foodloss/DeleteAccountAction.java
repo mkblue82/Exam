@@ -14,24 +14,23 @@ public class DeleteAccountAction extends Action {
 		String action = req.getParameter("action");
 		// アカウント削除画面を表示
 		if (action == null || action.isEmpty()) {
-			req.getRequestDispatcher("/delete_account.jsp").forward(req, res);
+			req.getRequestDispatcher("/jsp/delete_account.jsp").forward(req, res);
 		}
 		// パスワード検証
 		else if ("verify".equals(action)) {
 			String password = req.getParameter("password");
 			HttpSession session = req.getSession(false);
-			// パスワード検証ロジック
 			// DBからユーザー情報を取得してパスワードを確認
 			boolean isPasswordCorrect = verifyPassword(session, password);
 			if (isPasswordCorrect) {
 				// パスワードが正しい場合、最終確認画面へ
 				req.setAttribute("verified", true);
-				req.getRequestDispatcher("/delete_account_confirm.jsp").forward(req, res);
+				req.getRequestDispatcher("/jsp/delete_account_confirm.jsp").forward(req, res);
 			} else {
 				// パスワードが間違っている場合
 				req.setAttribute("error", "パスワードが正しくありません");
 				req.setAttribute("password", password); // 入力されたパスワードを初期値として渡す
-				req.getRequestDispatcher("/delete_account.jsp").forward(req, res);
+				req.getRequestDispatcher("/jsp/delete_account.jsp").forward(req, res);
 			}
 		}
 		// アカウント削除実行
@@ -46,10 +45,10 @@ public class DeleteAccountAction extends Action {
 					session.invalidate();
 				}
 				// 削除完了画面へ遷移
-				req.getRequestDispatcher("/delete_account_done.jsp").forward(req, res);
+				req.getRequestDispatcher("/jsp/delete_account_done.jsp").forward(req, res);
 			} catch (Exception e) {
 				req.setAttribute("error", "アカウント削除に失敗しました");
-				req.getRequestDispatcher("/delete_account_confirm.jsp").forward(req, res);
+				req.getRequestDispatcher("/jsp/delete_account_confirm.jsp").forward(req, res);
 			}
 		}
 	}

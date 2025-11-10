@@ -15,6 +15,7 @@
             border-radius: 10px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
             text-align: center;
+            margin-top: 150px;
         }
 
         .logout-complete-container h1 {
@@ -69,7 +70,7 @@
         </div>
     </main>
 
-    <!-- フッター読み込み -->
+    <!-- フッター -->
     <jsp:include page="footer.jsp" />
 </div>
 

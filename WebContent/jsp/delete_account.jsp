@@ -107,7 +107,7 @@
 </head>
 <body>
 <div id="container">
-    <!-- ヘッダー読み込み -->
+    <!-- ヘッダー -->
     <jsp:include page="header.jsp" />
 
     <main class="column">
@@ -131,7 +131,7 @@
                     </div>
 
                     <div class="button-group">
-                        <button type="button" class="btn-cancel" onclick="location.href='${pageContext.request.contextPath}/foodloss/MyPage.action'">キャンセル</button>
+                        <button type="button" class="btn-cancel" onclick="location.href='${pageContext.request.contextPath}/foodloss/Menu.action'">キャンセル</button>
                         <button type="submit" class="btn-delete">次へ</button>
                     </div>
                 </form>
@@ -139,7 +139,7 @@
         </div>
     </main>
 
-    <!-- フッター読み込み -->
+    <!-- フッター -->
     <jsp:include page="footer.jsp" />
 </div>
 
