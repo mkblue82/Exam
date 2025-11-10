@@ -1,4 +1,4 @@
-package action;
+package foodloss;
 
 import java.io.File;
 import java.io.IOException;
