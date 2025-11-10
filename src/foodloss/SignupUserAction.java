@@ -17,7 +17,7 @@ import bean.User;
 import dao.UserDAO;
 import tool.DBManager;
 
-@WebServlet("/signup_user.jsp")
+@WebServlet("/sigunupUser")
 public class SignupUserAction extends HttpServlet {
 
     @Override
