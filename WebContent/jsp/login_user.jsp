@@ -172,7 +172,7 @@
 
                     <button type="submit" class="btn-login">ログイン</button>
                     <button type="button" class="btn-register"
-                            onclick="location.href='${pageContext.request.contextPath}/jsp/signup_user.jsp'">新規登録</button>
+                            onclick="location.href='${pageContext.request.contextPath}/foodloss/SignupUser.action'" method="post">新規登録</button>
                 </form>
             </div>
         </div>

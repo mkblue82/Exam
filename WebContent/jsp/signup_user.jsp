@@ -1,6 +1,11 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-
-
+<%
+    // CSRFトークンがセッションにない場合は生成
+    if (session.getAttribute("csrfToken") == null) {
+        String csrfToken = java.util.UUID.randomUUID().toString();
+        session.setAttribute("csrfToken", csrfToken);
+    }
+%>
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -124,8 +129,13 @@
 	<div class="register-container">
 	    <h1>新規ユーザー登録</h1>
 
+        <% if (request.getAttribute("errorMessage") != null) { %>
+            <div class="error-message">
+                <%= request.getAttribute("errorMessage") %>
+            </div>
+        <% } %>
 
-	    <form action="${pageContext.request.contextPath}/SignupUser.action" method="post">
+	    <form action="${pageContext.request.contextPath}/foodloss/SignupUser.action" method="post">
 	        <input type="hidden" name="csrfToken" value="${sessionScope.csrfToken}">
 
 	        <div class="form-group">
@@ -150,8 +160,6 @@
 	                  value="${param.phone}">
 	        </div>
 
-
-
 	        <div class="form-group">
 	            <label for="password">パスワード</label>
 	            <input type="password" id="password" name="password" required minlength="8"
@@ -163,9 +171,7 @@
 	                onclick="location.href='${pageContext.request.contextPath}/jsp/login_user.jsp'">ログインに戻る</button>
 	    </form>
 	</div>
-	 <jsp:include page="footer.jsp" />
-
-
+	<jsp:include page="footer.jsp" />
 
 </body>
 </html>
