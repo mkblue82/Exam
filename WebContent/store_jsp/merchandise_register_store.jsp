@@ -132,11 +132,10 @@
             <div class="register-wrapper">
                 <h1>商品登録</h1>
 
-                <form action="${pageContext.request.contextPath}/product_register"
-                      method="post"
-                      enctype="multipart/form-data"
-                      id="productRegisterForm">
-                    <input type="hidden" name="csrfToken" value="${sessionScope.csrfToken}">
+				<form action="${pageContext.request.contextPath}/merchandise_register_store"
+				      method="post"
+				      enctype="multipart/form-data"
+				      id="productRegisterForm">
 
                     <div class="form-group">
                         <label for="productName">商品名</label>

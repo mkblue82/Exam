@@ -23,7 +23,7 @@ import dao.MerchandiseDAO;
  * 商品登録処理を行うサーブレット
  * 画像の仕様に基づいた実装
  */
-@WebServlet("/merchandise_register")
+@WebServlet("/merchandise_register_store")
 @MultipartConfig(
     fileSizeThreshold = 1024 * 1024 * 2,  // 2MB
     maxFileSize = 1024 * 1024 * 5,        // 5MB
