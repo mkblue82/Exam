@@ -1,6 +1,6 @@
-package dao;
+	package dao;
 
-import java.sql.Connection;
+	import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -9,13 +9,14 @@ import java.util.List;
 
 import bean.User;
 
-public class UserDAO {
+	public class UserDAO {
 
-    private Connection con;
+	    private Connection con;
 
-    public UserDAO(Connection con) {
-        this.con = con;
-    }
+	    public UserDAO(Connection con) {
+	        this.con = con;
+	    }
+
 
     // ユーザー登録
     public void insert(User user) throws SQLException {
@@ -62,6 +63,7 @@ public class UserDAO {
         }
         return list;
     }
+
 
     // IDで検索
     public User findById(int id) throws SQLException {
@@ -121,7 +123,6 @@ public class UserDAO {
 
     public User login(String email, String password) throws Exception {
 
-        String sql = "SELECT * FROM T004_user WHERE メールアドレス = ? AND パスワード = ?";
 
         String sql = "SELECT * FROM t004_user WHERE t004_fd2_user = ? AND t004_fd4_user = ?";
         try (PreparedStatement ps = con.prepareStatement(sql)) {
@@ -156,3 +157,4 @@ public class UserDAO {
         return null;
     }
 }
+

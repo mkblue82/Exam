@@ -23,7 +23,7 @@ import dao.MerchandiseDAO;
  * 商品登録処理を行うサーブレット
  * 画像の仕様に基づいた実装
  */
-@WebServlet("/merchandise_register")
+@WebServlet("/merchandise_register_store")
 @MultipartConfig(
     fileSizeThreshold = 1024 * 1024 * 2,  // 2MB
     maxFileSize = 1024 * 1024 * 5,        // 5MB
@@ -50,6 +50,7 @@ public class MerchandiseRegisterAction extends HttpServlet {
         // CSRFトークン生成
         String csrfToken = UUID.randomUUID().toString();
         session.setAttribute("csrfToken", csrfToken);
+        request.setAttribute("csrfToken", csrfToken);
 
         request.getRequestDispatcher("/jsp/merchandise_register.jsp").forward(request, response);
     }
@@ -72,6 +73,9 @@ public class MerchandiseRegisterAction extends HttpServlet {
         String sessionToken = (String) session.getAttribute("csrfToken");
         if (csrfToken == null || !csrfToken.equals(sessionToken)) {
             request.setAttribute("errorMessage", "不正なリクエストです。");
+            String newCsrfToken = UUID.randomUUID().toString();
+            session.setAttribute("csrfToken", newCsrfToken);
+            request.setAttribute("csrfToken", newCsrfToken);
             request.getRequestDispatcher("/jsp/merchandise_register.jsp").forward(request, response);
             return;
         }
@@ -79,17 +83,18 @@ public class MerchandiseRegisterAction extends HttpServlet {
         // 新しいCSRFトークンを生成（ワンタイムトークン）
         String newCsrfToken = UUID.randomUUID().toString();
         session.setAttribute("csrfToken", newCsrfToken);
+        request.setAttribute("csrfToken", newCsrfToken);
 
         try {
             // パラメータ取得
-            String productName = request.getParameter("productName");
+            String merchandiseName = request.getParameter("merchandiseName");
             String quantityStr = request.getParameter("quantity");
             String expirationDateStr = request.getParameter("expirationDate");
             String tags = request.getParameter("tags");
-            Part imagePart = request.getPart("productImage");
+            Part imagePart = request.getPart("merchandiseImage");
 
             // 基本バリデーション - 未入力チェック（画像仕様①-1）
-            String validationError = validateInput(productName, quantityStr, expirationDateStr, imagePart);
+            String validationError = validateInput(merchandiseName, quantityStr, expirationDateStr, imagePart);
             if (validationError != null) {
                 request.setAttribute("errorMessage", validationError);
                 request.getRequestDispatcher("/jsp/merchandise_register.jsp").forward(request, response);
@@ -121,7 +126,7 @@ public class MerchandiseRegisterAction extends HttpServlet {
             }
 
             // 商品名の長さチェック
-            if (productName.length() > 100) {
+            if (merchandiseName.length() > 100) {
                 request.setAttribute("errorMessage", "商品名は100文字以内で入力してください。");
                 request.getRequestDispatcher("/jsp/merchandise_register.jsp").forward(request, response);
                 return;
@@ -151,8 +156,8 @@ public class MerchandiseRegisterAction extends HttpServlet {
 
             // 商品の重複チェック（画像仕様②-2）
             MerchandiseDAO merchandiseDAO = new MerchandiseDAO();
-            if (merchandiseDAO.isDuplicateProduct(storeId, productName)) {
-                request.setAttribute("errorMessage", "入力された店舗情報は登録済みです");
+            if (merchandiseDAO.isDuplicateProduct(storeId, merchandiseName)) {
+                request.setAttribute("errorMessage", "この商品は既に登録されています");
                 request.getRequestDispatcher("/jsp/merchandise_register.jsp").forward(request, response);
                 return;
             }
@@ -170,11 +175,16 @@ public class MerchandiseRegisterAction extends HttpServlet {
 
             // 商品オブジェクト作成
             Merchandise merchandise = new Merchandise();
-            merchandise.setMerchandiseName(productName);
+            merchandise.setMerchandiseName(merchandiseName);
             merchandise.setStock(quantity);
             merchandise.setPrice(price);
             merchandise.setUseByDate(expirationDate);
+<<<<<<< HEAD
             merchandise.setMerchandiseTag(tags != null ? tags : "");
+            merchandise.setMerchandiseImage(imagePath);  // 画像パスを設定
+=======
+            merchandise.setMerchandiseTag(tags != null ? tags : "");
+>>>>>>> branch 'master' of https://github.com/mkblue82/Exam.git
             merchandise.setEmployeeId(employeeId);
             merchandise.setRegistrationTime(new Timestamp(System.currentTimeMillis()));
             merchandise.setStoreId(storeId);
@@ -205,11 +215,11 @@ public class MerchandiseRegisterAction extends HttpServlet {
      * 画像仕様①-1：未入力フィールドチェック
      * @return エラーメッセージ（エラーがない場合null）
      */
-    private String validateInput(String productName, String quantity,
+    private String validateInput(String merchandiseName, String quantity,
                                  String expirationDate, Part imagePart) {
 
         // 未入力チェック
-        if (productName == null || productName.trim().isEmpty()) {
+        if (merchandiseName == null || merchandiseName.trim().isEmpty()) {
             return "このフィールドを入力してください"; // 商品名
         }
 
@@ -237,12 +247,14 @@ public class MerchandiseRegisterAction extends HttpServlet {
         try {
             // ファイルサイズチェック
             if (imagePart.getSize() > MAX_FILE_SIZE) {
+                System.err.println("ファイルサイズが上限を超えています: " + imagePart.getSize());
                 return null;
             }
 
             // ファイル名取得
             String fileName = getFileName(imagePart);
             if (fileName == null || fileName.isEmpty()) {
+                System.err.println("ファイル名の取得に失敗しました");
                 return null;
             }
 
@@ -257,6 +269,7 @@ public class MerchandiseRegisterAction extends HttpServlet {
             }
 
             if (!validExtension) {
+                System.err.println("許可されていない拡張子です: " + extension);
                 return null;
             }
 
@@ -264,7 +277,11 @@ public class MerchandiseRegisterAction extends HttpServlet {
             String uploadPath = getServletContext().getRealPath("") + File.separator + UPLOAD_DIR;
             File uploadDir = new File(uploadPath);
             if (!uploadDir.exists()) {
-                uploadDir.mkdirs();
+                boolean created = uploadDir.mkdirs();
+                if (!created) {
+                    System.err.println("アップロードディレクトリの作成に失敗しました: " + uploadPath);
+                    return null;
+                }
             }
 
             // ユニークなファイル名生成
@@ -274,11 +291,13 @@ public class MerchandiseRegisterAction extends HttpServlet {
 
             // ファイル保存
             imagePart.write(filePath);
+            System.out.println("画像ファイルを保存しました: " + filePath);
 
-            // DBに保存する相対パス（現時点ではファイルシステムのみに保存）
+            // DBに保存する相対パス
             return UPLOAD_DIR + "/" + uniqueFileName;
 
         } catch (Exception e) {
+            System.err.println("画像保存中にエラーが発生しました");
             e.printStackTrace();
             return null;
         }
