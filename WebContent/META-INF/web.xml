@@ -4,7 +4,6 @@
          xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee
                              http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
          version="3.1">
-
     <!-- PostgreSQL DataSource -->
     <resource-ref>
         <description>PostgreSQL DataSource</description>
@@ -16,27 +15,15 @@
     <!-- LoginExecuteAction 用サーブレット -->
     <servlet>
         <servlet-name>LoginExecute</servlet-name>
-        <servlet-class>tool.ActionServlet</servlet-class>
+        <servlet-class>foodloss.LoginExecuteAction</servlet-class>
     </servlet>
-
     <servlet-mapping>
         <servlet-name>LoginExecute</servlet-name>
         <url-pattern>/LoginExecute.action</url-pattern>
     </servlet-mapping>
 
     <!-- メインメニュー用サーブレット（例：必要に応じて追加） -->
-    <servlet>
-        <servlet-name>MainMenu</servlet-name>
-        <servlet-class>tool.ActionServlet</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>MainMenu</servlet-name>
-        <url-pattern>/main/Menu.action</url-pattern>
-    </servlet-mapping>
-
-    <!-- JSPファイルのサーブレットマッピング（必要に応じて） -->
     <welcome-file-list>
         <welcome-file>index.jsp</welcome-file>
     </welcome-file-list>
-
 </web-app>
