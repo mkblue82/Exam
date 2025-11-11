@@ -87,14 +87,14 @@ public class MerchandiseRegisterAction extends HttpServlet {
 
         try {
             // パラメータ取得
-            String productName = request.getParameter("productName");
+            String merchandiseName = request.getParameter("merchandiseName");
             String quantityStr = request.getParameter("quantity");
             String expirationDateStr = request.getParameter("expirationDate");
             String tags = request.getParameter("tags");
-            Part imagePart = request.getPart("productImage");
+            Part imagePart = request.getPart("merchandiseImage");
 
             // 基本バリデーション - 未入力チェック（画像仕様①-1）
-            String validationError = validateInput(productName, quantityStr, expirationDateStr, imagePart);
+            String validationError = validateInput(merchandiseName, quantityStr, expirationDateStr, imagePart);
             if (validationError != null) {
                 request.setAttribute("errorMessage", validationError);
                 request.getRequestDispatcher("/jsp/merchandise_register.jsp").forward(request, response);
@@ -126,7 +126,7 @@ public class MerchandiseRegisterAction extends HttpServlet {
             }
 
             // 商品名の長さチェック
-            if (productName.length() > 100) {
+            if (merchandiseName.length() > 100) {
                 request.setAttribute("errorMessage", "商品名は100文字以内で入力してください。");
                 request.getRequestDispatcher("/jsp/merchandise_register.jsp").forward(request, response);
                 return;
@@ -156,7 +156,7 @@ public class MerchandiseRegisterAction extends HttpServlet {
 
             // 商品の重複チェック（画像仕様②-2）
             MerchandiseDAO merchandiseDAO = new MerchandiseDAO();
-            if (merchandiseDAO.isDuplicateProduct(storeId, productName)) {
+            if (merchandiseDAO.isDuplicateProduct(storeId, merchandiseName)) {
                 request.setAttribute("errorMessage", "この商品は既に登録されています");
                 request.getRequestDispatcher("/jsp/merchandise_register.jsp").forward(request, response);
                 return;
@@ -175,12 +175,19 @@ public class MerchandiseRegisterAction extends HttpServlet {
 
             // 商品オブジェクト作成
             Merchandise merchandise = new Merchandise();
-            merchandise.setMerchandiseName(productName);
+            merchandise.setMerchandiseName(merchandiseName);
             merchandise.setStock(quantity);
             merchandise.setPrice(price);
             merchandise.setUseByDate(expirationDate);
+<<<<<<< HEAD
             merchandise.setProductTag(tags != null ? tags : "");
             merchandise.setProductImage(imagePath);
+=======
+<<<<<<< HEAD
+            merchandise.setMerchandiseTag(tags != null ? tags : "");
+            merchandise.setMerchandiseImage(imagePath);  // 画像パスを設定
+=======
+>>>>>>> branch 'master' of https://github.com/mkblue82/Exam.git
             merchandise.setMerchandiseTag(tags != null ? tags : "");
             merchandise.setEmployeeId(employeeId);
             merchandise.setRegistrationTime(new Timestamp(System.currentTimeMillis()));
@@ -205,14 +212,45 @@ public class MerchandiseRegisterAction extends HttpServlet {
         }
     }
 
+<<<<<<< HEAD
     /** 入力値の基本バリデーション */
     private String validateInput(String productName, String quantity,
+=======
+    /**
+     * 入力値の基本バリデーション
+     * 画像仕様①-1：未入力フィールドチェック
+     * @return エラーメッセージ（エラーがない場合null）
+     */
+    private String validateInput(String merchandiseName, String quantity,
+>>>>>>> branch 'master' of https://github.com/mkblue82/Exam.git
                                  String expirationDate, Part imagePart) {
+<<<<<<< HEAD
         if (productName == null || productName.trim().isEmpty()) return "このフィールドを入力してください";
         if (quantity == null || quantity.trim().isEmpty()) return "このフィールドを入力してください";
         if (expirationDate == null || expirationDate.trim().isEmpty()) return "このフィールドを入力してください";
         if (imagePart == null || imagePart.getSize() == 0) return "このフィールドを入力してください";
         return null;
+=======
+
+        // 未入力チェック
+        if (merchandiseName == null || merchandiseName.trim().isEmpty()) {
+            return "このフィールドを入力してください"; // 商品名
+        }
+
+        if (quantity == null || quantity.trim().isEmpty()) {
+            return "このフィールドを入力してください"; // 個数
+        }
+
+        if (expirationDate == null || expirationDate.trim().isEmpty()) {
+            return "このフィールドを入力してください"; // 消費期限
+        }
+
+        if (imagePart == null || imagePart.getSize() == 0) {
+            return "このフィールドを入力してください"; // 画像
+        }
+
+        return null; // エラーなし
+>>>>>>> branch 'master' of https://github.com/mkblue82/Exam.git
     }
 
     /** 画像ファイルのバリデーションと保存 */

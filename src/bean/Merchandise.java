@@ -36,7 +36,7 @@ public class Merchandise implements java.io.Serializable {
     }
 
     // 商品IDのゲッター・セッター
-    public int getProductId(){
+    public int getMerchandiseId(){
         return merchandiseId;
     }
     public void setMerchandiseId(int merchandiseId){
