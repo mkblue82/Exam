@@ -26,12 +26,12 @@ public class MerchandiseDAO extends DAO {
 
         while (rs.next()) {
             Merchandise m = new Merchandise();
-            m.setProductId(rs.getInt("T002_PK1_merchandise"));
+            m.setMerchandiseId(rs.getInt("T002_PK1_merchandise"));
             m.setStock(rs.getInt("T002_FD1_merchandise"));
             m.setPrice(rs.getInt("T002_FD2_merchandise"));
             m.setUseByDate(rs.getDate("T002_FD3_merchandise"));
-            m.setProductTag(rs.getString("T002_FD4_merchandise"));
-            m.setProductName(rs.getString("T002_FD5_merchandise"));
+            m.setMerchandiseTag(rs.getString("T002_FD4_merchandise"));
+            m.setMerchandiseName(rs.getString("T002_FD5_merchandise"));
             m.setEmployeeId(rs.getInt("T002_FD6_merchandise"));
             m.setRegistrationTime(rs.getTimestamp("T002_FD7_merchandise"));
             m.setStoreId(rs.getInt("T002_FD8_merchandise"));
@@ -45,7 +45,7 @@ public class MerchandiseDAO extends DAO {
     }
 
     // 商品IDで検索
-    public Merchandise selectById(int productId) throws Exception {
+    public Merchandise selectById(int merchandiseId) throws Exception {
         Connection con = getConnection();
         PreparedStatement st = con.prepareStatement(
             "select T002_PK1_merchandise, T002_FD1_merchandise, " +
@@ -54,18 +54,18 @@ public class MerchandiseDAO extends DAO {
             "T002_FD8_merchandise, T002_FD9_merchandise " +
             "from T002_merchandise " +
             "where T002_PK1_merchandise = ?");
-        st.setInt(1, productId);
+        st.setInt(1, merchandiseId);
         ResultSet rs = st.executeQuery();
 
         Merchandise m = null;
         if (rs.next()) {
             m = new Merchandise();
-            m.setProductId(rs.getInt("T002_PK1_merchandise"));
+            m.setMerchandiseId(rs.getInt("T002_PK1_merchandise"));
             m.setStock(rs.getInt("T002_FD1_merchandise"));
             m.setPrice(rs.getInt("T002_FD2_merchandise"));
             m.setUseByDate(rs.getDate("T002_FD3_merchandise"));
-            m.setProductTag(rs.getString("T002_FD4_merchandise"));
-            m.setProductName(rs.getString("T002_FD5_merchandise"));
+            m.setMerchandiseTag(rs.getString("T002_FD4_merchandise"));
+            m.setMerchandiseName(rs.getString("T002_FD5_merchandise"));
             m.setEmployeeId(rs.getInt("T002_FD6_merchandise"));
             m.setRegistrationTime(rs.getTimestamp("T002_FD7_merchandise"));
             m.setStoreId(rs.getInt("T002_FD8_merchandise"));
@@ -94,12 +94,12 @@ public class MerchandiseDAO extends DAO {
 
         while (rs.next()) {
             Merchandise m = new Merchandise();
-            m.setProductId(rs.getInt("T002_PK1_merchandise"));
+            m.setMerchandiseId(rs.getInt("T002_PK1_merchandise"));
             m.setStock(rs.getInt("T002_FD1_merchandise"));
             m.setPrice(rs.getInt("T002_FD2_merchandise"));
             m.setUseByDate(rs.getDate("T002_FD3_merchandise"));
-            m.setProductTag(rs.getString("T002_FD4_merchandise"));
-            m.setProductName(rs.getString("T002_FD5_merchandise"));
+            m.setMerchandiseTag(rs.getString("T002_FD4_merchandise"));
+            m.setMerchandiseName(rs.getString("T002_FD5_merchandise"));
             m.setEmployeeId(rs.getInt("T002_FD6_merchandise"));
             m.setRegistrationTime(rs.getTimestamp("T002_FD7_merchandise"));
             m.setStoreId(rs.getInt("T002_FD8_merchandise"));
@@ -125,8 +125,8 @@ public class MerchandiseDAO extends DAO {
         st.setInt(1, merchandise.getStock());
         st.setInt(2, merchandise.getPrice());
         st.setDate(3, merchandise.getUseByDate());
-        st.setString(4, merchandise.getProductTag());
-        st.setString(5, merchandise.getProductName());
+        st.setString(4, merchandise.getMerchandiseTag());
+        st.setString(5, merchandise.getMerchandiseName());
         st.setInt(6, merchandise.getEmployeeId());
         st.setTimestamp(7, merchandise.getRegistrationTime());
         st.setInt(8, merchandise.getStoreId());
@@ -137,6 +137,30 @@ public class MerchandiseDAO extends DAO {
         con.close();
         return line;
     }
+
+    // 最新の商品IDを取得（店舗IDと商品名から）
+    public int getLatestMerchandiseId(int storeId, String merchandiseName) throws Exception {
+        Connection con = getConnection();
+        PreparedStatement st = con.prepareStatement(
+            "SELECT T002_PK1_merchandise FROM T002_merchandise " +
+            "WHERE T002_FD8_merchandise = ? AND T002_FD5_merchandise = ? " +
+            "ORDER BY T002_FD7_merchandise DESC LIMIT 1"
+        );
+        st.setInt(1, storeId);
+        st.setString(2, merchandiseName);
+        ResultSet rs = st.executeQuery();
+
+        int id = 0;
+        if (rs.next()) {
+            id = rs.getInt("T002_PK1_merchandise");
+        }
+
+        rs.close();
+        st.close();
+        con.close();
+        return id;
+    }
+
 
     // 商品を更新
     public int update(Merchandise merchandise) throws Exception {
@@ -150,8 +174,8 @@ public class MerchandiseDAO extends DAO {
         st.setInt(1, merchandise.getStock());
         st.setInt(2, merchandise.getPrice());
         st.setDate(3, merchandise.getUseByDate());
-        st.setString(4, merchandise.getProductTag());
-        st.setString(5, merchandise.getProductName());
+        st.setString(4, merchandise.getMerchandiseTag());
+        st.setString(5, merchandise.getMerchandiseName());
         st.setInt(6, merchandise.getEmployeeId());
         st.setTimestamp(7, merchandise.getRegistrationTime());
         st.setInt(8, merchandise.getStoreId());
@@ -165,11 +189,11 @@ public class MerchandiseDAO extends DAO {
     }
 
     // 商品を削除
-    public int delete(int productId) throws Exception {
+    public int delete(int merchandiseId) throws Exception {
         Connection con = getConnection();
         PreparedStatement st = con.prepareStatement(
             "delete from T002_merchandise where T002_PK1_merchandise = ?");
-        st.setInt(1, productId);
+        st.setInt(1, merchandiseId);
 
         int line = st.executeUpdate();
         st.close();
@@ -194,12 +218,12 @@ public class MerchandiseDAO extends DAO {
 
         while (rs.next()) {
             Merchandise m = new Merchandise();
-            m.setProductId(rs.getInt("T002_PK1_merchandise"));
+            m.setMerchandiseId(rs.getInt("T002_PK1_merchandise"));
             m.setStock(rs.getInt("T002_FD1_merchandise"));
             m.setPrice(rs.getInt("T002_FD2_merchandise"));
             m.setUseByDate(rs.getDate("T002_FD3_merchandise"));
-            m.setProductTag(rs.getString("T002_FD4_merchandise"));
-            m.setProductName(rs.getString("T002_FD5_merchandise"));
+            m.setMerchandiseTag(rs.getString("T002_FD4_merchandise"));
+            m.setMerchandiseName(rs.getString("T002_FD5_merchandise"));
             m.setEmployeeId(rs.getInt("T002_FD6_merchandise"));
             m.setRegistrationTime(rs.getTimestamp("T002_FD7_merchandise"));
             m.setStoreId(rs.getInt("T002_FD8_merchandise"));
@@ -213,12 +237,12 @@ public class MerchandiseDAO extends DAO {
     }
 
     // 同一店舗内で同じ商品名が存在するか確認
-    public boolean isDuplicateProduct(int storeId, String productName) throws Exception {
+    public boolean isDuplicateProduct(int storeId, String merchandiseName) throws Exception {
         Connection con = getConnection();
         PreparedStatement st = con.prepareStatement(
             "SELECT COUNT(*) FROM T002_merchandise WHERE T002_FD8_merchandise = ? AND T002_FD5_merchandise = ?");
         st.setInt(1, storeId);
-        st.setString(2, productName);
+        st.setString(2, merchandiseName);
         ResultSet rs = st.executeQuery();
 
         boolean exists = false;
