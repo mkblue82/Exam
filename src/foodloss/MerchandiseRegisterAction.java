@@ -86,14 +86,14 @@ public class MerchandiseRegisterAction extends HttpServlet {
         request.setAttribute("csrfToken", newCsrfToken);
 
         try {
-            // パラメータ取得
-            String merchandiseName = request.getParameter("merchandiseName");
+            // パラメータ取得（JSPと一致）
+            String merchandiseName = request.getParameter("productName");
             String quantityStr = request.getParameter("quantity");
             String expirationDateStr = request.getParameter("expirationDate");
             String tags = request.getParameter("tags");
-            Part imagePart = request.getPart("merchandiseImage");
+            Part imagePart = request.getPart("productImage");
 
-            // 基本バリデーション - 未入力チェック（画像仕様①-1）
+            // 未入力チェック
             String validationError = validateInput(merchandiseName, quantityStr, expirationDateStr, imagePart);
             if (validationError != null) {
                 request.setAttribute("errorMessage", validationError);
@@ -125,14 +125,13 @@ public class MerchandiseRegisterAction extends HttpServlet {
                 return;
             }
 
-            // 商品名の長さチェック
+            // 商品名・タグの長さチェック
             if (merchandiseName.length() > 100) {
                 request.setAttribute("errorMessage", "商品名は100文字以内で入力してください。");
                 request.getRequestDispatcher("/jsp/merchandise_register.jsp").forward(request, response);
                 return;
             }
 
-            // タグの長さチェック
             if (tags != null && tags.length() > 200) {
                 request.setAttribute("errorMessage", "タグは200文字以内で入力してください。");
                 request.getRequestDispatcher("/jsp/merchandise_register.jsp").forward(request, response);
@@ -154,15 +153,15 @@ public class MerchandiseRegisterAction extends HttpServlet {
                 employeeId = 0; // デフォルト値
             }
 
-            // 商品の重複チェック（画像仕様②-2）
+            // 商品の重複チェック
             MerchandiseDAO merchandiseDAO = new MerchandiseDAO();
             if (merchandiseDAO.isDuplicateProduct(storeId, merchandiseName)) {
-                request.setAttribute("errorMessage", "この商品は既に登録されています");
+                request.setAttribute("errorMessage", "この商品は既に登録されています。");
                 request.getRequestDispatcher("/jsp/merchandise_register.jsp").forward(request, response);
                 return;
             }
 
-            // 画像ファイルのバリデーションと保存
+            // 画像バリデーションと保存
             String imagePath = validateAndSaveImage(imagePart);
             if (imagePath == null) {
                 request.setAttribute("errorMessage", "画像ファイルの保存に失敗しました。ファイル形式とサイズを確認してください。");
@@ -170,7 +169,7 @@ public class MerchandiseRegisterAction extends HttpServlet {
                 return;
             }
 
-            // 価格はデフォルト0（必要に応じて画面から取得）
+            // 価格はデフォルト0（必要に応じて拡張）
             int price = 0;
 
             // 商品オブジェクト作成
@@ -179,26 +178,20 @@ public class MerchandiseRegisterAction extends HttpServlet {
             merchandise.setStock(quantity);
             merchandise.setPrice(price);
             merchandise.setUseByDate(expirationDate);
-<<<<<<< HEAD
-            merchandise.setMerchandiseTag(tags != null ? tags : "");
-            merchandise.setMerchandiseImage(imagePath);  // 画像パスを設定
-=======
-            merchandise.setMerchandiseTag(tags != null ? tags : "");
->>>>>>> branch 'master' of https://github.com/mkblue82/Exam.git
+            merchandise.setProductTag(tags != null ? tags : "");
+            merchandise.setProductImage(imagePath);
             merchandise.setEmployeeId(employeeId);
             merchandise.setRegistrationTime(new Timestamp(System.currentTimeMillis()));
             merchandise.setStoreId(storeId);
-            merchandise.setBookingStatus(false); // デフォルトは予約なし
+            merchandise.setBookingStatus(false);
 
             // DB登録
             int result = merchandiseDAO.insert(merchandise);
 
             if (result > 0) {
-                // 登録成功 - 商品登録完了画面へリダイレクト（画像仕様③）
                 session.setAttribute("successMessage", "商品を登録しました。");
                 response.sendRedirect(request.getContextPath() + "/merchandise_register_complete");
             } else {
-                // 登録失敗
                 request.setAttribute("errorMessage", "商品の登録に失敗しました。もう一度お試しください。");
                 request.getRequestDispatcher("/jsp/merchandise_register.jsp").forward(request, response);
             }
@@ -213,124 +206,79 @@ public class MerchandiseRegisterAction extends HttpServlet {
     /**
      * 入力値の基本バリデーション
      * 画像仕様①-1：未入力フィールドチェック
-     * @return エラーメッセージ（エラーがない場合null）
      */
     private String validateInput(String merchandiseName, String quantity,
                                  String expirationDate, Part imagePart) {
 
-        // 未入力チェック
         if (merchandiseName == null || merchandiseName.trim().isEmpty()) {
-            return "このフィールドを入力してください"; // 商品名
+            return "商品名を入力してください。";
         }
 
         if (quantity == null || quantity.trim().isEmpty()) {
-            return "このフィールドを入力してください"; // 個数
+            return "個数を入力してください。";
         }
 
         if (expirationDate == null || expirationDate.trim().isEmpty()) {
-            return "このフィールドを入力してください"; // 消費期限
+            return "消費期限を入力してください。";
         }
 
         if (imagePart == null || imagePart.getSize() == 0) {
-            return "このフィールドを入力してください"; // 画像
+            return "画像を選択してください。";
         }
 
         return null; // エラーなし
     }
 
-    /**
-     * 画像ファイルのバリデーションと保存
-     * @param imagePart アップロードされた画像ファイル
-     * @return 保存された画像の相対パス（失敗時null）
-     */
+    /** 画像ファイルのバリデーションと保存 */
     private String validateAndSaveImage(Part imagePart) {
         try {
-            // ファイルサイズチェック
-            if (imagePart.getSize() > MAX_FILE_SIZE) {
-                System.err.println("ファイルサイズが上限を超えています: " + imagePart.getSize());
-                return null;
-            }
+            if (imagePart.getSize() > MAX_FILE_SIZE) return null;
 
-            // ファイル名取得
             String fileName = getFileName(imagePart);
-            if (fileName == null || fileName.isEmpty()) {
-                System.err.println("ファイル名の取得に失敗しました");
-                return null;
-            }
+            if (fileName == null || fileName.isEmpty()) return null;
 
-            // 拡張子チェック
             String extension = getFileExtension(fileName).toLowerCase();
-            boolean validExtension = false;
+            boolean valid = false;
             for (String allowed : ALLOWED_EXTENSIONS) {
                 if (extension.equals(allowed)) {
-                    validExtension = true;
+                    valid = true;
                     break;
                 }
             }
+            if (!valid) return null;
 
-            if (!validExtension) {
-                System.err.println("許可されていない拡張子です: " + extension);
-                return null;
-            }
-
-            // ファイル保存
             String uploadPath = getServletContext().getRealPath("") + File.separator + UPLOAD_DIR;
             File uploadDir = new File(uploadPath);
-            if (!uploadDir.exists()) {
-                boolean created = uploadDir.mkdirs();
-                if (!created) {
-                    System.err.println("アップロードディレクトリの作成に失敗しました: " + uploadPath);
-                    return null;
-                }
-            }
+            if (!uploadDir.exists() && !uploadDir.mkdirs()) return null;
 
-            // ユニークなファイル名生成
             String timestamp = new SimpleDateFormat("yyyyMMddHHmmss").format(new java.util.Date());
             String uniqueFileName = timestamp + "_" + UUID.randomUUID().toString() + extension;
             String filePath = uploadPath + File.separator + uniqueFileName;
 
-            // ファイル保存
             imagePart.write(filePath);
-            System.out.println("画像ファイルを保存しました: " + filePath);
 
-            // DBに保存する相対パス
             return UPLOAD_DIR + "/" + uniqueFileName;
-
         } catch (Exception e) {
-            System.err.println("画像保存中にエラーが発生しました");
             e.printStackTrace();
             return null;
         }
     }
 
-    /**
-     * Partからファイル名を取得
-     */
+    /** ファイル名を取得 */
     private String getFileName(Part part) {
         String contentDisposition = part.getHeader("content-disposition");
-        if (contentDisposition == null) {
-            return null;
-        }
-
-        String[] tokens = contentDisposition.split(";");
-        for (String token : tokens) {
+        if (contentDisposition == null) return null;
+        for (String token : contentDisposition.split(";")) {
             if (token.trim().startsWith("filename")) {
-                String fileName = token.substring(token.indexOf("=") + 1).trim();
-                // ダブルクォートを除去
-                return fileName.replace("\"", "");
+                return token.substring(token.indexOf("=") + 1).trim().replace("\"", "");
             }
         }
         return null;
     }
 
-    /**
-     * ファイル名から拡張子を取得
-     */
+    /** 拡張子を取得 */
     private String getFileExtension(String fileName) {
         int lastIndex = fileName.lastIndexOf(".");
-        if (lastIndex > 0) {
-            return fileName.substring(lastIndex);
-        }
-        return "";
+        return (lastIndex > 0) ? fileName.substring(lastIndex) : "";
     }
 }

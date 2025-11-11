@@ -125,7 +125,10 @@
 </head>
 <body>
 <div id="container">
+<<<<<<< HEAD
     <jsp:include page="/store_jsp/header_store.jsp" />
+=======
+>>>>>>> branch 'master' of https://github.com/mkblue82/Exam.git
 
     <main class="column">
         <div class="main-contents">
