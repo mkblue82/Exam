@@ -6,7 +6,7 @@ import java.sql.SQLException;
 
 public class DBManager {
 
-    private static final String URL = "jdbc:postgresql://localhost:5432/postgres"; // DB名に変更OK
+    private static final String URL = "jdbc:postgresql://ep-rapid-surf-a100ysmf-pooler.ap-southeast-1.aws.neon.tech/neondb"; // DB名に変更OK
     private static final String USER = "neondb_owner";  // あなたのユーザー名
     private static final String PASSWORD = "npg_fpWk07TEejNO"; // あなたのパスワード
 
