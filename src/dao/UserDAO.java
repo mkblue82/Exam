@@ -110,27 +110,27 @@ public class UserDAO {
         }
     }
 
- // メールアドレスとパスワードで検索（ログイン認証用）
-    public User findByEmailAndPassword(String email, String password) throws SQLException {
-        String sql = "SELECT * FROM T004_user WHERE メールアドレス=? AND パスワード=?";
-        try (PreparedStatement pstmt = con.prepareStatement(sql)) {
-            pstmt.setString(1, email);
-            pstmt.setString(2, password);
-            ResultSet rs = pstmt.executeQuery();
-            if (rs.next()) {
-                User user = new User();
-                user.setUserId(rs.getInt("ユーザー_ID"));
-                user.setName(rs.getString("氏名"));
-                user.setEmail(rs.getString("メールアドレス"));
-                user.setPhone(rs.getString("電話番号"));
-                user.setPassword(rs.getString("パスワード"));
-                user.setFavoriteStore(rs.getString("お気に入り店舗"));
-                user.setStoreId(rs.getInt("店舗ID"));
-                user.setNotification(rs.getBoolean("通知ON_OFF"));
-                return user;
+    public User login(String email, String password) throws Exception {
+        String sql = "SELECT * FROM users WHERE email = ? AND password = ?";
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, email);
+            ps.setString(2, password);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    User user = new User();
+                    user.setUserId(rs.getInt("user_id"));
+                    user.setName(rs.getString("name"));
+                    user.setEmail(rs.getString("email"));
+                    user.setPhone(rs.getString("phone"));
+                    user.setPassword(rs.getString("password"));
+                    user.setFavoriteStore(rs.getString("favorite_store"));
+                    user.setStoreId(rs.getInt("store_id"));
+                    user.setNotification(rs.getBoolean("notification"));
+                    return user;
+                }
             }
         }
         return null;
     }
-
 }
