@@ -32,6 +32,7 @@ public class LoginExecuteAction extends Action {
             UserDAO dao = new UserDAO(con);
             User user = dao.login(email, password);
 
+
             if (user != null) {
                 // ✅ ログイン成功
                 logger.info("Login successful: " + email);
