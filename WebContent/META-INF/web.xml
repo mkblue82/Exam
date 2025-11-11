@@ -34,6 +34,19 @@
         <url-pattern>/main/Menu.action</url-pattern>
     </servlet-mapping>
 
+
+     <!-- SignupUserAction 用サーブレット（追加） -->
+    <servlet>
+        <servlet-name>SignupUserAction</servlet-name>
+        <servlet-class>foodloss.SignupUserAction</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>SignupUserAction</servlet-name>
+        <url-pattern>/signupUser</url-pattern>
+    </servlet-mapping>
+
+
+
     <!-- JSPファイルのサーブレットマッピング（必要に応じて） -->
     <welcome-file-list>
         <welcome-file>index.jsp</welcome-file>
