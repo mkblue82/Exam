@@ -52,7 +52,7 @@ public class MerchandiseRegisterAction extends HttpServlet {
         session.setAttribute("csrfToken", csrfToken);
         request.setAttribute("csrfToken", csrfToken);
 
-        request.getRequestDispatcher("/jsp/merchandise_register.jsp").forward(request, response);
+        request.getRequestDispatcher("/jsp/merchandise_register_store.jsp").forward(request, response);
     }
 
     @Override
@@ -76,7 +76,7 @@ public class MerchandiseRegisterAction extends HttpServlet {
             String newCsrfToken = UUID.randomUUID().toString();
             session.setAttribute("csrfToken", newCsrfToken);
             request.setAttribute("csrfToken", newCsrfToken);
-            request.getRequestDispatcher("/jsp/merchandise_register.jsp").forward(request, response);
+            request.getRequestDispatcher("/jsp/merchandise_register_store.jsp").forward(request, response);
             return;
         }
 
@@ -97,7 +97,7 @@ public class MerchandiseRegisterAction extends HttpServlet {
             String validationError = validateInput(merchandiseName, quantityStr, expirationDateStr, imagePart);
             if (validationError != null) {
                 request.setAttribute("errorMessage", validationError);
-                request.getRequestDispatcher("/jsp/merchandise_register.jsp").forward(request, response);
+                request.getRequestDispatcher("/jsp/merchandise_register_store.jsp").forward(request, response);
                 return;
             }
 
@@ -108,7 +108,7 @@ public class MerchandiseRegisterAction extends HttpServlet {
                 quantity = Integer.parseInt(quantityStr);
                 if (quantity < 1 || quantity > 9999) {
                     request.setAttribute("errorMessage", "個数は1～9999の範囲で入力してください。");
-                    request.getRequestDispatcher("/jsp/merchandise_register.jsp").forward(request, response);
+                    request.getRequestDispatcher("/jsp/merchandise_register_store.jsp").forward(request, response);
                     return;
                 }
 
@@ -116,25 +116,25 @@ public class MerchandiseRegisterAction extends HttpServlet {
                 Date today = new Date(System.currentTimeMillis());
                 if (expirationDate.before(today)) {
                     request.setAttribute("errorMessage", "消費期限は今日以降の日付を指定してください。");
-                    request.getRequestDispatcher("/jsp/merchandise_register.jsp").forward(request, response);
+                    request.getRequestDispatcher("/jsp/merchandise_register_store.jsp").forward(request, response);
                     return;
                 }
             } catch (IllegalArgumentException e) {
                 request.setAttribute("errorMessage", "入力形式が正しくありません。");
-                request.getRequestDispatcher("/jsp/merchandise_register.jsp").forward(request, response);
+                request.getRequestDispatcher("/jsp/merchandise_register_store.jsp").forward(request, response);
                 return;
             }
 
             // 商品名・タグの長さチェック
             if (merchandiseName.length() > 100) {
                 request.setAttribute("errorMessage", "商品名は100文字以内で入力してください。");
-                request.getRequestDispatcher("/jsp/merchandise_register.jsp").forward(request, response);
+                request.getRequestDispatcher("/jsp/merchandise_register_store.jsp").forward(request, response);
                 return;
             }
 
             if (tags != null && tags.length() > 200) {
                 request.setAttribute("errorMessage", "タグは200文字以内で入力してください。");
-                request.getRequestDispatcher("/jsp/merchandise_register.jsp").forward(request, response);
+                request.getRequestDispatcher("/jsp/merchandise_register_store.jsp").forward(request, response);
                 return;
             }
 
@@ -142,7 +142,7 @@ public class MerchandiseRegisterAction extends HttpServlet {
             bean.Store store = (bean.Store) session.getAttribute("store");
             if (store == null) {
                 request.setAttribute("errorMessage", "店舗情報が取得できませんでした。");
-                request.getRequestDispatcher("/jsp/merchandise_register.jsp").forward(request, response);
+                request.getRequestDispatcher("/jsp/merchandise_register_store.jsp").forward(request, response);
                 return;
             }
             int storeId = store.getStoreId();
@@ -157,7 +157,7 @@ public class MerchandiseRegisterAction extends HttpServlet {
             MerchandiseDAO merchandiseDAO = new MerchandiseDAO();
             if (merchandiseDAO.isDuplicateProduct(storeId, merchandiseName)) {
                 request.setAttribute("errorMessage", "この商品は既に登録されています。");
-                request.getRequestDispatcher("/jsp/merchandise_register.jsp").forward(request, response);
+                request.getRequestDispatcher("/jsp/merchandise_register_store.jsp").forward(request, response);
                 return;
             }
 
@@ -165,7 +165,7 @@ public class MerchandiseRegisterAction extends HttpServlet {
             String imagePath = validateAndSaveImage(imagePart);
             if (imagePath == null) {
                 request.setAttribute("errorMessage", "画像ファイルの保存に失敗しました。ファイル形式とサイズを確認してください。");
-                request.getRequestDispatcher("/jsp/merchandise_register.jsp").forward(request, response);
+                request.getRequestDispatcher("/jsp/merchandise_register_store.jsp").forward(request, response);
                 return;
             }
 
@@ -193,13 +193,13 @@ public class MerchandiseRegisterAction extends HttpServlet {
                 response.sendRedirect(request.getContextPath() + "/merchandise_register_complete");
             } else {
                 request.setAttribute("errorMessage", "商品の登録に失敗しました。もう一度お試しください。");
-                request.getRequestDispatcher("/jsp/merchandise_register.jsp").forward(request, response);
+                request.getRequestDispatcher("/jsp/merchandise_register_store.jsp").forward(request, response);
             }
 
         } catch (Exception e) {
             e.printStackTrace();
             request.setAttribute("errorMessage", "システムエラーが発生しました。管理者にお問い合わせください。");
-            request.getRequestDispatcher("/jsp/merchandise_register.jsp").forward(request, response);
+            request.getRequestDispatcher("/jsp/merchandise_register_store.jsp").forward(request, response);
         }
     }
 
