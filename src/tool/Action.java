@@ -11,6 +11,7 @@ public abstract class Action {
 			HttpServletRequest req, HttpServletResponse res
 		) throws Exception;
 
+	// 直す時は一言ください！！！！！！
 	protected Connection getConnection() throws SQLException {
 		return new DBManager().getConnection();
 	}

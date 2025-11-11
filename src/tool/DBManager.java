@@ -4,6 +4,8 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
+
+// 直す時は一言ください！！！！！
 public class DBManager {
 
     private static final String URL = "jdbc:postgresql://ep-rapid-surf-a100ysmf-pooler.ap-southeast-1.aws.neon.tech/neondb"; // DB名に変更OK
