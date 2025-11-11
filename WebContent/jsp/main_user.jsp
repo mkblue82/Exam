@@ -12,15 +12,15 @@
 <div id="container">
 
   <!-- ヘッダー読み込み -->
-  <jsp:include page="header.jsp" />
+  <jsp:include page="header_user.jsp" />
 
   <!-- 販売中の商品 -->
   <section>
     <h2 class="ribon"><span>販売中の商品</span></h2>
     <div class="thumbnail-slide">
-      <c:forEach var="product" items="${productList}">
-        <a href="item.jsp?id=${product.id}">
-          <img src="../images/${product.image}" alt="${product.name}">
+      <c:forEach var="merchandise" items="${merchandiseList}">
+        <a href="item.jsp?id=${merchandise.id}">
+          <img src="../images/${merchandise.image}" alt="${merchandise.name}">
         </a>
       </c:forEach>
     </div>
