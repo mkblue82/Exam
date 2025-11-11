@@ -23,6 +23,32 @@
     </servlet-mapping>
 
     <!-- メインメニュー用サーブレット（例：必要に応じて追加） -->
+<<<<<<< HEAD
+=======
+    <servlet>
+        <servlet-name>MainMenu</servlet-name>
+        <servlet-class>tool.ActionServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>MainMenu</servlet-name>
+        <url-pattern>/main/Menu.action</url-pattern>
+    </servlet-mapping>
+
+
+     <!-- SignupUserAction 用サーブレット（追加） -->
+    <servlet>
+        <servlet-name>SignupUserAction</servlet-name>
+        <servlet-class>foodloss.SignupUserAction</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>SignupUserAction</servlet-name>
+        <url-pattern>/signup_user</url-pattern>
+    </servlet-mapping>
+
+
+
+    <!-- JSPファイルのサーブレットマッピング（必要に応じて） -->
+>>>>>>> branch 'master' of https://github.com/mkblue82/Exam.git
     <welcome-file-list>
         <welcome-file>index.jsp</welcome-file>
     </welcome-file-list>
