@@ -180,7 +180,7 @@ public class MerchandiseDAO extends DAO {
         st.setTimestamp(7, merchandise.getRegistrationTime());
         st.setInt(8, merchandise.getStoreId());
         st.setBoolean(9, merchandise.getBookingStatus());
-        st.setInt(10, merchandise.getProductId());
+        st.setInt(10, merchandise.getMerchandiseId());
 
         int line = st.executeUpdate();
         st.close();
@@ -237,7 +237,7 @@ public class MerchandiseDAO extends DAO {
     }
 
     // 同一店舗内で同じ商品名が存在するか確認
-    public boolean isDuplicateProduct(int storeId, String merchandiseName) throws Exception {
+    public boolean isDuplicateMerchandise(int storeId, String merchandiseName) throws Exception {
         Connection con = getConnection();
         PreparedStatement st = con.prepareStatement(
             "SELECT COUNT(*) FROM T002_merchandise WHERE T002_FD8_merchandise = ? AND T002_FD5_merchandise = ?");
