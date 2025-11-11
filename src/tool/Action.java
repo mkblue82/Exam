@@ -1,6 +1,7 @@
 package tool;
 
 import java.sql.Connection;
+import java.sql.SQLException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -10,8 +11,7 @@ public abstract class Action {
 			HttpServletRequest req, HttpServletResponse res
 		) throws Exception;
 
-	protected Connection getConnection() throws Exception{
-		return DBManager.getConnection();
+	protected Connection getConnection() throws SQLException {
+		return new DBManager().getConnection();
 	}
-
 }
