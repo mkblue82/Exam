@@ -13,30 +13,18 @@
         <res-auth>Container</res-auth>
     </resource-ref>
 
-    <!-- LoginExecuteAction 用サーブレット -->
+    <session-config>
+        <session-timeout>30</session-timeout>
+    </session-config>
+
     <servlet>
-        <servlet-name>LoginExecute</servlet-name>
-        <servlet-class>tool.ActionServlet</servlet-class>
+        <servlet-name>Front</servlet-name>
+        <servlet-class>tool.Front</servlet-class>
     </servlet>
 
     <servlet-mapping>
-        <servlet-name>LoginExecute</servlet-name>
-        <url-pattern>/LoginExecute.action</url-pattern>
+        <servlet-name>Front</servlet-name>
+        <url-pattern>*.action</url-pattern>
     </servlet-mapping>
-
-    <!-- メインメニュー用サーブレット（例：必要に応じて追加） -->
-    <servlet>
-        <servlet-name>MainMenu</servlet-name>
-        <servlet-class>tool.ActionServlet</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>MainMenu</servlet-name>
-        <url-pattern>/main/Menu.action</url-pattern>
-    </servlet-mapping>
-
-    <!-- JSPファイルのサーブレットマッピング（必要に応じて） -->
-    <welcome-file-list>
-        <welcome-file>index.jsp</welcome-file>
-    </welcome-file-list>
 
 </web-app>
