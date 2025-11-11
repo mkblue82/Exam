@@ -110,23 +110,24 @@ public class UserDAO {
         }
     }
 
+
     public User login(String email, String password) throws Exception {
-        String sql = "SELECT * FROM users WHERE email = ? AND password = ?";
+        String sql = "SELECT * FROM T004_user WHERE メールアドレス = ? AND パスワード = ?";
         try (PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1, email);
             ps.setString(2, password);
 
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    User user = new User();
-                    user.setUserId(rs.getInt("user_id"));
-                    user.setName(rs.getString("name"));
-                    user.setEmail(rs.getString("email"));
-                    user.setPhone(rs.getString("phone"));
-                    user.setPassword(rs.getString("password"));
-                    user.setFavoriteStore(rs.getString("favorite_store"));
-                    user.setStoreId(rs.getInt("store_id"));
-                    user.setNotification(rs.getBoolean("notification"));
+                	User user = new User();
+                	user.setUserId(rs.getInt("ユーザー_ID"));
+                    user.setName(rs.getString("氏名"));
+                    user.setEmail(rs.getString("メールアドレス"));
+                    user.setPhone(rs.getString("電話番号"));
+                    user.setPassword(rs.getString("パスワード"));
+                    user.setFavoriteStore(rs.getString("お気に入り店舗"));
+                    user.setStoreId(rs.getInt("店舗ID"));
+                    user.setNotification(rs.getBoolean("通知ON_OFF"));
                     return user;
                 }
             }
