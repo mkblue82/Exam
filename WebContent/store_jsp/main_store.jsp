@@ -71,7 +71,7 @@
     </main>
 
     <!-- ✅ 共通フッター -->
-    <jsp:include page="footer.jsp" />
+    <jsp:include page="/jsp/footer.jsp" />
 </div>
 
 <!-- JS（共通） -->
