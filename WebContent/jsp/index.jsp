@@ -17,7 +17,13 @@ body {
   flex-direction: column;
   justify-content: space-between;
 }
-
+/* ヘッダー */
+header {
+  background-color: rgba(255, 255, 255, 0.8);
+  padding: 20px;
+  text-align: center;
+  flex-shrink: 0;
+}
 /* メインコンテンツ中央寄せ */
 main {
   display: flex;
@@ -25,8 +31,8 @@ main {
   align-items: center;
   flex-grow: 1;
   gap: 80px;
+  margin-top: 40px;
 }
-
 /* 各ログインボックス */
 .login-box {
   background: rgba(255, 255, 255, 0.85);
@@ -39,7 +45,6 @@ main {
 .login-box:hover {
   transform: translateY(-4px);
 }
-
 /* ログインボタン */
 .login-box a.btn {
   display: inline-block;
@@ -54,7 +59,6 @@ main {
 .login-box a.btn:hover {
   background-color: #b86532;
 }
-
 /* 下のリンク（加盟店登録、新規登録） */
 .login-box a.sub-link {
   display: block;
@@ -65,33 +69,29 @@ main {
 .login-box a.sub-link:hover {
   text-decoration: underline;
 }
-
-/* ヘッダーとフッター */
-header, footer {
+/* フッター */
+footer {
   text-align: center;
   background-color: rgba(255, 255, 255, 0.8);
   padding: 10px;
+  flex-shrink: 0;
 }
 </style>
 </head>
-
 <body>
-
-
-
+<header>
+  <h1 id="logo"><span>タイトル募集</span></h1>
+</header>
 <main>
   <div class="login-box">
     <a href="login_store.jsp" class="btn">店舗用ログイン</a>
   </div>
-
   <div class="login-box">
     <a href="login_user.jsp" class="btn">ユーザー用ログイン</a>
   </div>
 </main>
-
 <footer>
   <small>Copyright &copy; フードロス削減システム All Rights Reserved.</small>
 </footer>
-
 </body>
 </html>
