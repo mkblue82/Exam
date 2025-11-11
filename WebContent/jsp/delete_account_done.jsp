@@ -64,7 +64,7 @@
             <div class="delete-account-complete-container">
                 <h1>削除完了</h1>
                 <p class="complete-message">アカウント削除が完了しました。<br>ご利用ありがとうございました。</p>
-                <form method="GET" action="${pageContext.request.contextPath}/foodloss/Index.action">
+                <form method="GET" action="${pageContext.request.contextPath}/foodloss/Top.action">
                     <button type="submit" class="btn-login">TOP画面へ</button>
                 </form>
             </div>
