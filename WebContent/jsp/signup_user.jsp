@@ -125,7 +125,7 @@
 	    <h1>新規ユーザー登録</h1>
 
 
-	    <form action="${pageContext.request.contextPath}/foodloss/SignupUser.action" method="post">
+	    <form action="${pageContext.request.contextPath}/SignupUser.action" method="post">
 	        <input type="hidden" name="csrfToken" value="${sessionScope.csrfToken}">
 
 	        <div class="form-group">
