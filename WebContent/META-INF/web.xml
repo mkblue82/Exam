@@ -55,10 +55,8 @@
 
 
     <!-- JSPファイルのサーブレットマッピング（必要に応じて） -->
->>>>>>> branch 'master' of https://github.com/mkblue82/Exam.git
->>>>>>> branch 'master' of https://github.com/mkblue82/Exam.git
+
     <welcome-file-list>
         <welcome-file>index.jsp</welcome-file>
     </welcome-file-list>
 </web-app>
->>>>>>> branch 'master' of https://github.com/mkblue82/Exam.git
