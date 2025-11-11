@@ -90,7 +90,7 @@
 <body>
 <div id="container">
     <!-- ヘッダー読み込み -->
-    <jsp:include page="header.jsp" />
+    <jsp:include page="header_user.jsp" />
 
     <!-- アカウント削除確認コンテンツ -->
     <main class="column">

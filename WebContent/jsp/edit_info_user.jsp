@@ -84,7 +84,7 @@
 <div id="container">
 
     <!-- ✅ 共通ヘッダー -->
-    <jsp:include page="header.jsp" />
+    <jsp:include page="header_user.jsp" />
 
     <!-- ✅ メインエリア -->
     <main class="column">
