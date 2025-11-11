@@ -125,10 +125,9 @@
 </head>
 <body>
 <div id="container">
-<<<<<<< HEAD
-=======
+
+
     <jsp:include page="/store_jsp/header_store.jsp" />
->>>>>>> branch 'master' of https://github.com/mkblue82/Exam.git
 
 
     <main class="column">
@@ -143,16 +142,15 @@
                     </div>
                 <% } %>
 
-<<<<<<< HEAD
+
                 <form id="productRegisterForm"
                       action="${pageContext.request.contextPath}/merchandise_register_store"
                       method="post" enctype="multipart/form-data">
-=======
                 <form action="${pageContext.request.contextPath}/merchandise_register_store"
                       method="post"
                       enctype="multipart/form-data"
                       id="merchandiseRegisterForm">
->>>>>>> branch 'master' of https://github.com/mkblue82/Exam.git
+
 
                     <%-- CSRFトークン --%>
                     <input type="hidden" name="csrfToken" value="${csrfToken}">
