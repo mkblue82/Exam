@@ -39,7 +39,7 @@ body { font-family:Arial,sans-serif; background:#f5f5f5; min-height:100vh; paddi
             <div class="error-message">${error}</div>
         </c:if>
 
-        <form action="${pageContext.request.contextPath}/LoginExecute.action" method="post">
+        <form action="${pageContext.request.contextPath}/LoginExecute.Action" method="post">
 
             <div class="form-group">
                 <label for="email">メールアドレス</label>
