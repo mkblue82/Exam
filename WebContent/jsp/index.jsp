@@ -87,7 +87,7 @@ footer {
     <a href="login_store.jsp" class="btn">店舗用ログイン</a>
   </div>
   <div class="login-box">
-    <a href="login_user.jsp" class="btn">ユーザー用ログイン</a>
+    <a href="${pageContext.request.contextPath}/foodloss/Login.action" class="btn">ユーザー用ログイン</a>
   </div>
 </main>
 <footer>
