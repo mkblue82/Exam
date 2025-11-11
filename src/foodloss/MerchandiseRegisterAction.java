@@ -206,26 +206,20 @@ public class MerchandiseRegisterAction extends HttpServlet {
             request.getRequestDispatcher("/jsp/merchandise_register.jsp").forward(request, response);
         }
     }
-
-<<<<<<< HEAD
     /** 入力値の基本バリデーション */
     private String validateInput(String productName, String quantity,
-=======
     /**
      * 入力値の基本バリデーション
      * 画像仕様①-1：未入力フィールドチェック
      * @return エラーメッセージ（エラーがない場合null）
      */
     private String validateInput(String merchandiseName, String quantity,
->>>>>>> branch 'master' of https://github.com/mkblue82/Exam.git
-                                 String expirationDate, Part imagePart) {
-<<<<<<< HEAD
         if (productName == null || productName.trim().isEmpty()) return "このフィールドを入力してください";
         if (quantity == null || quantity.trim().isEmpty()) return "このフィールドを入力してください";
         if (expirationDate == null || expirationDate.trim().isEmpty()) return "このフィールドを入力してください";
         if (imagePart == null || imagePart.getSize() == 0) return "このフィールドを入力してください";
         return null;
-=======
+
 
         // 未入力チェック
         if (merchandiseName == null || merchandiseName.trim().isEmpty()) {
@@ -245,7 +239,6 @@ public class MerchandiseRegisterAction extends HttpServlet {
         }
 
         return null; // エラーなし
->>>>>>> branch 'master' of https://github.com/mkblue82/Exam.git
     }
 
     /** 画像ファイルのバリデーションと保存 */
