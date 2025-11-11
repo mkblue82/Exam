@@ -86,14 +86,14 @@ public class MerchandiseRegisterAction extends HttpServlet {
         request.setAttribute("csrfToken", newCsrfToken);
 
         try {
-            // パラメータ取得
-            String merchandiseName = request.getParameter("merchandiseName");
+            // パラメータ取得（JSPと一致）
+            String merchandiseName = request.getParameter("productName");
             String quantityStr = request.getParameter("quantity");
             String expirationDateStr = request.getParameter("expirationDate");
             String tags = request.getParameter("tags");
-            Part imagePart = request.getPart("merchandiseImage");
+            Part imagePart = request.getPart("productImage");
 
-            // 基本バリデーション - 未入力チェック（画像仕様①-1）
+            // 未入力チェック
             String validationError = validateInput(merchandiseName, quantityStr, expirationDateStr, imagePart);
             if (validationError != null) {
                 request.setAttribute("errorMessage", validationError);
@@ -125,14 +125,13 @@ public class MerchandiseRegisterAction extends HttpServlet {
                 return;
             }
 
-            // 商品名の長さチェック
+            // 商品名・タグの長さチェック
             if (merchandiseName.length() > 100) {
                 request.setAttribute("errorMessage", "商品名は100文字以内で入力してください。");
                 request.getRequestDispatcher("/jsp/merchandise_register.jsp").forward(request, response);
                 return;
             }
 
-            // タグの長さチェック
             if (tags != null && tags.length() > 200) {
                 request.setAttribute("errorMessage", "タグは200文字以内で入力してください。");
                 request.getRequestDispatcher("/jsp/merchandise_register.jsp").forward(request, response);
@@ -154,15 +153,15 @@ public class MerchandiseRegisterAction extends HttpServlet {
                 employeeId = 0; // デフォルト値
             }
 
-            // 商品の重複チェック（画像仕様②-2）
+            // 商品の重複チェック
             MerchandiseDAO merchandiseDAO = new MerchandiseDAO();
             if (merchandiseDAO.isDuplicateProduct(storeId, merchandiseName)) {
-                request.setAttribute("errorMessage", "この商品は既に登録されています");
+                request.setAttribute("errorMessage", "この商品は既に登録されています。");
                 request.getRequestDispatcher("/jsp/merchandise_register.jsp").forward(request, response);
                 return;
             }
 
-            // 画像ファイルのバリデーションと保存
+            // 画像バリデーションと保存
             String imagePath = validateAndSaveImage(imagePart);
             if (imagePath == null) {
                 request.setAttribute("errorMessage", "画像ファイルの保存に失敗しました。ファイル形式とサイズを確認してください。");
@@ -170,7 +169,7 @@ public class MerchandiseRegisterAction extends HttpServlet {
                 return;
             }
 
-            // 価格はデフォルト0（必要に応じて画面から取得）
+            // 価格はデフォルト0（必要に応じて拡張）
             int price = 0;
 
             // 商品オブジェクト作成
@@ -179,16 +178,8 @@ public class MerchandiseRegisterAction extends HttpServlet {
             merchandise.setStock(quantity);
             merchandise.setPrice(price);
             merchandise.setUseByDate(expirationDate);
-<<<<<<< HEAD
             merchandise.setProductTag(tags != null ? tags : "");
             merchandise.setProductImage(imagePath);
-=======
-<<<<<<< HEAD
-            merchandise.setMerchandiseTag(tags != null ? tags : "");
-            merchandise.setMerchandiseImage(imagePath);  // 画像パスを設定
-=======
->>>>>>> branch 'master' of https://github.com/mkblue82/Exam.git
-            merchandise.setMerchandiseTag(tags != null ? tags : "");
             merchandise.setEmployeeId(employeeId);
             merchandise.setRegistrationTime(new Timestamp(System.currentTimeMillis()));
             merchandise.setStoreId(storeId);
@@ -212,45 +203,30 @@ public class MerchandiseRegisterAction extends HttpServlet {
         }
     }
 
-<<<<<<< HEAD
-    /** 入力値の基本バリデーション */
-    private String validateInput(String productName, String quantity,
-=======
     /**
      * 入力値の基本バリデーション
      * 画像仕様①-1：未入力フィールドチェック
-     * @return エラーメッセージ（エラーがない場合null）
      */
     private String validateInput(String merchandiseName, String quantity,
->>>>>>> branch 'master' of https://github.com/mkblue82/Exam.git
                                  String expirationDate, Part imagePart) {
-<<<<<<< HEAD
-        if (productName == null || productName.trim().isEmpty()) return "このフィールドを入力してください";
-        if (quantity == null || quantity.trim().isEmpty()) return "このフィールドを入力してください";
-        if (expirationDate == null || expirationDate.trim().isEmpty()) return "このフィールドを入力してください";
-        if (imagePart == null || imagePart.getSize() == 0) return "このフィールドを入力してください";
-        return null;
-=======
 
-        // 未入力チェック
         if (merchandiseName == null || merchandiseName.trim().isEmpty()) {
-            return "このフィールドを入力してください"; // 商品名
+            return "商品名を入力してください。";
         }
 
         if (quantity == null || quantity.trim().isEmpty()) {
-            return "このフィールドを入力してください"; // 個数
+            return "個数を入力してください。";
         }
 
         if (expirationDate == null || expirationDate.trim().isEmpty()) {
-            return "このフィールドを入力してください"; // 消費期限
+            return "消費期限を入力してください。";
         }
 
         if (imagePart == null || imagePart.getSize() == 0) {
-            return "このフィールドを入力してください"; // 画像
+            return "画像を選択してください。";
         }
 
         return null; // エラーなし
->>>>>>> branch 'master' of https://github.com/mkblue82/Exam.git
     }
 
     /** 画像ファイルのバリデーションと保存 */
@@ -264,7 +240,10 @@ public class MerchandiseRegisterAction extends HttpServlet {
             String extension = getFileExtension(fileName).toLowerCase();
             boolean valid = false;
             for (String allowed : ALLOWED_EXTENSIONS) {
-                if (extension.equals(allowed)) { valid = true; break; }
+                if (extension.equals(allowed)) {
+                    valid = true;
+                    break;
+                }
             }
             if (!valid) return null;
 

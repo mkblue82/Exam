@@ -125,7 +125,6 @@
 </head>
 <body>
 <div id="container">
-    <jsp:include page="/jsp/header.jsp" />
 
     <main class="column">
         <div class="main-contents">
