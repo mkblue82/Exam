@@ -1,5 +1,13 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
+<%@ page import="java.util.UUID" %>
+<%
+    if (session.getAttribute("csrfToken") == null) {
+        session.setAttribute("csrfToken", UUID.randomUUID().toString());
+    }
+%>
+
+
 <!DOCTYPE html>
 <html lang="ja">
 <head>
