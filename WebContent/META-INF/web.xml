@@ -3,9 +3,13 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee
                              http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
+<<<<<<< HEAD
          version="3.1"
          metadata-complete="false">
 
+=======
+         version="3.1">
+>>>>>>> branch 'master' of https://github.com/mkblue82/Exam.git
     <!-- PostgreSQL DataSource -->
     <resource-ref>
         <description>PostgreSQL DataSource</description>
@@ -17,14 +21,20 @@
     <!-- LoginExecuteAction 用サーブレット -->
     <servlet>
         <servlet-name>LoginExecute</servlet-name>
-        <servlet-class>tool.ActionServlet</servlet-class>
+        <servlet-class>foodloss.LoginExecuteAction</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>LoginExecute</servlet-name>
         <url-pattern>/LoginExecute.action</url-pattern>
     </servlet-mapping>
 
+<<<<<<< HEAD
     <!-- メインメニュー用サーブレット -->
+=======
+    <!-- メインメニュー用サーブレット（例：必要に応じて追加） -->
+<<<<<<< HEAD
+=======
+>>>>>>> branch 'master' of https://github.com/mkblue82/Exam.git
     <servlet>
         <servlet-name>MainMenu</servlet-name>
         <servlet-class>tool.ActionServlet</servlet-class>
@@ -34,6 +44,7 @@
         <url-pattern>/main/Menu.action</url-pattern>
     </servlet-mapping>
 
+<<<<<<< HEAD
     <!-- 商品登録用サーブレット -->
     <servlet>
         <servlet-name>MerchandiseRegisterAction</servlet-name>
@@ -50,6 +61,23 @@
     </servlet-mapping>
 
     <!-- JSPファイルのサーブレットマッピング -->
+=======
+
+     <!-- SignupUserAction 用サーブレット（追加） -->
+    <servlet>
+        <servlet-name>SignupUserAction</servlet-name>
+        <servlet-class>foodloss.SignupUserAction</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>SignupUserAction</servlet-name>
+        <url-pattern>/signup_user</url-pattern>
+    </servlet-mapping>
+
+
+
+    <!-- JSPファイルのサーブレットマッピング（必要に応じて） -->
+>>>>>>> branch 'master' of https://github.com/mkblue82/Exam.git
+>>>>>>> branch 'master' of https://github.com/mkblue82/Exam.git
     <welcome-file-list>
         <welcome-file>index.jsp</welcome-file>
     </welcome-file-list>

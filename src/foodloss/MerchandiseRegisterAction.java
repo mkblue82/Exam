@@ -175,12 +175,16 @@ public class MerchandiseRegisterAction extends HttpServlet {
 
             // 商品オブジェクト作成
             Merchandise merchandise = new Merchandise();
-            merchandise.setProductName(productName);
+            merchandise.setMerchandiseName(productName);
             merchandise.setStock(quantity);
             merchandise.setPrice(price);
             merchandise.setUseByDate(expirationDate);
+<<<<<<< HEAD
             merchandise.setProductTag(tags != null ? tags : "");
             merchandise.setProductImage(imagePath);  // 画像パスを設定
+=======
+            merchandise.setMerchandiseTag(tags != null ? tags : "");
+>>>>>>> branch 'master' of https://github.com/mkblue82/Exam.git
             merchandise.setEmployeeId(employeeId);
             merchandise.setRegistrationTime(new Timestamp(System.currentTimeMillis()));
             merchandise.setStoreId(storeId);
