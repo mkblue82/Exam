@@ -125,6 +125,10 @@
 </head>
 <body>
 <div id="container">
+<<<<<<< HEAD
+=======
+    <jsp:include page="/store_jsp/header_store.jsp" />
+>>>>>>> branch 'master' of https://github.com/mkblue82/Exam.git
 
 
     <main class="column">
@@ -139,21 +143,28 @@
                     </div>
                 <% } %>
 
+<<<<<<< HEAD
                 <form id="productRegisterForm"
                       action="${pageContext.request.contextPath}/merchandise_register_store"
                       method="post" enctype="multipart/form-data">
+=======
+                <form action="${pageContext.request.contextPath}/merchandise_register_store"
+                      method="post"
+                      enctype="multipart/form-data"
+                      id="merchandiseRegisterForm">
+>>>>>>> branch 'master' of https://github.com/mkblue82/Exam.git
 
                     <%-- CSRFトークン --%>
                     <input type="hidden" name="csrfToken" value="${csrfToken}">
 
                     <div class="form-group">
-                        <label for="productName">商品名 <span style="color: red;">*</span></label>
+                        <label for="merchandiseName">商品名 <span style="color: red;">*</span></label>
                         <input type="text"
-                               id="productName"
-                               name="productName"
+                               id="merchandiseName"
+                               name="merchandiseName"
                                required
                                maxlength="100"
-                               value="${param.productName != null ? param.productName : ''}">
+                               value="${param.merchandiseName != null ? param.merchandiseName : ''}">
                     </div>
 
                     <div class="form-group">
@@ -187,10 +198,10 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="productImage">画像 <span style="color: red;">*</span></label>
+                        <label for="merchandiseImage">画像 <span style="color: red;">*</span></label>
                         <input type="file"
-                               id="productImage"
-                               name="productImage"
+                               id="merchandiseImage"
+                               name="merchandiseImage"
                                accept="image/*"
                                required
                                onchange="previewImage(this)">
@@ -233,7 +244,7 @@
         }
     }
 
-    document.getElementById('productRegisterForm').addEventListener('submit', function(e) {
+    document.getElementById('merchandiseRegisterForm').addEventListener('submit', function(e) {
         const expirationDate = new Date(document.getElementById('expirationDate').value);
         const today = new Date();
         today.setHours(0, 0, 0, 0);
@@ -244,7 +255,7 @@
             return false;
         }
 
-        const fileInput = document.getElementById('productImage');
+        const fileInput = document.getElementById('merchandiseImage');
         if (fileInput.files.length > 0) {
             const fileSize = fileInput.files[0].size;
             const maxSize = 5 * 1024 * 1024; // 5MB

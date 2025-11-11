@@ -93,11 +93,7 @@
 <body>
 <div id="container">
     <!-- ヘッダー -->
-<<<<<<< HEAD
-
-=======
-    <jsp:include page="/store_jsp/header_store.jsp" />
->>>>>>> branch 'master' of https://github.com/mkblue82/Exam.git
+    <jsp:include page="/jsp/header_user.jsp" />
 
     <!-- エラーコンテンツ -->
     <main class="column">

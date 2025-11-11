@@ -125,7 +125,7 @@
 	    <h1>新規ユーザー登録</h1>
 
 
-	    <form action="${pageContext.request.contextPath}/signup_user" method="post">
+	    <form action="${pageContext.request.contextPath}/SignupUser.action" method="post">
 	        <input type="hidden" name="csrfToken" value="${sessionScope.csrfToken}">
 
 	        <div class="form-group">
@@ -151,6 +151,7 @@
 	        </div>
 
 
+
 	        <div class="form-group">
 	            <label for="password">パスワード</label>
 	            <input type="password" id="password" name="password" required minlength="8"
@@ -163,6 +164,7 @@
 	    </form>
 	</div>
 	 <jsp:include page="footer.jsp" />
+
 
 
 </body>

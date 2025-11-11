@@ -36,6 +36,7 @@
 
     <!-- 商品登録用サーブレット - 削除（@WebServletアノテーションを使用） -->
 
+
     <!-- SignupUserAction 用サーブレット -->
     <servlet>
         <servlet-name>SignupUserAction</servlet-name>
@@ -43,7 +44,7 @@
     </servlet>
     <servlet-mapping>
         <servlet-name>SignupUserAction</servlet-name>
-        <url-pattern>/signup_user</url-pattern>
+        <url-pattern>/SignupUser.action</url-pattern>
     </servlet-mapping>
 
     <welcome-file-list>
