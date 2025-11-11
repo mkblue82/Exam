@@ -1,13 +1,13 @@
 	package dao;
 
 	import java.sql.Connection;
-	import java.sql.PreparedStatement;
-	import java.sql.ResultSet;
-	import java.sql.SQLException;
-	import java.util.ArrayList;
-	import java.util.List;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
-	import bean.User;
+import bean.User;
 
 	public class UserDAO {
 
@@ -17,20 +17,7 @@
 	        this.con = con;
 	    }
 
-<<<<<<< HEAD
-	    // ユーザー登録
-	    public void insert(User user) throws SQLException {
-	        String sql = "INSERT INTO T004_user (氏名, メールアドレス, 電話番号, パスワード, お気に入り店舗, 店舗ID, 通知ON_OFF) "
-	                   + "VALUES (?, ?, ?, ?, ?, ?, ?)RETURNING ユーザー_ID";
-	        try (PreparedStatement pstmt = con.prepareStatement(sql)) {
-	            pstmt.setString(1, user.getName());
-	            pstmt.setString(2, user.getEmail());
-	            pstmt.setString(3, user.getPhone());
-	            pstmt.setString(4, user.getPassword());
-	            pstmt.setString(5, user.getFavoriteStore());
-	            pstmt.setInt(6, user.getStoreId());
-	            pstmt.setBoolean(7, user.isNotification());
-=======
+
     // ユーザー登録
     public void insert(User user) throws SQLException {
         String sql = "INSERT INTO t004_user (t004_fd1_user, t004_fd2_user, t004_fd3_user, t004_fd4_user, t004_fd5_user, t004_fd6_user, t004_fd7_user) "
@@ -43,19 +30,7 @@
             pstmt.setString(5, user.getFavoriteStore());
             pstmt.setString(6, String.valueOf(user.getStoreId()));
             pstmt.setBoolean(7, user.isNotification());
->>>>>>> branch 'master' of https://github.com/mkblue82/Exam.git
 
-<<<<<<< HEAD
-	            try (ResultSet rs = pstmt.executeQuery()) {
-	                if (rs.next()){
-	                    user.setUserId(rs.getInt(1));
-	            	}
-
-	            }
-
-	        }
-	    }
-=======
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()){
                     user.setUserId(rs.getInt(1));
@@ -63,31 +38,7 @@
             }
         }
     }
->>>>>>> branch 'master' of https://github.com/mkblue82/Exam.git
 
-<<<<<<< HEAD
-	    // 全件取得
-	    public List<User> findAll() throws SQLException {
-	        List<User> list = new ArrayList<>();
-	        String sql = "SELECT * FROM T004_user ORDER BY ユーザー_ID";
-	        try (PreparedStatement pstmt = con.prepareStatement(sql);
-	             ResultSet rs = pstmt.executeQuery()) {
-	            while (rs.next()) {
-	                User user = new User();
-	                user.setUserId(rs.getInt("ユーザー_ID"));
-	                user.setName(rs.getString("氏名"));
-	                user.setEmail(rs.getString("メールアドレス"));
-	                user.setPhone(rs.getString("電話番号"));
-	                user.setPassword(rs.getString("パスワード"));
-	                user.setFavoriteStore(rs.getString("お気に入り店舗"));
-	                user.setStoreId(rs.getInt("店舗ID"));
-	                user.setNotification(rs.getBoolean("通知ON_OFF"));
-	                list.add(user);
-	            }
-	        }
-	        return list;
-	    }
-=======
     // 全件取得
     public List<User> findAll() throws SQLException {
         List<User> list = new ArrayList<>();
@@ -138,26 +89,7 @@
         }
         return null;
     }
->>>>>>> branch 'master' of https://github.com/mkblue82/Exam.git
 
-<<<<<<< HEAD
-	    // 更新
-	    public void update(User user) throws SQLException {
-	        String sql = "UPDATE T004_user SET 氏名=?, メールアドレス=?, 電話番号=?, パスワード=?, "
-	                   + "お気に入り店舗=?, 店舗ID=?, 通知ON_OFF=? WHERE ユーザー_ID=?";
-	        try (PreparedStatement pstmt = con.prepareStatement(sql)) {
-	            pstmt.setString(1, user.getName());
-	            pstmt.setString(2, user.getEmail());
-	            pstmt.setString(3, user.getPhone());
-	            pstmt.setString(4, user.getPassword());
-	            pstmt.setString(5, user.getFavoriteStore());
-	            pstmt.setInt(6, user.getStoreId());
-	            pstmt.setBoolean(7, user.isNotification());
-	            pstmt.setInt(8, user.getUserId());
-	            pstmt.executeUpdate();
-	        }
-	    }
-=======
     // 更新
     public void update(User user) throws SQLException {
         String sql = "UPDATE t004_user SET t004_fd1_user=?, t004_fd2_user=?, t004_fd3_user=?, t004_fd4_user=?, "
@@ -174,18 +106,7 @@
             pstmt.executeUpdate();
         }
     }
->>>>>>> branch 'master' of https://github.com/mkblue82/Exam.git
 
-<<<<<<< HEAD
-	    // 削除
-	    public void delete(int id) throws SQLException {
-	        String sql = "DELETE FROM T004_user WHERE ユーザー_ID=?";
-	        try (PreparedStatement pstmt = con.prepareStatement(sql)) {
-	            pstmt.setInt(1, id);
-	            pstmt.executeUpdate();
-	        }
-	    }
-=======
     // 削除
     public void delete(int id) throws SQLException {
         String sql = "DELETE FROM t004_user WHERE t004_pk1_user=?";
@@ -194,16 +115,7 @@
             pstmt.executeUpdate();
         }
     }
->>>>>>> branch 'master' of https://github.com/mkblue82/Exam.git
 
-<<<<<<< HEAD
-	 // ログイン認証用メソッド
-	    public User login(String email, String password) throws Exception {
-	        String sql = "SELECT * FROM T004_user WHERE メールアドレス = ? AND パスワード = ?";
-	        try (PreparedStatement ps = con.prepareStatement(sql)) {
-	            ps.setString(1, email);
-	            ps.setString(2, password);
-=======
 
 
 
@@ -211,34 +123,13 @@
 
     public User login(String email, String password) throws Exception {
 
-        String sql = "SELECT * FROM T004_user WHERE メールアドレス = ? AND パスワード = ?";
+
 
         String sql = "SELECT * FROM t004_user WHERE t004_fd2_user = ? AND t004_fd4_user = ?";
         try (PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1, email);
             ps.setString(2, password);
->>>>>>> branch 'master' of https://github.com/mkblue82/Exam.git
 
-<<<<<<< HEAD
-	            try (ResultSet rs = ps.executeQuery()) {
-	                if (rs.next()) {
-	                    User user = new User();
-	                    user.setUserId(rs.getInt("ユーザー_ID"));
-	                    user.setName(rs.getString("氏名"));
-	                    user.setEmail(rs.getString("メールアドレス"));
-	                    user.setPhone(rs.getString("電話番号"));
-	                    user.setPassword(rs.getString("パスワード"));
-	                    user.setFavoriteStore(rs.getString("お気に入り店舗"));
-	                    user.setStoreId(rs.getInt("店舗ID"));
-	                    user.setNotification(rs.getBoolean("通知ON_OFF"));
-	                    return user;
-	                }
-	            }
-	        }
-	        return null;
-	    }
-
-=======
             System.out.println("DEBUG: Searching for email=" + email + ", password=" + password);
 
             try (ResultSet rs = ps.executeQuery()) {
@@ -267,4 +158,4 @@
         return null;
     }
 }
->>>>>>> branch 'master' of https://github.com/mkblue82/Exam.git
+
