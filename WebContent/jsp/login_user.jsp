@@ -34,10 +34,6 @@ body { font-family:Arial,sans-serif; background:#f5f5f5; min-height:100vh; paddi
             <h1>ログイン</h1>
         </div>
 
-        <!-- エラー表示 -->
-        <c:if test="${not empty error}">
-            <div class="error-message">${error}</div>
-        </c:if>
 
         <form action="${pageContext.request.contextPath}/LoginExecute.action" method="post">
 
