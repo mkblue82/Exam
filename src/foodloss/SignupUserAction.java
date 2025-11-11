@@ -7,7 +7,6 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -17,7 +16,7 @@ import bean.User;
 import dao.UserDAO;
 import tool.DBManager;
 
-@WebServlet("/signup_ser")
+
 public class SignupUserAction extends HttpServlet {
 
     @Override

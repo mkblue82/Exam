@@ -42,7 +42,7 @@
     </servlet>
     <servlet-mapping>
         <servlet-name>SignupUserAction</servlet-name>
-        <url-pattern>/signupUser</url-pattern>
+        <url-pattern>/signup_user</url-pattern>
     </servlet-mapping>
 
 
