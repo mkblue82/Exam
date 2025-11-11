@@ -121,8 +121,6 @@ public class UserDAO {
 
     public User login(String email, String password) throws Exception {
 
-        String sql = "SELECT * FROM T004_user WHERE メールアドレス = ? AND パスワード = ?";
-
         String sql = "SELECT * FROM t004_user WHERE t004_fd2_user = ? AND t004_fd4_user = ?";
         try (PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1, email);
