@@ -1,5 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
+
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -53,6 +54,7 @@
 
         .form-group input[type="text"],
         .form-group input[type="email"],
+        .form-group input[type="tel"],
         .form-group input[type="password"] {
             width: 100%;
             padding: 0.8rem;
@@ -123,7 +125,7 @@
 	    <h1>新規ユーザー登録</h1>
 
 
-	    <form action="${pageContext.request.contextPath}/signupUser" method="post">
+	    <form action="${pageContext.request.contextPath}/signup_user" method="post">
 	        <input type="hidden" name="csrfToken" value="${sessionScope.csrfToken}">
 
 	        <div class="form-group">
@@ -139,6 +141,15 @@
 	                   placeholder="example@mail.com"
 	                  value="${param.email}">
 	        </div>
+
+			<div class="form-group">
+	            <label for="phone">電話番号</label>
+	            <input type="tel" id="phone" name="phone" required
+	                  placeholder="09012345678"
+         			  pattern="[0-9]{10,11}"
+	                  value="${param.phone}">
+	        </div>
+
 
 	        <div class="form-group">
 	            <label for="password">パスワード</label>
