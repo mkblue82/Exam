@@ -170,11 +170,11 @@ public class MerchandiseRegisterAction extends HttpServlet {
 
             // 商品オブジェクト作成
             Merchandise merchandise = new Merchandise();
-            merchandise.setProductName(productName);
+            merchandise.setMerchandiseName(productName);
             merchandise.setStock(quantity);
             merchandise.setPrice(price);
             merchandise.setUseByDate(expirationDate);
-            merchandise.setProductTag(tags != null ? tags : "");
+            merchandise.setMerchandiseTag(tags != null ? tags : "");
             merchandise.setEmployeeId(employeeId);
             merchandise.setRegistrationTime(new Timestamp(System.currentTimeMillis()));
             merchandise.setStoreId(storeId);
