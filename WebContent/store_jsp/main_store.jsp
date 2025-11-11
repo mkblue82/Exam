@@ -53,7 +53,7 @@
 <body>
 <div id="container">
     <!-- ✅ 共通ヘッダー -->
-    <jsp:include page="header_store.jsp" />
+    <jsp:include page="/store_jsp/header_store.jsp" />
 
     <!-- ✅ メインエリア -->
     <main class="column">
