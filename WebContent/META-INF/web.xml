@@ -51,6 +51,7 @@
         <url-pattern>/merchandise_register_store</url-pattern>
     </servlet-mapping>
 
+
     <!-- SignupUserAction 用サーブレット -->
     <servlet>
         <servlet-name>SignupUserAction</servlet-name>
