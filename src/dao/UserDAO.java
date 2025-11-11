@@ -52,7 +52,10 @@ public class UserDAO {
                 user.setPhone(rs.getString("t004_fd3_user"));
                 user.setPassword(rs.getString("t004_fd4_user"));
                 user.setFavoriteStore(rs.getString("t004_fd5_user"));
-                user.setStoreId(Integer.parseInt(rs.getString("t004_fd6_user")));
+
+                String storeIdStr = rs.getString("t004_fd6_user");
+                user.setStoreId(storeIdStr != null ? Integer.parseInt(storeIdStr) : 0);
+
                 user.setNotification(rs.getBoolean("t004_fd7_user"));
                 list.add(user);
             }
@@ -74,7 +77,10 @@ public class UserDAO {
                 user.setPhone(rs.getString("t004_fd3_user"));
                 user.setPassword(rs.getString("t004_fd4_user"));
                 user.setFavoriteStore(rs.getString("t004_fd5_user"));
-                user.setStoreId(Integer.parseInt(rs.getString("t004_fd6_user")));
+
+                String storeIdStr = rs.getString("t004_fd6_user");
+                user.setStoreId(storeIdStr != null ? Integer.parseInt(storeIdStr) : 0);
+
                 user.setNotification(rs.getBoolean("t004_fd7_user"));
                 return user;
             }
@@ -115,8 +121,11 @@ public class UserDAO {
             ps.setString(1, email);
             ps.setString(2, password);
 
+            System.out.println("DEBUG: Searching for email=" + email + ", password=" + password);
+
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
+                    System.out.println("DEBUG: User found!");
                     User user = new User();
                     user.setUserId(rs.getInt("t004_pk1_user"));
                     user.setName(rs.getString("t004_fd1_user"));
@@ -124,9 +133,14 @@ public class UserDAO {
                     user.setPhone(rs.getString("t004_fd3_user"));
                     user.setPassword(rs.getString("t004_fd4_user"));
                     user.setFavoriteStore(rs.getString("t004_fd5_user"));
-                    user.setStoreId(Integer.parseInt(rs.getString("t004_fd6_user")));
+
+                    String storeIdStr = rs.getString("t004_fd6_user");
+                    user.setStoreId(storeIdStr != null ? Integer.parseInt(storeIdStr) : 0);
+
                     user.setNotification(rs.getBoolean("t004_fd7_user"));
                     return user;
+                } else {
+                    System.out.println("DEBUG: No user found for email=" + email);
                 }
             }
         }

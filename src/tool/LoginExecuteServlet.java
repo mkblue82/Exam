@@ -10,7 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import foodloss.LoginExecuteAction;
 
-@WebServlet("/LoginExecute") // これがブラウザからアクセスするURL
+@WebServlet("/LoginExecute.action") // これがブラウザからアクセスするURL
 public class LoginExecuteServlet extends HttpServlet {
 
     @Override
