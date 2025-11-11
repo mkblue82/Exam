@@ -125,7 +125,7 @@
 </head>
 <body>
 <div id="container">
-    <jsp:include page="/jsp/header.jsp" />
+
 
     <main class="column">
         <div class="main-contents">
@@ -139,10 +139,9 @@
                     </div>
                 <% } %>
 
-                <form action="${pageContext.request.contextPath}/merchandise_register_store"
-                      method="post"
-                      enctype="multipart/form-data"
-                      id="productRegisterForm">
+                <form id="productRegisterForm"
+                      action="${pageContext.request.contextPath}/merchandise_register_store"
+                      method="post" enctype="multipart/form-data">
 
                     <%-- CSRFトークン --%>
                     <input type="hidden" name="csrfToken" value="${csrfToken}">

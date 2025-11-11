@@ -5,9 +5,7 @@
                              http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
          version="3.1"
          metadata-complete="false">
-
 <!-- tanaka -->
-
     <!-- PostgreSQL DataSource -->
     <resource-ref>
         <description>PostgreSQL DataSource</description>
@@ -36,20 +34,7 @@
         <url-pattern>/main/Menu.action</url-pattern>
     </servlet-mapping>
 
-    <!-- 商品登録用サーブレット -->
-    <servlet>
-        <servlet-name>MerchandiseRegisterAction</servlet-name>
-        <servlet-class>foodloss.MerchandiseRegisterAction</servlet-class>
-        <multipart-config>
-            <max-file-size>5242880</max-file-size>
-            <max-request-size>10485760</max-request-size>
-            <file-size-threshold>2097152</file-size-threshold>
-        </multipart-config>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>MerchandiseRegisterAction</servlet-name>
-        <url-pattern>/merchandise_register_store</url-pattern>
-    </servlet-mapping>
+    <!-- 商品登録用サーブレット - 削除（@WebServletアノテーションを使用） -->
 
     <!-- SignupUserAction 用サーブレット -->
     <servlet>
@@ -64,5 +49,5 @@
     <welcome-file-list>
         <welcome-file>index.jsp</welcome-file>
     </welcome-file-list>
-
 </web-app>
+
