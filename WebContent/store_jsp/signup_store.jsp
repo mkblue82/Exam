@@ -176,6 +176,6 @@
 	                onclick="location.href='${pageContext.request.contextPath}/jsp/login_store.jsp'">ログインに戻る</button>
 	    </form>
 	</div>
-	 <jsp:include page="footer.jsp" />
+	 <jsp:include page="/jsp/footer.jsp" />
 </body>
 </html>
