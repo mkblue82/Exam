@@ -14,10 +14,11 @@ public class FrontController extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
 		try {
+
 			// パスを取得s
 			String path = req.getServletPath().substring(1);
 			// ファイル名を取得しクラス名に変換
-			String name = path.replace(".a", "A").replace('/', '.');
+			String name = path.replace(".action", "Action").replace('/', '.');
 			// アクションクラスのインスタンスを返却
 			Action action = (Action) Class.forName(name).getDeclaredConstructor().newInstance();
 
