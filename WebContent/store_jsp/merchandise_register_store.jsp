@@ -132,39 +132,49 @@
             <div class="register-wrapper">
                 <h1>商品登録</h1>
 
-				<form action="${pageContext.request.contextPath}/merchandise_register_store"
-				      method="post"
-				      enctype="multipart/form-data"
-				      id="productRegisterForm">
+                <%-- エラーメッセージ表示 --%>
+                <% if (request.getAttribute("errorMessage") != null) { %>
+                    <div class="error-message">
+                        <%= request.getAttribute("errorMessage") %>
+                    </div>
+                <% } %>
+
+                <form action="${pageContext.request.contextPath}/merchandise_register_store"
+                      method="post"
+                      enctype="multipart/form-data"
+                      id="productRegisterForm">
+
+                    <%-- CSRFトークン --%>
+                    <input type="hidden" name="csrfToken" value="${csrfToken}">
 
                     <div class="form-group">
-                        <label for="productName">商品名</label>
+                        <label for="productName">商品名 <span style="color: red;">*</span></label>
                         <input type="text"
                                id="productName"
                                name="productName"
                                required
                                maxlength="100"
-                               value="${param.productName}">
+                               value="${param.productName != null ? param.productName : ''}">
                     </div>
 
                     <div class="form-group">
-                        <label for="quantity">個数</label>
+                        <label for="quantity">個数 <span style="color: red;">*</span></label>
                         <input type="number"
                                id="quantity"
                                name="quantity"
                                required
                                min="1"
                                max="9999"
-                               value="${param.quantity}">
+                               value="${param.quantity != null ? param.quantity : ''}">
                     </div>
 
                     <div class="form-group">
-                        <label for="expirationDate">消費期限</label>
+                        <label for="expirationDate">消費期限 <span style="color: red;">*</span></label>
                         <input type="date"
                                id="expirationDate"
                                name="expirationDate"
                                required
-                               value="${param.expirationDate}">
+                               value="${param.expirationDate != null ? param.expirationDate : ''}">
                     </div>
 
                     <div class="form-group">
@@ -173,11 +183,12 @@
                                id="tags"
                                name="tags"
                                maxlength="200"
-                               value="${param.tags}">
+                               placeholder="例: 野菜, 新鮮, セール"
+                               value="${param.tags != null ? param.tags : ''}">
                     </div>
 
                     <div class="form-group">
-                        <label for="productImage">画像</label>
+                        <label for="productImage">画像 <span style="color: red;">*</span></label>
                         <input type="file"
                                id="productImage"
                                name="productImage"
@@ -204,54 +215,54 @@
     <jsp:include page="/jsp/footer.jsp" />
 </div>
 
-    <script>
-        function previewImage(input) {
-            const preview = document.getElementById('preview');
-            const previewContainer = document.getElementById('imagePreview');
+<script>
+    function previewImage(input) {
+        const preview = document.getElementById('preview');
+        const previewContainer = document.getElementById('imagePreview');
 
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
 
-                reader.onload = function(e) {
-                    preview.src = e.target.result;
-                    previewContainer.style.display = 'block';
-                }
-
-                reader.readAsDataURL(input.files[0]);
-            } else {
-                previewContainer.style.display = 'none';
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+                previewContainer.style.display = 'block';
             }
+
+            reader.readAsDataURL(input.files[0]);
+        } else {
+            previewContainer.style.display = 'none';
+        }
+    }
+
+    document.getElementById('productRegisterForm').addEventListener('submit', function(e) {
+        const expirationDate = new Date(document.getElementById('expirationDate').value);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        if (expirationDate < today) {
+            e.preventDefault();
+            alert('消費期限は今日以降の日付を指定してください。');
+            return false;
         }
 
-        document.getElementById('productRegisterForm').addEventListener('submit', function(e) {
-            const expirationDate = new Date(document.getElementById('expirationDate').value);
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
+        const fileInput = document.getElementById('productImage');
+        if (fileInput.files.length > 0) {
+            const fileSize = fileInput.files[0].size;
+            const maxSize = 5 * 1024 * 1024; // 5MB
 
-            if (expirationDate < today) {
+            if (fileSize > maxSize) {
                 e.preventDefault();
-                alert('消費期限は今日以降の日付を指定してください。');
+                alert('画像ファイルのサイズは5MB以下にしてください。');
                 return false;
             }
+        }
+    });
+</script>
 
-            const fileInput = document.getElementById('productImage');
-            if (fileInput.files.length > 0) {
-                const fileSize = fileInput.files[0].size;
-                const maxSize = 5 * 1024 * 1024;
-
-                if (fileSize > maxSize) {
-                    e.preventDefault();
-                    alert('画像ファイルのサイズは5MB以下にしてください。');
-                    return false;
-                }
-            }
-        });
-    </script>
-
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
-    <script src="${pageContext.request.contextPath}/js/slick.js"></script>
-    <script src="${pageContext.request.contextPath}/js/main.js"></script>
-    <script src="${pageContext.request.contextPath}/js/validation.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
+<script src="${pageContext.request.contextPath}/js/slick.js"></script>
+<script src="${pageContext.request.contextPath}/js/main.js"></script>
+<script src="${pageContext.request.contextPath}/js/validation.js"></script>
 </body>
 </html>
