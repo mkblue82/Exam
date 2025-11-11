@@ -1,41 +1,40 @@
 package foodloss;
 
-import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import bean.User;
 import dao.UserDAO;
+import tool.Action;
 import tool.DBManager;
 
 
-public class SignupUserAction extends HttpServlet {
-
-	@Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse res)
-            throws ServletException, IOException {
-        req.getRequestDispatcher("/jsp/signup_user.jsp").forward(req, res);
-    }
-
+public class SignupUserAction extends Action {
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse res)
-            throws ServletException, IOException {
+    public void execute(HttpServletRequest req, HttpServletResponse res)
+            throws Exception {
 
+        // GETリクエストの場合
+        if ("GET".equalsIgnoreCase(req.getMethod())) {
+            req.getRequestDispatcher("/jsp/signup_user.jsp").forward(req, res);
+            return;
+        }
+
+        // POSTリクエストの場合
         req.setCharacterEncoding("UTF-8");
 
         // --- CSRFトークンチェック ---
         HttpSession session = req.getSession();
         String token = req.getParameter("csrfToken");
         String sessionToken = (String) session.getAttribute("csrfToken");
+
         if (sessionToken == null || !sessionToken.equals(token)) {
             req.setAttribute("errorMessage", "不正なアクセスです。");
             req.getRequestDispatcher("/jsp/signup_user.jsp").forward(req, res);
@@ -46,7 +45,49 @@ public class SignupUserAction extends HttpServlet {
         String name = req.getParameter("name");
         String email = req.getParameter("email");
         String phone = req.getParameter("phone");
-        String password = hashPassword(req.getParameter("password"));
+        String passwordRaw = req.getParameter("password");
+
+        // --- 未入力チェック ---
+        if (name == null || name.trim().isEmpty()) {
+            req.setAttribute("errorMessage", "氏名を入力してください。");
+            req.getRequestDispatcher("/jsp/signup_user.jsp").forward(req, res);
+            return;
+        }
+
+        if (email == null || email.trim().isEmpty()) {
+            req.setAttribute("errorMessage", "メールアドレスを入力してください。");
+            req.getRequestDispatcher("/jsp/signup_user.jsp").forward(req, res);
+            return;
+        }
+
+        if (phone == null || phone.trim().isEmpty()) {
+            req.setAttribute("errorMessage", "電話番号を入力してください。");
+            req.getRequestDispatcher("/jsp/signup_user.jsp").forward(req, res);
+            return;
+        }
+
+        if (passwordRaw == null || passwordRaw.trim().isEmpty()) {
+            req.setAttribute("errorMessage", "パスワードを入力してください。");
+            req.getRequestDispatcher("/jsp/signup_user.jsp").forward(req, res);
+            return;
+        }
+
+        // パスワードの桁数チェック
+        if (passwordRaw.length() < 8) {
+            req.setAttribute("errorMessage", "パスワードは8文字以上で入力してください。");
+            req.getRequestDispatcher("/jsp/signup_user.jsp").forward(req, res);
+            return;
+        }
+
+        // 電話番号の形式チェック
+        if (!phone.matches("[0-9]{10,11}")) {
+            req.setAttribute("errorMessage", "電話番号は10桁または11桁の数字で入力してください。");
+            req.getRequestDispatcher("/jsp/signup_user.jsp").forward(req, res);
+            return;
+        }
+
+        // パスワードのハッシュ化
+        String password = hashPassword(passwordRaw);
 
         // --- Userオブジェクト作成 ---
         User user = new User();
@@ -61,10 +102,22 @@ public class SignupUserAction extends HttpServlet {
         // --- DB登録 ---
         try (Connection conn = DBManager.getConnection()) {
             UserDAO dao = new UserDAO(conn);
-            dao.insert(user); // SERIAL IDに対応、挿入後 userId がセットされる
 
-            // 成功時：CSRFトークンを削除して完了ページへ
+            // メールアドレスの重複チェック
+            if (isEmailExists(dao, email)) {
+                req.setAttribute("errorMessage", "このメールアドレスは既に登録されています。");
+                req.getRequestDispatcher("/jsp/signup_user.jsp").forward(req, res);
+                return;
+            }
+
+            // ユーザー登録（SERIAL型でユーザーIDが自動生成される）
+            dao.insert(user);
+
+            // 成功時：CSRFトークンを削除
             session.removeAttribute("csrfToken");
+            session.setAttribute("registeredUser", user);
+
+            // 登録完了画面へ遷移
             req.getRequestDispatcher("/jsp/signupsuccess_user.jsp").forward(req, res);
 
         } catch (SQLException e) {
@@ -74,7 +127,21 @@ public class SignupUserAction extends HttpServlet {
         }
     }
 
-    // --- パスワードハッシュ化 ---
+    /**
+     * メールアドレスの重複チェック
+     */
+    private boolean isEmailExists(UserDAO dao, String email) throws SQLException {
+        for (User user : dao.findAll()) {
+            if (user.getEmail().equals(email)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * パスワードハッシュ化
+     */
     private String hashPassword(String password) {
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-256");
