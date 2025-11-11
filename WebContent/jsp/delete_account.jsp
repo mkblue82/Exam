@@ -108,7 +108,7 @@
 <body>
 <div id="container">
     <!-- ヘッダー -->
-    <jsp:include page="header.jsp" />
+    <jsp:include page="header_user.jsp" />
 
     <main class="column">
         <div class="main-contents">
