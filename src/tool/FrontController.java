@@ -14,6 +14,7 @@ public class FrontController extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
 		try {
+			System.out.println("FrontController called: " + req.getServletPath());
 
 			// パスを取得s
 			String path = req.getServletPath().substring(1);

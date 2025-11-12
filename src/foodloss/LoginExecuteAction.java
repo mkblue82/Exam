@@ -2,35 +2,13 @@ package foodloss;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
-import bean.User;
-import dao.UserDAO;
 import tool.Action;
-import tool.DBManager;
 
 public class LoginExecuteAction extends Action {
-
     @Override
-    public void execute(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        String email = request.getParameter("email");
-        String password = request.getParameter("password");
-
-        DBManager db = new DBManager();
-        UserDAO dao = new UserDAO(db.getConnection());
-        User user = dao.login(email, password);
-
-
-        if (user != null) {
-            HttpSession session = request.getSession();
-            session.setAttribute("user", user);
-
-            // ログイン成功 → Menu.action にリダイレクト
-            response.sendRedirect(request.getContextPath() + "/Menu.action");
-
-        } else {
-            request.setAttribute("error", "メールアドレスまたはパスワードが違います。");
-            request.getRequestDispatcher("/jsp/login_user.jsp").forward(request, response);
-        }
+    public void execute(HttpServletRequest req, HttpServletResponse res) throws Exception {
+        System.out.println("★★ LoginExecuteAction 実行されました ★★");
+        res.getWriter().println("OK");
     }
 }

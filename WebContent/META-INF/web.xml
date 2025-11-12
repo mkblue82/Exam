@@ -8,6 +8,16 @@
 
 <!-- tanaka -->
 
+<servlet>
+    <servlet-name>FrontController</servlet-name>
+    <servlet-class>tool.FrontController</servlet-class>
+</servlet>
+<servlet-mapping>
+    <servlet-name>FrontController</servlet-name>
+    <url-pattern>*.action</url-pattern>
+</servlet-mapping>
+
+
     <!-- PostgreSQL DataSource -->
     <resource-ref>
         <description>PostgreSQL DataSource</description>
@@ -16,15 +26,7 @@
         <res-auth>Container</res-auth>
     </resource-ref>
 
-    <!-- LoginExecuteAction 用サーブレット -->
-    <servlet>
-        <servlet-name>LoginExecute</servlet-name>
-        <servlet-class>foodloss.LoginExecuteAction</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>LoginExecute</servlet-name>
-        <url-pattern>/LoginExecute.action</url-pattern>
-    </servlet-mapping>
+
 
     <!-- メインメニュー用サーブレット -->
     <servlet>
