@@ -93,8 +93,7 @@
 <body>
 <div id="container">
     <!-- ヘッダー -->
-<jsp:include page="/store_jsp/header_store.jsp" />
-
+    <jsp:include page="/jsp/header_user.jsp" />
 
     <!-- エラーコンテンツ -->
     <main class="column">

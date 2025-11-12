@@ -64,8 +64,10 @@
         <div class="main-contents">
             <div class="main-content">
                 <div class="point-section">
+
+                <!-- ポイント機能追加したらここら辺都度直してください -->
                     <h2>所有ポイント</h2>
-                    <p>${user.point} P</p>
+                    <p>0 P</p>
                 </div>
                 <div class="button-group">
                     <a href="${pageContext.request.contextPath}/jsp/edit_info.jsp">情報変更</a>
@@ -81,7 +83,7 @@
 <!-- JS -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
-<script src="../js/slick.js"></script>
-<script src="../js/main.js"></script>
+<script src="${pageContext.request.contextPath}/js/slick.js"></script>
+<script src="${pageContext.request.contextPath}/js/main.js"></script>
 </body>
 </html>

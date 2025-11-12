@@ -15,7 +15,7 @@
 <div id="menubar">
   <nav>
     <ul>
-      <li><a href="${pageContext.request.contextPath}/jsp/main_user.jsp">ホーム<span>Home</span></a></li>
+      <li><a href="${pageContext.request.contextPath}/jsp/main_store.jsp">ホーム<span>Home</span></a></li>
       <li><a href="${pageContext.request.contextPath}/jsp/mypage.jsp"><span>STOREページ</span></a></li>
     </ul>
   </nav>

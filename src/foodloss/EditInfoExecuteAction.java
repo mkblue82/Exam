@@ -1,4 +1,4 @@
-package action;
+package foodloss;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -10,7 +10,6 @@ import javax.servlet.http.HttpSession;
 import bean.User;
 import dao.UserDAO;
 import tool.Action;
-import tool.DBConnection;
 
 public class EditInfoExecuteAction extends Action {
 
@@ -39,7 +38,7 @@ public class EditInfoExecuteAction extends Action {
 
         Connection con = null;
         try {
-            con = DBConnection.getConnection();
+            con = DBManager.getConnection();
             UserDAO dao = new UserDAO(con);
 
             // DB登録済みのユーザー情報を取得（更新のため最新状態に）

@@ -12,10 +12,10 @@ body {
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  height: 100vh;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  margin: 0;
 }
 /* ヘッダー */
 header {
@@ -24,14 +24,23 @@ header {
   text-align: center;
   flex-shrink: 0;
 }
-/* メインコンテンツ中央寄せ */
+/* コンテナ */
+#container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-height: calc(100vh - 0px);
+}
+/* メインコンテンツ */
 main {
   display: flex;
   justify-content: center;
   align-items: center;
-  flex-grow: 1;
   gap: 80px;
-  margin-top: 40px;
+  padding: 0 20px;
+  flex: 1;
+  margin-top: -150px;
 }
 /* 各ログインボックス */
 .login-box {
@@ -69,29 +78,30 @@ main {
 .login-box a.sub-link:hover {
   text-decoration: underline;
 }
-/* フッター */
-footer {
-  text-align: center;
-  background-color: rgba(255, 255, 255, 0.8);
-  padding: 10px;
-  flex-shrink: 0;
-}
 </style>
 </head>
 <body>
-<header>
-  <h1 id="logo"><span>タイトル募集</span></h1>
-</header>
-<main>
-  <div class="login-box">
-    <a href="login_store.jsp" class="btn">店舗用ログイン</a>
-  </div>
-  <div class="login-box">
-    <a href="login_user.jsp" class="btn">ユーザー用ログイン</a>
-  </div>
-</main>
-<footer>
-  <small>Copyright &copy; フードロス削減システム All Rights Reserved.</small>
-</footer>
+<div id="container">
+  <header>
+    <h1 id="logo"><span>タイトル募集</span></h1>
+  </header>
+  <main>
+    <div class="login-box">
+      <a href="login_store.jsp" class="btn">店舗用ログイン</a>
+    </div>
+    <div class="login-box">
+      <a href="${pageContext.request.contextPath}/foodloss/Login.action" class="btn">ユーザー用ログイン</a>
+    </div>
+  </main>
+
+  <!-- フッター読み込み -->
+  <jsp:include page="footer.jsp" />
+</div>
+
+<!-- JS -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
+<script src="${pageContext.request.contextPath}/js/slick.js"></script>
+<script src="${pageContext.request.contextPath}/js/main.js"></script>
 </body>
 </html>

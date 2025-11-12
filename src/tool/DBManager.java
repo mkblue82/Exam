@@ -4,9 +4,12 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
+
+// 直す時は一言ください！！！！！
 public class DBManager {
 
     private static final String URL = "jdbc:postgresql://ep-rapid-surf-a100ysmf-pooler.ap-southeast-1.aws.neon.tech:5432/neondb"; // DB名に変更OK
+
     private static final String USER = "neondb_owner";  // あなたのユーザー名
     private static final String PASSWORD = "npg_fpWk07TEejNO"; // あなたのパスワード
 
@@ -21,7 +24,7 @@ public class DBManager {
     }
 
     // データベース接続を返す
-    public static Connection getConnection() throws SQLException {
+    public Connection getConnection() throws SQLException {
         return DriverManager.getConnection(URL, USER, PASSWORD);
     }
 }

@@ -9,14 +9,13 @@ import java.util.List;
 
 import bean.User;
 
-	public class UserDAO {
+public class UserDAO {
 
-	    private Connection con;
+    private Connection con;
 
-	    public UserDAO(Connection con) {
-	        this.con = con;
-	    }
-
+    public UserDAO(Connection con) {
+        this.con = con;
+    }
 
     // ユーザー登録
     public void insert(User user) throws SQLException {
@@ -28,7 +27,14 @@ import bean.User;
             pstmt.setString(3, user.getPhone());
             pstmt.setString(4, user.getPassword());
             pstmt.setString(5, user.getFavoriteStore());
-            pstmt.setString(6, String.valueOf(user.getStoreId()));
+
+            // storeIdが0の場合はNULLを設定
+            if (user.getStoreId() == 0) {
+                pstmt.setNull(6, java.sql.Types.INTEGER);
+            } else {
+                pstmt.setInt(6, user.getStoreId());
+            }
+
             pstmt.setBoolean(7, user.isNotification());
 
             try (ResultSet rs = pstmt.executeQuery()) {
@@ -54,8 +60,9 @@ import bean.User;
                 user.setPassword(rs.getString("t004_fd4_user"));
                 user.setFavoriteStore(rs.getString("t004_fd5_user"));
 
-                String storeIdStr = rs.getString("t004_fd6_user");
-                user.setStoreId(storeIdStr != null ? Integer.parseInt(storeIdStr) : 0);
+                // NULLチェックを追加
+                Integer storeId = (Integer) rs.getObject("t004_fd6_user");
+                user.setStoreId(storeId != null ? storeId : 0);
 
                 user.setNotification(rs.getBoolean("t004_fd7_user"));
                 list.add(user);
@@ -63,7 +70,6 @@ import bean.User;
         }
         return list;
     }
-
 
     // IDで検索
     public User findById(int id) throws SQLException {
@@ -80,8 +86,9 @@ import bean.User;
                 user.setPassword(rs.getString("t004_fd4_user"));
                 user.setFavoriteStore(rs.getString("t004_fd5_user"));
 
-                String storeIdStr = rs.getString("t004_fd6_user");
-                user.setStoreId(storeIdStr != null ? Integer.parseInt(storeIdStr) : 0);
+                // NULLチェックを追加
+                Integer storeId = (Integer) rs.getObject("t004_fd6_user");
+                user.setStoreId(storeId != null ? storeId : 0);
 
                 user.setNotification(rs.getBoolean("t004_fd7_user"));
                 return user;
@@ -100,7 +107,14 @@ import bean.User;
             pstmt.setString(3, user.getPhone());
             pstmt.setString(4, user.getPassword());
             pstmt.setString(5, user.getFavoriteStore());
-            pstmt.setString(6, String.valueOf(user.getStoreId()));
+
+            // storeIdが0の場合はNULLを設定
+            if (user.getStoreId() == 0) {
+                pstmt.setNull(6, java.sql.Types.INTEGER);
+            } else {
+                pstmt.setInt(6, user.getStoreId());
+            }
+
             pstmt.setBoolean(7, user.isNotification());
             pstmt.setInt(8, user.getUserId());
             pstmt.executeUpdate();
@@ -116,14 +130,8 @@ import bean.User;
         }
     }
 
-
-
-
     // ログイン
-
     public User login(String email, String password) throws Exception {
-
-
         String sql = "SELECT * FROM t004_user WHERE t004_fd2_user = ? AND t004_fd4_user = ?";
         try (PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1, email);
@@ -133,8 +141,6 @@ import bean.User;
 
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-
-
                     System.out.println("DEBUG: User found!");
                     User user = new User();
                     user.setUserId(rs.getInt("t004_pk1_user"));
@@ -144,8 +150,9 @@ import bean.User;
                     user.setPassword(rs.getString("t004_fd4_user"));
                     user.setFavoriteStore(rs.getString("t004_fd5_user"));
 
-                    String storeIdStr = rs.getString("t004_fd6_user");
-                    user.setStoreId(storeIdStr != null ? Integer.parseInt(storeIdStr) : 0);
+                    // NULLチェックを追加
+                    Integer storeId = (Integer) rs.getObject("t004_fd6_user");
+                    user.setStoreId(storeId != null ? storeId : 0);
 
                     user.setNotification(rs.getBoolean("t004_fd7_user"));
                     return user;
@@ -157,4 +164,3 @@ import bean.User;
         return null;
     }
 }
-
