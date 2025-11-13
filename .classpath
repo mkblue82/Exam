@@ -17,3 +17,5 @@
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/postgresql-42.7.7.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
+
+<!-- jreファイルを修正 11/13 -->
