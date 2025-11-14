@@ -146,7 +146,7 @@
                 </form>
 
                 <div class="back-link">
-                    <a href="${pageContext.request.contextPath}/jsp/main_store.jsp">← 戻る</a>
+                    <a href="${pageContext.request.contextPath}/store_jsp/employee_list.jsp">← 戻る</a>
                 </div>
             </div>
         </div>

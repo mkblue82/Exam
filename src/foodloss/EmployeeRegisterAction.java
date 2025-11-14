@@ -35,7 +35,7 @@ public class EmployeeRegisterAction extends Action {
         Employee e = new Employee();
         e.setEmployeeCode(employeeCode);
         e.setEmployeeName(employeeName);
-        e.setStoreId(String.valueOf(store.getStoreId())); // storeIdはint型なのでStringに変換
+        e.setStoreCode(String.valueOf(store.getStoreId())); // storeIdはint型なのでStringに変換
 
         int result = dao.insert(e);
 
