@@ -117,7 +117,7 @@
             background: #b56c3a;
         }
 
-        ssss
+
 
         .btn-register {
             background: #fff;
