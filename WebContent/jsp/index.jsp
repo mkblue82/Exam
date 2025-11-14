@@ -1,4 +1,4 @@
-　　<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 
 <!DOCTYPE html>
 <html lang="ja">
@@ -6,8 +6,9 @@
 <meta charset="UTF-8">
 <title>ログイン選択</title>
 <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
+
 <style>
-/* 背景設定 */
+/* 背景 */
 body {
   background-image: url("${pageContext.request.contextPath}/images/food_background.jpg");
   background-size: cover;
@@ -18,89 +19,138 @@ body {
   flex-direction: column;
   margin: 0;
 }
-/* ヘッダー */
+
 header {
-  background-color: rgba(255, 255, 255, 0.8);
+  background-color: rgba(255, 255, 255, 0.85);
   padding: 20px;
   text-align: center;
   flex-shrink: 0;
 }
-/* コンテナ */
+
+
 #container {
   flex: 1;
   display: flex;
   flex-direction: column;
   width: 100%;
-  min-height: calc(100vh - 0px);
 }
-/* メインコンテンツ */
+
 main {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 80px;
-  padding: 0 20px;
+  gap: 100px;
+  padding: 40px 20px;
   flex: 1;
-  margin-top: -150px;
 }
-/* 各ログインボックス */
+
+/* カードボックス */
 .login-box {
-  background: rgba(255, 255, 255, 0.85);
-  padding: 40px 60px;
-  border-radius: 15px;
-  text-align: center;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-  transition: transform 0.2s;
+    background: #fff;
+    padding: 30px;
+    width: 260px;
+    border-radius: 20px;
+    text-align: center;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.18);
+    transition: transform 0.3s;
 }
+
 .login-box:hover {
-  transform: translateY(-4px);
+    transform: translateY(-4px);
 }
-/* ログインボタン */
-.login-box a.btn {
-  display: inline-block;
-  padding: 15px 40px;
-  background-color: #c07148;
-  color: white;
-  text-decoration: none;
-  border-radius: 8px;
-  font-size: 1.1rem;
-  font-weight: bold;
+
+/* ログインボタン（大） */
+.btn-main {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    width: 100%;
+    height: 120px;
+
+    background-color: #c07148;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 12px;
+    font-size: 1.3rem;
+    font-weight: bold;
+
+    line-height: 1.5;
+    transition: 0.3s;
 }
-.login-box a.btn:hover {
-  background-color: #a85d38;
+
+.btn-main:hover {
+    background-color: #a85d38;
 }
-/* 下のリンク（加盟店登録、新規登録） */
-.login-box a.sub-link {
-  display: block;
-  margin-top: 15px;
-  color: #0073e6;
-  text-decoration: none;
+
+/* 下のリンク（加盟店登録 / 新規登録） */
+.sub-link {
+    margin-top: 16px;
+    display: block;
+    color: #005bbb;
+    text-decoration: none;
+    font-size: 1rem;
+    font-weight: bold;
 }
-.login-box a.sub-link:hover {
-  text-decoration: underline;
+
+.sub-link:hover {
+    text-decoration: underline;
+}
+
+/* フッター街並み画像 */
+.footer-img {
+    width: 100%;
+    margin-top: 50px;
+}
+
+footer {
+    text-align: center;
+    color: #666;
+    font-size: 0.9rem;
+    padding: 10px 0 20px 0;
 }
 </style>
+
 </head>
+
 <body>
+
 <div id="container">
-  <header>
-    <h1 id="logo"><span>タイトル募集</span></h1>
-  </header>
-  <main>
-    <div class="login-box">
-      <a href="login_store.jsp" class="btn">店舗用ログイン</a>
-    </div>
-    <div class="login-box">
-      <a href="${pageContext.request.contextPath}/foodloss/Login.action" class="btn">ユーザー用ログイン</a>
-    </div>
-  </main>
-  <!-- フッター読み込み -->
-  <jsp:include page="footer.jsp" />
+
+    <!-- ヘッダー -->
+    <header>
+	   <h1 id="logo"><span>タイトル募集</span></h1>
+	</header>
+
+    <!-- メインコンテンツ -->
+    <main>
+
+        <!-- 店舗ログイン -->
+        <div class="login-box">
+            <a href="${pageContext.request.contextPath}/foodloss/Login_Store.action" class="btn-main">
+                店舗用<br>ログイン
+            </a>
+            <a href="${pageContext.request.contextPath}/foodloss/store_register.jsp" class="sub-link">
+                加盟店登録
+            </a>
+        </div>
+
+        <!-- ユーザーログイン -->
+        <div class="login-box">
+            <a href="${pageContext.request.contextPath}/foodloss/Login.action" class="btn-main">
+                ユーザー用	<br>ログイン
+            </a>
+            <a href="${pageContext.request.contextPath}/foodloss/user_register.jsp" class="sub-link">
+                新規登録
+            </a>
+        </div>
+
+    </main>
+
+    <jsp:include page="footer.jsp" />
+
 </div>
-<!-- JS -->
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
-<script src="${pageContext.request.contextPath}/js/slick.js"></script>
-<script src="${pageContext.request.contextPath}/js/main.js"></script>
+
 </body>
 </html>
