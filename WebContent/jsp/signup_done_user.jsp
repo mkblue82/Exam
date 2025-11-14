@@ -124,7 +124,7 @@
 </head>
 <body>
 <div id="container">
-    <!-- 登録完了コンテンツ -->
+    <!-- 登録完了 -->
     <main class="column">
         <div class="main-contents">
             <div class="success-container">

@@ -126,9 +126,8 @@
 <body>
 <div id="container">
 
-
+    <%-- ヘッダー読み込み --%>
     <jsp:include page="/store_jsp/header_store.jsp" />
-
 
     <main class="column">
         <div class="main-contents">
@@ -142,18 +141,15 @@
                     </div>
                 <% } %>
 
-
-                <form id="productRegisterForm"
-                      action="${pageContext.request.contextPath}/merchandise_register_store"
-                      method="post" enctype="multipart/form-data">
-                <form action="${pageContext.request.contextPath}/merchandise_register_store"
-                      method="post"
-                      enctype="multipart/form-data"
-                      id="merchandiseRegisterForm">
-
+                <%-- 商品登録フォーム --%>
+					<form action="${pageContext.request.contextPath}/MerchandiseRegisterAction"
+					      method="post"
+					      enctype="multipart/form-data"
+					      id="merchandiseRegisterForm">
 
                     <%-- CSRFトークン --%>
-                    <input type="hidden" name="csrfToken" value="${csrfToken}">
+                       <input type="hidden" name="storeId" value="${sessionScope.store.id}">
+
 
                     <div class="form-group">
                         <label for="merchandiseName">商品名 <span style="color: red;">*</span></label>
@@ -211,7 +207,7 @@
                     <div class="button-group">
                         <button type="submit" class="btn btn-submit">登録する</button>
                         <button type="button" class="btn btn-cancel"
-                                onclick="location.href='${pageContext.request.contextPath}/jsp/store_menu.jsp'">
+                                onclick="location.href='${pageContext.request.contextPath}/store/main_store.jsp'">
                             キャンセル
                         </button>
                     </div>
@@ -220,7 +216,9 @@
         </div>
     </main>
 
-    <jsp:include page="/jsp/footer.jsp" />
+    <%-- フッター読み込み --%>
+        <jsp:include page="/jsp/footer.jsp" />
+
 </div>
 
 <script>

@@ -115,6 +115,13 @@
             <div class="delete-account-container">
                 <h1>アカウント削除</h1>
 
+                <!-- エラーメッセージ表示 -->
+                <% if (request.getAttribute("error") != null) { %>
+                    <div class="error-message">
+                        <%= request.getAttribute("error") %>
+                    </div>
+                <% } %>
+
                 <form method="POST" action="${pageContext.request.contextPath}/foodloss/DeleteAccount.action" id="deleteForm">
                     <input type="hidden" name="action" value="verify">
 
@@ -127,7 +134,7 @@
                                minlength="8"
                                placeholder="パスワードを入力"
                                aria-required="true"
-                               value="${not empty password ? password : ''}">
+                               value="<%= request.getAttribute("password") != null ? request.getAttribute("password") : "" %>">
                     </div>
 
                     <div class="button-group">

@@ -1,4 +1,5 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+　　<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -58,7 +59,7 @@ main {
 .login-box a.btn {
   display: inline-block;
   padding: 15px 40px;
-  background-color: #d47b44;
+  background-color: #c07148;
   color: white;
   text-decoration: none;
   border-radius: 8px;
@@ -66,7 +67,7 @@ main {
   font-weight: bold;
 }
 .login-box a.btn:hover {
-  background-color: #b86532;
+  background-color: #a85d38;
 }
 /* 下のリンク（加盟店登録、新規登録） */
 .login-box a.sub-link {
@@ -93,11 +94,9 @@ main {
       <a href="${pageContext.request.contextPath}/foodloss/Login.action" class="btn">ユーザー用ログイン</a>
     </div>
   </main>
-
   <!-- フッター読み込み -->
   <jsp:include page="footer.jsp" />
 </div>
-
 <!-- JS -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>

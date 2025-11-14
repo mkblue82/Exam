@@ -17,7 +17,6 @@
             text-align: center;
             margin-top: 150px;
         }
-
         .delete-account-complete-container h1 {
             color: #c07148;
             margin-bottom: 1.5rem;
@@ -26,14 +25,12 @@
             padding-bottom: 1rem;
             text-align: center;
         }
-
         .complete-message {
             color: #555;
             font-size: 1rem;
             margin-bottom: 2rem;
             line-height: 1.6;
         }
-
         .btn-login {
             width: 100%;
             padding: 0.8rem;
@@ -47,7 +44,6 @@
             color: #fff;
             box-shadow: 0 3px 10px rgba(192, 113, 72, 0.3);
         }
-
         .btn-login:hover {
             background: #a85d38;
             transform: translateY(-2px);
@@ -57,7 +53,6 @@
 </head>
 <body>
 <div id="container">
-
     <!-- アカウント削除完了コンテンツ -->
     <main class="column">
         <div class="main-contents">
@@ -70,11 +65,9 @@
             </div>
         </div>
     </main>
-
     <!-- フッター読み込み -->
     <jsp:include page="footer.jsp" />
 </div>
-
 <!-- JS -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>

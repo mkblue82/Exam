@@ -1,20 +1,52 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-
-
+<%
+    // CSRFトークンがセッションにない場合は生成
+    if (session.getAttribute("csrfToken") == null) {
+        String csrfToken = java.util.UUID.randomUUID().toString();
+        session.setAttribute("csrfToken", csrfToken);
+    }
+%>
 <!DOCTYPE html>
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>新規店舗申請</title>
+    <title>新規店舗登録</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             background: #f5f5f5;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+        }
+
+        .column {
+            flex: 1;
+            width: 100%;
+        }
+
+        .main-contents {
+            width: 100%;
+            padding: 20px;
         }
 
         .register-container {
-            max-width: 500px;
+            max-width: 450px;
+            width: 100%;
             margin: 80px auto;
             padding: 2rem;
             background: #fff;
@@ -120,62 +152,85 @@
         }
     </style>
 </head>
+
 <body>
-	<div class="register-container">
-	    <h1>新規店舗申請</h1>
+<div id="container">
+    <!-- 登録コンテンツ -->
+    <main class="column">
+        <div class="main-contents">
+            <div class="register-container">
+                <h1>新規店舗登録</h1>
 
+                <% if (request.getAttribute("errorMessage") != null) { %>
+                    <div class="error-message">
+                        <%= request.getAttribute("errorMessage") %>
+                    </div>
+                <% } %>
 
-	    <!-- enctypeでファイルアップロードを許可 -->
-	    <form action="${pageContext.request.contextPath}/StoreRegisterServlet"
-	          method="post" enctype="multipart/form-data" id="storeRegisterForm">
+                <!-- enctypeでファイルアップロードを許可 -->
+                <form action="${pageContext.request.contextPath}/StoreRegisterServlet"
+                      method="post" enctype="multipart/form-data" id="storeRegisterForm">
 
-	        <input type="hidden" name="csrfToken" value="${sessionScope.csrfToken}">
+                    <input type="hidden" name="csrfToken" value="${sessionScope.csrfToken}">
 
-	        <div class="form-group">
-	            <label for="storeName">店舗名</label>
-	            <input type="text" id="storeName" name="storeName" required
-	                   placeholder="例：Sample Bakery"
-	                   value="${param.storeName}">
-	        </div>
+                    <div class="form-group">
+                        <label for="storeName">店舗名</label>
+                        <input type="text" id="storeName" name="storeName" required
+                               placeholder="例：Sample Bakery"
+                               value="${param.storeName}">
+                    </div>
 
-	        <div class="form-group">
-	            <label for="address">店舗住所</label>
-	            <input type="text" id="address" name="address" required
-	                   placeholder="例：東京都新宿区〇〇1-2-3"
-	                   value="${param.address}">
-	        </div>
+                    <div class="form-group">
+                        <label for="address">店舗住所</label>
+                        <input type="text" id="address" name="address" required
+                               placeholder="例：東京都新宿区〇〇1-2-3"
+                               value="${param.address}">
+                    </div>
 
-	        <div class="form-group">
-	            <label for="phone">店舗電話番号</label>
-	            <input type="tel" id="phone" name="phone" required
-	                   placeholder="例：03-1234-5678"
-	                   value="${param.phone}">
-	        </div>
+                    <div class="form-group">
+                        <label for="phone">店舗電話番号</label>
+                        <input type="tel" id="phone" name="phone" required
+                               placeholder="例：0312345678"
+                               pattern="[0-9]{10,11}"
+                               value="${param.phone}">
+                    </div>
 
-	        <div class="form-group">
-	            <label for="email">店舗メールアドレス</label>
-	            <input type="email" id="email" name="email" required
-	                   placeholder="例：store@mail.com"
-	                   value="${param.email}">
-	        </div>
+                    <div class="form-group">
+                        <label for="email">店舗メールアドレス</label>
+                        <input type="email" id="email" name="email" required
+                               placeholder="例：store@mail.com"
+                               value="${param.email}">
+                    </div>
 
-	        <div class="form-group">
-	            <label for="password">パスワード</label>
-	            <input type="password" id="password" name="password" required minlength="8"
-	                   placeholder="8文字以上で入力してください">
-	        </div>
+                    <div class="form-group">
+                        <label for="password">パスワード</label>
+                        <input type="password" id="password" name="password" required minlength="8"
+                               placeholder="8文字以上で入力してください">
+                    </div>
 
-	        <div class="form-group">
-	            <label for="permitFile">営業許可書（画像またはPDF）</label>
-	            <input type="file" id="permitFile" name="permitFile"
-	                   accept=".jpg,.jpeg,.png,.pdf" required>
-	        </div>
+                    <div class="form-group">
+                        <label for="permitFile">営業許可書（画像またはPDF）</label>
+                        <input type="file" id="permitFile" name="permitFile"
+                               accept=".jpg,.jpeg,.png,.pdf" required>
+                    </div>
 
-	        <button type="submit" class="btn-submit">申請する</button>
-	        <button type="button" class="btn-cancel"
-	                onclick="location.href='${pageContext.request.contextPath}/jsp/login_store.jsp'">ログインに戻る</button>
-	    </form>
-	</div>
-	 <jsp:include page="/jsp/footer.jsp" />
+                    <button type="submit" class="btn-submit">申請する</button>
+                    <button type="button" class="btn-cancel"
+                            onclick="location.href='${pageContext.request.contextPath}/jsp/login_store.jsp'">ログインに戻る</button>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <!-- フッター読み込み -->
+    <jsp:include page="/jsp/footer.jsp" />
+</div>
+
+<!-- JS -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
+<script src="${pageContext.request.contextPath}/js/slick.js"></script>
+<script src="${pageContext.request.contextPath}/js/main.js"></script>
+
 </body>
 </html>
