@@ -126,7 +126,7 @@
 <body>
 <div id="container">
 
-    <%-- ヘッダー読み込み --%>
+    <%-- ヘッダー読み込 --%>
     <jsp:include page="/store_jsp/header_store.jsp" />
 
     <main class="column">
