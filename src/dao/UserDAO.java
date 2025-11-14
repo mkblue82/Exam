@@ -76,22 +76,23 @@ public class UserDAO {
         String sql = "SELECT * FROM t004_user WHERE t004_pk1_user = ?";
         try (PreparedStatement pstmt = con.prepareStatement(sql)) {
         	pstmt.setInt(1, id);
-            ResultSet rs = pstmt.executeQuery();
-            if (rs.next()) {
-                User user = new User();
-                user.setUserId(rs.getInt("t004_pk1_user"));
-                user.setName(rs.getString("t004_fd1_user"));
-                user.setEmail(rs.getString("t004_fd2_user"));
-                user.setPhone(rs.getString("t004_fd3_user"));
-                user.setPassword(rs.getString("t004_fd4_user"));
-                user.setFavoriteStore(rs.getString("t004_fd5_user"));
+            try (ResultSet rs = pstmt.executeQuery()) {
+	            if (rs.next()) {
+	                User user = new User();
+	                user.setUserId(rs.getInt("t004_pk1_user"));
+	                user.setName(rs.getString("t004_fd1_user"));
+	                user.setEmail(rs.getString("t004_fd2_user"));
+	                user.setPhone(rs.getString("t004_fd3_user"));
+	                user.setPassword(rs.getString("t004_fd4_user"));
+	                user.setFavoriteStore(rs.getString("t004_fd5_user"));
 
-                // NULLチェックを追加
-                Integer storeId = (Integer) rs.getObject("t004_fd6_user");
-                user.setStoreId(storeId != null ? storeId : 0);
+	                // NULLチェックを追加
+	                Integer storeId = (Integer) rs.getObject("t004_fd6_user");
+	                user.setStoreId(storeId != null ? storeId : 0);
 
-                user.setNotification(rs.getBoolean("t004_fd7_user"));
-                return user;
+	                user.setNotification(rs.getBoolean("t004_fd7_user"));
+	                return user;
+	            }
             }
         }
         return null;
@@ -131,7 +132,7 @@ public class UserDAO {
     }
 
     // ログイン
-    public User login(String email, String password) throws Exception {
+    public User login(String email, String password) throws SQLException {
         String sql = "SELECT * FROM t004_user WHERE t004_fd2_user = ? AND t004_fd4_user = ?";
         try (PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1, email);
