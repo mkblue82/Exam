@@ -50,7 +50,7 @@ public class Login_StoreExecuteAction extends Action {
             response.sendRedirect(request.getContextPath() + "/foodloss/Menu.action");
         } else {
             request.setAttribute("error", "店舗IDまたはパスワードが違います。");
-            request.getRequestDispatcher("/store_jsp/store_login.jsp").forward(request, response);
+            request.getRequestDispatcher("/store_jsp/login_store.jsp").forward(request, response);
         }
     }
 
