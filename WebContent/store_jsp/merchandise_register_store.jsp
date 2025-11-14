@@ -142,14 +142,13 @@
                 <% } %>
 
                 <%-- 商品登録フォーム --%>
-					<form action="${pageContext.request.contextPath}/MerchandiseRegisterAction"
-					      method="post"
-					      enctype="multipart/form-data"
-					      id="merchandiseRegisterForm">
+                <form action="${pageContext.request.contextPath}/foodloss/MerchandiseRegisterExecute.action"
+                      method="post"
+                      enctype="multipart/form-data"
+                      id="merchandiseRegisterForm">
 
-                    <%-- CSRFトークン --%>
-                       <input type="hidden" name="storeId" value="${sessionScope.store.id}">
-
+                    <%-- 店舗ID（セッションから取得） --%>
+                    <input type="hidden" name="storeId" value="${sessionScope.store.storeId}">
 
                     <div class="form-group">
                         <label for="merchandiseName">商品名 <span style="color: red;">*</span></label>
@@ -217,7 +216,7 @@
     </main>
 
     <%-- フッター読み込み --%>
-        <jsp:include page="/jsp/footer.jsp" />
+    <jsp:include page="/jsp/footer.jsp" />
 
 </div>
 
@@ -268,7 +267,7 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
 <script src="${pageContext.request.contextPath}/js/slick.js"></script>
-<script src="${pageContext.request.contextPath}/js/main.js"></script>
+<parameter name="${pageContext.request.contextPath}/js/main.js"></script>
 <script src="${pageContext.request.contextPath}/js/validation.js"></script>
 </body>
 </html>
