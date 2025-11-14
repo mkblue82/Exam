@@ -1,4 +1,14 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%
+    // セッション状態を確認
+    HttpSession userSession = request.getSession(false);
+    boolean isLoggedIn = (userSession != null && userSession.getAttribute("user") != null);
+
+    // キャッシュ制御
+    response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+    response.setHeader("Pragma", "no-cache");
+    response.setDateHeader("Expires", 0);
+%>
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -92,8 +102,10 @@
 </head>
 <body>
 <div id="container">
-    <!-- ヘッダー -->
-    <jsp:include page="/jsp/header_user.jsp" />
+    <!-- ヘッダー(ログイン中のみ表示) -->
+    <% if (isLoggedIn) { %>
+        <jsp:include page="/jsp/header_user.jsp" />
+    <% } %>
 
     <!-- エラーコンテンツ -->
     <main class="column">
@@ -114,10 +126,14 @@
             %>
 
             <div class="button-group">
-            <!-- 後でセッション確認してmain_user.jspかmain_store.jspに振り分けるかの処理にする -->
-            <!-- とりあえず仮でmain_user.jspに飛ぶ -->
-                <a href="${pageContext.request.contextPath}/jsp/main_user.jsp" class="btn btn-home">ホームへ戻る</a>
-                <button onclick="history.back()" class="btn btn-back">前のページに戻る</button>
+                <% if (isLoggedIn) { %>
+                    <!-- ログイン中: マイページへ戻る -->
+                    <a href="${pageContext.request.contextPath}/jsp/main_user.jsp" class="btn btn-home">ホームへ戻る</a>
+                    <button onclick="history.back()" class="btn btn-back">前のページに戻る</button>
+                <% } else { %>
+                    <!-- 未ログイン: TOPページへ -->
+                    <a href="${pageContext.request.contextPath}/foodloss/Top.action" class="btn btn-home">TOPへ戻る</a>
+                <% } %>
             </div>
         </div>
     </main>
@@ -131,5 +147,13 @@
 <script src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
 <script src="${pageContext.request.contextPath}/js/slick.js"></script>
 <script src="${pageContext.request.contextPath}/js/main.js"></script>
+
+<!-- ブラウザバック対策 -->
+<script>
+    history.pushState(null, null, location.href);
+    window.addEventListener('popstate', function() {
+        history.pushState(null, null, location.href);
+    });
+</script>
 </body>
 </html>

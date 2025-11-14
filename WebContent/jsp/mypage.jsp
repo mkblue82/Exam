@@ -1,4 +1,19 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%
+    // セッションチェック
+    HttpSession userSession = request.getSession(false);
+    if (userSession == null || userSession.getAttribute("user") == null) {
+        // セッションがない場合は共通エラーページへリダイレクト
+        request.setAttribute("errorMessage", "セッションが切れています。ログアウトされたか、長時間操作がありませんでした。");
+        request.getRequestDispatcher("/error.jsp").forward(request, response);
+        return;
+    }
+
+    // キャッシュ制御（ブラウザバック対策）
+    response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+    response.setHeader("Pragma", "no-cache");
+    response.setDateHeader("Expires", 0);
+%>
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -64,7 +79,6 @@
         <div class="main-contents">
             <div class="main-content">
                 <div class="point-section">
-
                 <!-- ポイント機能追加したらここら辺都度直してください -->
                     <h2>所有ポイント</h2>
                     <p>0 P</p>
@@ -85,5 +99,19 @@
 <script src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
 <script src="${pageContext.request.contextPath}/js/slick.js"></script>
 <script src="${pageContext.request.contextPath}/js/main.js"></script>
+
+<!-- ブラウザバック対策 -->
+<script>
+    // ページ読み込み時に履歴を操作
+    history.pushState(null, null, location.href);
+
+    // ブラウザの戻るボタンが押された時の処理
+    window.addEventListener('popstate', function(event) {
+        // 履歴を再び追加
+        history.pushState(null, null, location.href);
+        // 共通エラーページへ遷移
+        location.href = '${pageContext.request.contextPath}/error.jsp?error=セッションが切れています';
+    });
+</script>
 </body>
 </html>
