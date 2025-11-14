@@ -1,284 +1,125 @@
 package foodloss;
 
-import java.io.File;
 import java.io.IOException;
-import java.sql.Date;
+import java.sql.Connection;
 import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
-import java.util.UUID;
 
 import javax.servlet.ServletException;
-import javax.servlet.annotation.MultipartConfig;
+import javax.servlet.annotation.MultipartConfig;  // ← 追加
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import javax.servlet.http.Part;
 
 import bean.Merchandise;
 import dao.MerchandiseDAO;
+import tool.DBManager;
 
-/**
- * 商品登録処理を行うサーブレット
- * 画像の仕様に基づいた実装
- */
-@WebServlet("/merchandise_register_store")
-@MultipartConfig(
-    fileSizeThreshold = 1024 * 1024 * 2,  // 2MB
-    maxFileSize = 1024 * 1024 * 5,        // 5MB
-    maxRequestSize = 1024 * 1024 * 10     // 10MB
-)
+@WebServlet("/MerchandiseRegisterAction")
+@MultipartConfig  // ← 追加：multipart/form-dataを処理するために必要
 public class MerchandiseRegisterAction extends HttpServlet {
-    private static final long serialVersionUID = 1L;
-    private static final String UPLOAD_DIR = "uploads/products";
-    private static final String[] ALLOWED_EXTENSIONS = {".jpg", ".jpeg", ".png", ".gif"};
-    private static final long MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+	@Override
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+	        throws ServletException, IOException {
 
-    @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        // 商品登録画面を表示
-        HttpSession session = request.getSession(false);
+	    Connection connection = null;
 
-        // セッションチェック
-        if (session == null || session.getAttribute("store") == null) {
-            response.sendRedirect(request.getContextPath() + "/login");
-            return;
-        }
+	    try {
+	        request.setCharacterEncoding("UTF-8");
 
-        // CSRFトークン生成
-        String csrfToken = UUID.randomUUID().toString();
-        session.setAttribute("csrfToken", csrfToken);
-        request.setAttribute("csrfToken", csrfToken);
+	        // ✅ セッションから店舗情報を取得（ユーザーログインの場合は仮ID）
+	        HttpSession session = request.getSession();
+	        bean.Store store = (bean.Store) session.getAttribute("store");
 
-        request.getRequestDispatcher("/store_jsp/merchandise_register_store.jsp").forward(request, response);
-    }
+	        int storeId = 0;
 
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+	        if (store != null) {
+	            storeId = store.getStoreId();
+	            System.out.println("✅ セッションからstoreId取得: " + storeId);
+	        } else {
+	            // 🔧 テスト用：ユーザーログインの場合は仮のstoreId=2を使用
+	            bean.User user = (bean.User) session.getAttribute("user");
+	            if (user != null) {
+	                storeId = 2;  // テスト用の店舗ID（データベースに存在する店舗IDに変更）
+	                System.out.println("⚠️ ユーザーログイン中のため、テスト用storeId=2 を使用");
+	            } else {
+	                // どちらもログインしていない
+	                request.setAttribute("errorMessage", "ログインしてください");
+	                response.sendRedirect(request.getContextPath() + "/foodloss/Login.action");
+	                return;
+	            }
+	        }
 
-        request.setCharacterEncoding("UTF-8");
-        HttpSession session = request.getSession(false);
+	        String name = request.getParameter("merchandiseName");
+	        String quantityStr = request.getParameter("quantity");
+	        String expirationDateStr = request.getParameter("expirationDate");
+	        String tags = request.getParameter("tags");
 
-        // セッションチェック
-        if (session == null || session.getAttribute("store") == null) {
-            response.sendRedirect(request.getContextPath() + "/login");
-            return;
-        }
+	        System.out.println("★ merchandiseName = [" + name + "]");
+	        System.out.println("★ quantity = [" + quantityStr + "]");
+	        System.out.println("★ expirationDate = [" + expirationDateStr + "]");
+	        System.out.println("★ tags = [" + tags + "]");
 
-        // CSRFトークン検証
-        String csrfToken = request.getParameter("csrfToken");
-        String sessionToken = (String) session.getAttribute("csrfToken");
-        if (csrfToken == null || !csrfToken.equals(sessionToken)) {
-            request.setAttribute("errorMessage", "不正なリクエストです。");
-            String newCsrfToken = UUID.randomUUID().toString();
-            session.setAttribute("csrfToken", newCsrfToken);
-            request.setAttribute("csrfToken", newCsrfToken);
-            request.getRequestDispatcher("/store_jsp/merchandise_register_store.jsp").forward(request, response);
-            return;
-        }
+	        if (name == null || name.trim().isEmpty()) {
+	            request.setAttribute("errorMessage", "商品名を入力してください");
+	            request.getRequestDispatcher("/store_jsp/merchandise_register_store.jsp").forward(request, response);
+	            return;
+	        }
 
-        // 新しいCSRFトークンを生成（ワンタイムトークン）
-        String newCsrfToken = UUID.randomUUID().toString();
-        session.setAttribute("csrfToken", newCsrfToken);
-        request.setAttribute("csrfToken", newCsrfToken);
+	        if (quantityStr == null || quantityStr.trim().isEmpty()) {
+	            request.setAttribute("errorMessage", "個数を入力してください");
+	            request.getRequestDispatcher("/store_jsp/merchandise_register_store.jsp").forward(request, response);
+	            return;
+	        }
 
-        try {
-            // パラメータ取得（JSPと一致）
-            String merchandiseName = request.getParameter("productName");
-            String quantityStr = request.getParameter("quantity");
-            String expirationDateStr = request.getParameter("expirationDate");
-            String tags = request.getParameter("tags");
-            Part imagePart = request.getPart("productImage");
+	        if (expirationDateStr == null || expirationDateStr.trim().isEmpty()) {
+	            request.setAttribute("errorMessage", "消費期限を入力してください");
+	            request.getRequestDispatcher("/store_jsp/merchandise_register_store.jsp").forward(request, response);
+	            return;
+	        }
 
-            // 未入力チェック
-            String validationError = validateInput(merchandiseName, quantityStr, expirationDateStr, imagePart);
-            if (validationError != null) {
-                request.setAttribute("errorMessage", validationError);
-                request.getRequestDispatcher("/store_jsp/merchandise_register_store.jsp").forward(request, response);
-                return;
-            }
+	        int stock = Integer.parseInt(quantityStr);
+	        java.sql.Date useByDate = java.sql.Date.valueOf(expirationDateStr);
 
-            // 数値変換とバリデーション
-            int quantity;
-            Date expirationDate;
-            try {
-                quantity = Integer.parseInt(quantityStr);
-                if (quantity < 1 || quantity > 9999) {
-                    request.setAttribute("errorMessage", "個数は1～9999の範囲で入力してください。");
-                    request.getRequestDispatcher("/store_jsp/merchandise_register_store.jsp").forward(request, response);
-                    return;
-                }
+	        Merchandise m = new Merchandise();
+	        m.setStoreId(storeId);
+	        m.setMerchandiseName(name);
+	        m.setStock(stock);
+	        m.setUseByDate(useByDate);
+	        m.setMerchandiseTag(tags != null ? tags : "");
+	        m.setRegistrationTime(new Timestamp(System.currentTimeMillis()));
+	        m.setBookingStatus(false);
 
-                expirationDate = Date.valueOf(expirationDateStr);
-                Date today = new Date(System.currentTimeMillis());
-                if (expirationDate.before(today)) {
-                    request.setAttribute("errorMessage", "消費期限は今日以降の日付を指定してください。");
-                    request.getRequestDispatcher("/store_jsp/merchandise_register_store.jsp").forward(request, response);
-                    return;
-                }
-            } catch (IllegalArgumentException e) {
-                request.setAttribute("errorMessage", "入力形式が正しくありません。");
-                request.getRequestDispatcher("/store_jsp/merchandise_register_store.jsp").forward(request, response);
-                return;
-            }
+	        System.out.println("★ Merchandise設定完了: name=" + m.getMerchandiseName() + ", storeId=" + storeId);
 
-            // 商品名・タグの長さチェック
-            if (merchandiseName.length() > 100) {
-                request.setAttribute("errorMessage", "商品名は100文字以内で入力してください。");
-                request.getRequestDispatcher("/store_jsp/merchandise_register_store.jsp").forward(request, response);
-                return;
-            }
+	        DBManager db = new DBManager();
+	        connection = db.getConnection();
 
-            if (tags != null && tags.length() > 200) {
-                request.setAttribute("errorMessage", "タグは200文字以内で入力してください。");
-                request.getRequestDispatcher("/store_jsp/merchandise_register_store.jsp").forward(request, response);
-                return;
-            }
+	        MerchandiseDAO dao = new MerchandiseDAO(connection);
+	        dao.insert(m);
 
-            // 店舗情報取得
-            bean.Store store = (bean.Store) session.getAttribute("store");
-            if (store == null) {
-                request.setAttribute("errorMessage", "店舗情報が取得できませんでした。");
-                request.getRequestDispatcher("/store_jsp/merchandise_register_store.jsp").forward(request, response);
-                return;
-            }
-            int storeId = store.getStoreId();
+	        System.out.println("✅ 商品登録成功！");
+	        response.sendRedirect(request.getContextPath() + "/store_jsp/merchandise_list_store.jsp");
 
-            // 従業員ID取得（セッションから取得、なければ0）
-            Integer employeeId = (Integer) session.getAttribute("employeeId");
-            if (employeeId == null) {
-                employeeId = 0; // デフォルト値
-            }
-
-            // 商品の重複チェック
-            MerchandiseDAO merchandiseDAO = new MerchandiseDAO();
-            if (merchandiseDAO.isDuplicateProduct(storeId, merchandiseName)) {
-                request.setAttribute("errorMessage", "この商品は既に登録されています。");
-                request.getRequestDispatcher("/store_jsp/merchandise_register_store.jsp").forward(request, response);
-                return;
-            }
-
-            // 画像バリデーションと保存
-            String imagePath = validateAndSaveImage(imagePart);
-            if (imagePath == null) {
-                request.setAttribute("errorMessage", "画像ファイルの保存に失敗しました。ファイル形式とサイズを確認してください。");
-                request.getRequestDispatcher("/store_jsp/merchandise_register_store.jsp").forward(request, response);
-                return;
-            }
-
-            // 価格はデフォルト0（必要に応じて拡張）
-            int price = 0;
-
-            // 商品オブジェクト作成
-            Merchandise merchandise = new Merchandise();
-            merchandise.setMerchandiseName(merchandiseName);
-            merchandise.setStock(quantity);
-            merchandise.setPrice(price);
-            merchandise.setUseByDate(expirationDate);
-            merchandise.setProductTag(tags != null ? tags : "");
-            merchandise.setProductImage(imagePath);
-            merchandise.setEmployeeId(employeeId);
-            merchandise.setRegistrationTime(new Timestamp(System.currentTimeMillis()));
-            merchandise.setStoreId(storeId);
-            merchandise.setBookingStatus(false);
-
-            // DB登録
-            int result = merchandiseDAO.insert(merchandise);
-
-            if (result > 0) {
-                session.setAttribute("successMessage", "商品を登録しました。");
-                response.sendRedirect(request.getContextPath() + "/merchandise_register_complete");
-            } else {
-                request.setAttribute("errorMessage", "商品の登録に失敗しました。もう一度お試しください。");
-                request.getRequestDispatcher("/store_jsp/merchandise_register_store.jsp").forward(request, response);
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            request.setAttribute("errorMessage", "システムエラーが発生しました。管理者にお問い合わせください。");
-            request.getRequestDispatcher("/store_jsp/merchandise_register_store.jsp").forward(request, response);
-        }
-    }
-
-    /**
-     * 入力値の基本バリデーション
-     * 画像仕様①-1：未入力フィールドチェック
-     */
-    private String validateInput(String merchandiseName, String quantity,
-                                 String expirationDate, Part imagePart) {
-
-        if (merchandiseName == null || merchandiseName.trim().isEmpty()) {
-            return "商品名を入力してください。";
-        }
-
-        if (quantity == null || quantity.trim().isEmpty()) {
-            return "個数を入力してください。";
-        }
-
-        if (expirationDate == null || expirationDate.trim().isEmpty()) {
-            return "消費期限を入力してください。";
-        }
-
-        if (imagePart == null || imagePart.getSize() == 0) {
-            return "画像を選択してください。";
-        }
-
-        return null; // エラーなし
-    }
-
-    /** 画像ファイルのバリデーションと保存 */
-    private String validateAndSaveImage(Part imagePart) {
-        try {
-            if (imagePart.getSize() > MAX_FILE_SIZE) return null;
-
-            String fileName = getFileName(imagePart);
-            if (fileName == null || fileName.isEmpty()) return null;
-
-            String extension = getFileExtension(fileName).toLowerCase();
-            boolean valid = false;
-            for (String allowed : ALLOWED_EXTENSIONS) {
-                if (extension.equals(allowed)) {
-                    valid = true;
-                    break;
-                }
-            }
-            if (!valid) return null;
-
-            String uploadPath = getServletContext().getRealPath("") + File.separator + UPLOAD_DIR;
-            File uploadDir = new File(uploadPath);
-            if (!uploadDir.exists() && !uploadDir.mkdirs()) return null;
-
-            String timestamp = new SimpleDateFormat("yyyyMMddHHmmss").format(new java.util.Date());
-            String uniqueFileName = timestamp + "_" + UUID.randomUUID().toString() + extension;
-            String filePath = uploadPath + File.separator + uniqueFileName;
-
-            imagePart.write(filePath);
-
-            return UPLOAD_DIR + "/" + uniqueFileName;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    /** ファイル名を取得 */
-    private String getFileName(Part part) {
-        String contentDisposition = part.getHeader("content-disposition");
-        if (contentDisposition == null) return null;
-        for (String token : contentDisposition.split(";")) {
-            if (token.trim().startsWith("filename")) {
-                return token.substring(token.indexOf("=") + 1).trim().replace("\"", "");
-            }
-        }
-        return null;
-    }
-
-    /** 拡張子を取得 */
-    private String getFileExtension(String fileName) {
-        int lastIndex = fileName.lastIndexOf(".");
-        return (lastIndex > 0) ? fileName.substring(lastIndex) : "";
-    }
-}
+	    } catch (NumberFormatException e) {
+	        e.printStackTrace();
+	        request.setAttribute("errorMessage", "個数は数値で入力してください");
+	        request.getRequestDispatcher("/store_jsp/merchandise_register_store.jsp").forward(request, response);
+	    } catch (IllegalArgumentException e) {
+	        e.printStackTrace();
+	        request.setAttribute("errorMessage", "消費期限の形式が正しくありません");
+	        request.getRequestDispatcher("/store_jsp/merchandise_register_store.jsp").forward(request, response);
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        throw new ServletException(e);
+	    } finally {
+	        if (connection != null) {
+	            try {
+	                connection.close();
+	            } catch (Exception e) {
+	                e.printStackTrace();
+	            }
+	        }
+	    }
+	}}

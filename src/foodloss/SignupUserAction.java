@@ -100,6 +100,8 @@ public class SignupUserAction extends Action {
             return;
         }
 
+
+
         // 電話番号の形式チェック
         if (!phone.matches("[0-9]{10,11}")) {
             System.out.println("DEBUG: phone format invalid");
@@ -131,6 +133,17 @@ public class SignupUserAction extends Action {
         try (Connection conn = db.getConnection()) {
             System.out.println("DEBUG: DB connection established");
             UserDAO dao = new UserDAO(conn);
+
+         // 電話番号の重複チェック
+            System.out.println("DEBUG: Checking phone duplication");
+            if (isPhoneExists(dao, phone)) {
+                System.out.println("DEBUG: Phone already exists");
+                req.setAttribute("errorMessage", "この電話番号は既に登録されています。");
+                req.getRequestDispatcher("/jsp/signup_user.jsp").forward(req, res);
+                return;
+            }
+
+
 
             // メールアドレスの重複チェック
             System.out.println("DEBUG: Checking email duplication");
@@ -165,6 +178,24 @@ public class SignupUserAction extends Action {
         System.out.println("DEBUG: ========== SignupUserAction END ==========");
     }
 
+
+    /**
+     * 電話番号の重複チェック ← ここに追加！
+     */
+    private boolean isPhoneExists(UserDAO dao, String phone) throws SQLException {
+        System.out.println("DEBUG: isPhoneExists called for phone: " + phone);
+        for (User user : dao.findAll()) {
+            if (user.getPhone().equals(phone)) {
+                System.out.println("DEBUG: Found duplicate phone");
+                return true;
+            }
+        }
+        System.out.println("DEBUG: No duplicate phone found");
+        return false;
+    }
+
+
+
     /**
      * メールアドレスの重複チェック
      */
@@ -179,6 +210,9 @@ public class SignupUserAction extends Action {
         System.out.println("DEBUG: No duplicate email found");
         return false;
     }
+
+
+
 
     /**
      * パスワードハッシュ化
