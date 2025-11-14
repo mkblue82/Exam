@@ -23,6 +23,6 @@ public class Login_StoreAction extends Action {
 		//レスポンス値をセット 6
 		//なし
 		//JSPへフォワード 7
-		req.getRequestDispatcher("/jsp/login_store.jsp").forward(req, res);
+		req.getRequestDispatcher("/store_jsp/login_store.jsp").forward(req, res);
 	}
 }
