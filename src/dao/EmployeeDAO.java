@@ -27,7 +27,7 @@ public class EmployeeDAO extends DAO {
             e.setId(rs.getInt("T003_ID_employee"));
             e.setEmployeeCode(rs.getString("T003_PK1_employee"));
             e.setEmployeeName(rs.getString("T003_FD1_employee"));
-            e.setStoreId(rs.getString("T003_FD2_employee"));
+            e.setStoreCode(rs.getString("T003_FD2_employee"));
             e.setStoreName(rs.getString("T001_FD1_store"));
             list.add(e);
         }
@@ -55,7 +55,7 @@ public class EmployeeDAO extends DAO {
             e.setId(rs.getInt("T003_ID_employee"));
             e.setEmployeeCode(rs.getString("T003_PK1_employee"));
             e.setEmployeeName(rs.getString("T003_FD1_employee"));
-            e.setStoreId(rs.getString("T003_FD2_employee"));
+            e.setStoreCode(rs.getString("T003_FD2_employee"));
             e.setStoreName(rs.getString("T001_FD1_store"));
         }
 
@@ -82,7 +82,7 @@ public class EmployeeDAO extends DAO {
             e.setId(rs.getInt("T003_ID_employee"));
             e.setEmployeeCode(rs.getString("T003_PK1_employee"));
             e.setEmployeeName(rs.getString("T003_FD1_employee"));
-            e.setStoreId(rs.getString("T003_FD2_employee"));
+            e.setStoreCode(rs.getString("T003_FD2_employee"));
             e.setStoreName(rs.getString("T001_FD1_store"));
         }
 
@@ -92,7 +92,7 @@ public class EmployeeDAO extends DAO {
     }
 
     // 店舗IDで従業員一覧を取得
-    public List<Employee> selectByStoreId(String storeId) throws Exception {
+    public List<Employee> selectByStoreCode(String storeCode) throws Exception {
         List<Employee> list = new ArrayList<>();
         Connection con = getConnection();
         PreparedStatement st = con.prepareStatement(
@@ -102,7 +102,7 @@ public class EmployeeDAO extends DAO {
             "join T001_store on T003_employee.T003_FD2_employee = T001_store.T001_PK1_store " +
             "where T003_FD2_employee = ? " +
             "order by T003_ID_employee");
-        st.setString(1, storeId);
+        st.setString(1, storeCode);
         ResultSet rs = st.executeQuery();
 
         while (rs.next()) {
@@ -110,7 +110,7 @@ public class EmployeeDAO extends DAO {
             e.setId(rs.getInt("T003_ID_employee"));
             e.setEmployeeCode(rs.getString("T003_PK1_employee"));
             e.setEmployeeName(rs.getString("T003_FD1_employee"));
-            e.setStoreId(rs.getString("T003_FD2_employee"));
+            e.setStoreCode(rs.getString("T003_FD2_employee"));
             e.setStoreName(rs.getString("T001_FD1_store"));
             list.add(e);
         }
@@ -129,7 +129,7 @@ public class EmployeeDAO extends DAO {
 
         st.setString(1, employee.getEmployeeCode());
         st.setString(2, employee.getEmployeeName());
-        st.setString(3, employee.getStoreId());
+        st.setString(3, employee.getStoreCode());
 
         int line = st.executeUpdate();
         st.close();
@@ -145,7 +145,7 @@ public class EmployeeDAO extends DAO {
             "where T003_PK1_employee = ?");
 
         st.setString(1, employee.getEmployeeName());
-        st.setString(2, employee.getStoreId());
+        st.setString(2, employee.getStoreCode());
         st.setString(3, employee.getEmployeeCode());
 
         int line = st.executeUpdate();

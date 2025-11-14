@@ -24,10 +24,10 @@ public class EmployeeListAction extends HttpServlet {
 
         // セッションからログイン中店舗IDを取得
         HttpSession session = request.getSession(false);
-        String storeId = null;
+        String storeCode = null;
 
         if (session != null) {
-            storeId = (String) session.getAttribute("storeId");
+            storeCode = (String) session.getAttribute("storeCode");
         }
 
         // 検索パラメータを取得（個別検索用）
@@ -40,18 +40,18 @@ public class EmployeeListAction extends HttpServlet {
             if (employeeCode != null && !employeeCode.isEmpty()) {
                 // 社員コードで検索（単一）
                 Employee e = dao.selectByCode(employeeCode);
-                if (e != null && e.getStoreId().equals(storeId)) { // 自店舗所属のみ表示
+                if (e != null && e.getStoreCode().equals(storeCode)) { // 自店舗所属のみ表示
                     list.add(e);
                 }
-            } else if (storeId != null && !storeId.isEmpty()) {
+            } else if (storeCode != null && !storeCode.isEmpty()) {
                 // ログイン店舗の社員一覧を取得
-                list = dao.selectByStoreId(storeId);
+                list = dao.selectByStoreCode(storeCode);
             }
 
             // JSP にデータを渡す
             request.setAttribute("employeeList", list);
             request.setAttribute("employeeCode", employeeCode);
-            request.setAttribute("storeId", storeId);
+            request.setAttribute("storeCode", storeCode);
 
             // 一覧ページへ
             request.getRequestDispatcher("/store_jsp/employee_list.jsp").forward(request, response);
