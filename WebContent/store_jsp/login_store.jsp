@@ -154,7 +154,7 @@
             </div>
 
 
-            <form action="${pageContext.request.contextPath}/login_store" method="post" id="loginForm">
+            <form action="${pageContext.request.contextPath}/foodloss/Login_StoreExecute.action" method="post" id="loginForm">
                 <input type="hidden" name="csrfToken" value="${sessionScope.csrfToken}">
 
                 <div class="form-group">
@@ -180,7 +180,7 @@
 
                 <button type="submit" class="btn-login">ログイン</button>
                 <button type="button" class="btn-register"
-                        onclick="location.href='${pageContext.request.contextPath}/jsp/signup_store.jsp'">
+                        onclick="location.href='${pageContext.request.contextPath}/store_jsp/signup_store.jsp'">
                     新規登録
                 </button>
             </form>
@@ -194,7 +194,6 @@
 
     <jsp:include page="../jsp/footer.jsp" />
 
-    <jsp:include page="/jsp/footer.jsp" />
  <!-- JS -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>

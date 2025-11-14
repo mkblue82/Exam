@@ -3,17 +3,19 @@ package bean;
 import java.sql.Time;
 
 public class Store implements java.io.Serializable {
-    private int storeId;
-    private String storeName;
-    private String address;
-    private String phone;
-    private String representative;
-    private Time openingTime;
-    private String category;
-    private String email;
-    private byte[] license;
-    private String licenseFileName;
 
+    private int storeId;          // T001_PK1_store（店舗ID）
+    private String storeName;     // T001_FD1_store（店舗名）
+    private String address;       // T001_FD2_store（住所）
+    private String phone;         // T001_FD3_store（電話番号）
+    private String password;      // T001_FD4_store（パスワード）
+    private Time discountTime;    // T001_FD5_store（割引時間）
+    private int discountRate;     // T001_FD6_store（割引率）
+    private String email;         // T001_FD7_store（メールアドレス）
+    private byte[] license;       // T001_FD8_store（営業許可証）
+    private String licenseFileName; // T001_FD9_store（営業許可証ファイル名）
+
+    // --- Getter ---
     public int getStoreId() {
         return storeId;
     }
@@ -26,14 +28,14 @@ public class Store implements java.io.Serializable {
     public String getPhone() {
         return phone;
     }
-    public String getRepresentative() {
-        return representative;
+    public String getPassword() {
+        return password;
     }
-    public Time getOpeningTime() {
-        return openingTime;
+    public Time getDiscountTime() {
+        return discountTime;
     }
-    public String getCategory() {
-        return category;
+    public int getDiscountRate() {
+        return discountRate;
     }
     public String getEmail() {
         return email;
@@ -45,6 +47,7 @@ public class Store implements java.io.Serializable {
         return licenseFileName;
     }
 
+    // --- Setter ---
     public void setStoreId(int storeId) {
         this.storeId = storeId;
     }
@@ -57,14 +60,14 @@ public class Store implements java.io.Serializable {
     public void setPhone(String phone) {
         this.phone = phone;
     }
-    public void setRepresentative(String representative) {
-        this.representative = representative;
+    public void setPassword(String password) {
+        this.password = password;
     }
-    public void setOpeningTime(Time openingTime) {
-        this.openingTime = openingTime;
+    public void setDiscountTime(Time discountTime) {
+        this.discountTime = discountTime;
     }
-    public void setCategory(String category) {
-        this.category = category;
+    public void setDiscountRate(int discountRate) {
+        this.discountRate = discountRate;
     }
     public void setEmail(String email) {
         this.email = email;
@@ -75,5 +78,5 @@ public class Store implements java.io.Serializable {
     public void setLicenseFileName(String licenseFileName) {
         this.licenseFileName = licenseFileName;
     }
-}
 
+}

@@ -47,10 +47,10 @@ public class Login_StoreExecuteAction extends Action {
             HttpSession session = request.getSession();
             session.setAttribute("store", store);
             // ログイン成功 → 店舗メニュー画面にリダイレクト
-            response.sendRedirect(request.getContextPath() + "/foodloss/StoreMenu.action");
+            response.sendRedirect(request.getContextPath() + "/foodloss/Menu.action");
         } else {
             request.setAttribute("error", "店舗IDまたはパスワードが違います。");
-            request.getRequestDispatcher("/jsp/store_login.jsp").forward(request, response);
+            request.getRequestDispatcher("/store_jsp/store_login.jsp").forward(request, response);
         }
     }
 

@@ -108,38 +108,37 @@ public class StoreDAO {
         }
     }
 
-    /**
-     * 店舗IDとパスワードでログイン認証を行う
-     * @param storeId 店舗ID
-     * @param password ハッシュ化されたパスワード
-     * @return 認証成功した Store オブジェクト or null
-     */
-    public Store login(int storeId, String password) throws SQLException {
-        String sql = "SELECT * FROM t005_store WHERE t005_pk1_store = ? AND t005_fd4_store = ?";
+    public Store login(int storeId, String hashedPassword) throws SQLException {
+
+        String sql = "SELECT * FROM t001_store WHERE t001_pk1_store = ? AND t001_fd4_store = ?";
 
         try (PreparedStatement pstmt = con.prepareStatement(sql)) {
             pstmt.setInt(1, storeId);
-            pstmt.setString(2, password);
+            pstmt.setString(2, hashedPassword);
 
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
                     Store store = new Store();
-                    store.setStoreId(rs.getInt("t005_pk1_store"));
-                    store.setStoreName(rs.getString("t005_fd1_store"));
-                    store.setAddress(rs.getString("t005_fd2_store"));
-                    store.setPhone(rs.getString("t005_fd3_store"));
-                    store.setPassword(rs.getString("t005_fd4_store"));
-                    store.setDiscountTime(rs.getTime("t005_fd5_store"));
-                    store.setDiscountRate(rs.getInt("t005_fd6_store"));
-                    store.setEmail(rs.getString("t005_fd7_store"));
-                    store.setLicense(rs.getBytes("t005_fd8_store"));
-                    store.setLicenseFileName(rs.getString("t005_fd9_store"));
+
+                    store.setStoreId(rs.getInt("t001_pk1_store"));
+                    store.setStoreName(rs.getString("t001_fd1_store"));
+                    store.setAddress(rs.getString("t001_fd2_store"));
+                    store.setPhone(rs.getString("t001_fd3_store"));
+                    store.setPassword(rs.getString("t001_fd4_store"));
+                    store.setDiscountTime(rs.getTime("t001_fd5_store"));
+                    store.setDiscountRate(rs.getInt("t001_fd6_store"));
+                    store.setEmail(rs.getString("t001_fd7_store"));
+                    store.setLicense(rs.getBytes("t001_fd8_store"));
+
+
                     return store;
                 }
             }
         }
+
         return null; // 該当なし（ログイン失敗）
     }
+
 
 
 

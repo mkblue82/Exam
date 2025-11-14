@@ -16,7 +16,7 @@ public class MenuAction extends Action {
 
 		// 店舗としてログインしている場合
 		if (store != null) {
-			req.getRequestDispatcher("/jsp/main_store.jsp").forward(req, res);
+			req.getRequestDispatcher("/store_jsp/main_store.jsp").forward(req, res);
 		}
 		// 一般ユーザーとしてログインしている場合
 		else if (user != null) {
