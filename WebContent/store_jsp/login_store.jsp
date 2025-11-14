@@ -117,6 +117,8 @@
             background: #b56c3a;
         }
 
+
+
         .btn-register {
             background: #fff;
             color: #c77c4a;
