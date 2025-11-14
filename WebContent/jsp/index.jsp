@@ -98,18 +98,7 @@ main {
     text-decoration: underline;
 }
 
-/* フッター街並み画像 */
-.footer-img {
-    width: 100%;
-    margin-top: 50px;
-}
 
-footer {
-    text-align: center;
-    color: #666;
-    font-size: 0.9rem;
-    padding: 10px 0 20px 0;
-}
 </style>
 
 </head>
@@ -131,7 +120,7 @@ footer {
             <a href="${pageContext.request.contextPath}/foodloss/Login_Store.action" class="btn-main">
                 店舗用<br>ログイン
             </a>
-            <a href="${pageContext.request.contextPath}/foodloss/store_register.jsp" class="sub-link">
+            <a href="${pageContext.request.contextPath}/foodloss/SignupStore.action" class="sub-link">
                 加盟店登録
             </a>
         </div>
@@ -141,7 +130,7 @@ footer {
             <a href="${pageContext.request.contextPath}/foodloss/Login.action" class="btn-main">
                 ユーザー用	<br>ログイン
             </a>
-            <a href="${pageContext.request.contextPath}/foodloss/user_register.jsp" class="sub-link">
+            <a href="${pageContext.request.contextPath}/foodloss/SignupUser.action" class="sub-link">
                 新規登録
             </a>
         </div>
