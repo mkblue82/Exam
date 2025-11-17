@@ -1,65 +1,65 @@
 package foodloss;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import bean.Employee;
 import dao.EmployeeDAO;
+import tool.Action;
 
-@WebServlet("/employee_list")
-public class EmployeeListAction extends HttpServlet {
-    private static final long serialVersionUID = 1L;
+public class EmployeeListAction extends Action {
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+    public void execute(HttpServletRequest req, HttpServletResponse res)
+            throws Exception {
 
-        // セッションからログイン中店舗IDを取得
-        HttpSession session = request.getSession(false);
+        // ★ セッションから店舗コードを取得
+        HttpSession session = req.getSession(false);
         String storeCode = null;
 
         if (session != null) {
             storeCode = (String) session.getAttribute("storeCode");
         }
 
-        // 検索パラメータを取得（個別検索用）
-        String employeeCode = request.getParameter("employeeCode");
+        // ★ 検索用パラメータ
+        String employeeCode = req.getParameter("employeeCode");
+
+        // ★ DAO 呼び出し（Connection は渡さない）
+        EmployeeDAO dao = new EmployeeDAO();
+        List<Employee> list = new ArrayList<>();
 
         try {
-            EmployeeDAO dao = new EmployeeDAO();
-            List<Employee> list = new ArrayList<>();
 
             if (employeeCode != null && !employeeCode.isEmpty()) {
-                // 社員コードで検索（単一）
+
+                // 個別検索
                 Employee e = dao.selectByCode(employeeCode);
-                if (e != null && e.getStoreCode().equals(storeCode)) { // 自店舗所属のみ表示
+                if (e != null && e.getStoreCode().equals(storeCode)) {
                     list.add(e);
                 }
+
             } else if (storeCode != null && !storeCode.isEmpty()) {
-                // ログイン店舗の社員一覧を取得
+
+                // 全社員（店舗コード検索）
                 list = dao.selectByStoreCode(storeCode);
             }
 
-            // JSP にデータを渡す
-            request.setAttribute("employeeList", list);
-            request.setAttribute("employeeCode", employeeCode);
-            request.setAttribute("storeCode", storeCode);
-
-            // 一覧ページへ
-            request.getRequestDispatcher("/store_jsp/employee_list.jsp").forward(request, response);
+            // JSP に渡す
+            req.setAttribute("employeeList", list);
+            req.setAttribute("employeeCode", employeeCode);
+            req.setAttribute("storeCode", storeCode);
 
         } catch (Exception e) {
             e.printStackTrace();
-            request.setAttribute("errorMessage", "社員情報の取得中にエラーが発生しました。");
-            request.getRequestDispatcher("/store_jsp/error.jsp").forward(request, response);
+            req.setAttribute("errorMessage", "社員情報の取得中にエラーが発生しました。");
         }
+
+        // ★ 社員一覧 JSP に forward
+        req.getRequestDispatcher("/store_jsp/employee_list.jsp")
+           .forward(req, res);
     }
 }
