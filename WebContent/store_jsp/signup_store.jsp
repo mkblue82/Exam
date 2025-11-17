@@ -1,9 +1,8 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%
-    // セッションに CSRF トークンがなければ生成
+    // CSRFトークンをセッションに生成
     if (session.getAttribute("csrfToken") == null) {
-        String csrfToken = java.util.UUID.randomUUID().toString();
-        session.setAttribute("csrfToken", csrfToken);
+        session.setAttribute("csrfToken", java.util.UUID.randomUUID().toString());
     }
 %>
 <!DOCTYPE html>
@@ -18,16 +17,12 @@
         body { background:#f5f5f5; min-height:100vh; display:flex; flex-direction:column; }
         #container { flex:1; display:flex; flex-direction:column; width:100%; }
         .main-contents { width:100%; padding:20px; }
-        .register-container { max-width:450px; width:100%; margin:80px auto; padding:2rem; background:#fff; border-radius:10px; box-shadow:0 5px 20px rgba(0,0,0,0.1);}
-        .register-container h1 { color:#c07148; text-align:center; margin-bottom:2rem; font-size:2rem; border-bottom:2px solid #c07148; padding-bottom:1rem;}
-        .error-message { background:#ffebee; color:#c62828; padding:1rem; border-radius:5px; margin-bottom:1.5rem; border-left:4px solid #c62828; font-size:0.9rem;}
+        .register-container { max-width:450px; width:100%; margin:80px auto; padding:2rem; background:#fff; border-radius:10px; box-shadow:0 5px 20px rgba(0,0,0,0.1); }
+        .register-container h1 { color:#c07148; text-align:center; margin-bottom:2rem; font-size:2rem; border-bottom:2px solid #c07148; padding-bottom:1rem; }
+        .error-message { background:#ffebee; color:#c62828; padding:1rem; border-radius:5px; margin-bottom:1.5rem; border-left:4px solid #c62828; font-size:0.9rem; }
         .form-group { margin-bottom:1.5rem; }
         .form-group label { display:block; margin-bottom:0.5rem; font-weight:bold; color:#555; }
-        .form-group input[type="text"],
-        .form-group input[type="email"],
-        .form-group input[type="tel"],
-        .form-group input[type="password"],
-        .form-group input[type="file"] { width:100%; padding:0.8rem; border:1px solid #ccc; border-radius:5px; font-size:1rem; transition:0.3s; }
+        .form-group input[type="text"], .form-group input[type="email"], .form-group input[type="tel"], .form-group input[type="password"], .form-group input[type="file"] { width:100%; padding:0.8rem; border:1px solid #ccc; border-radius:5px; font-size:1rem; transition:0.3s; }
         .form-group input:focus { outline:none; border-color:#c07148; box-shadow:0 0 0 3px rgba(192,113,72,0.1); }
         .show-password { display:flex; align-items:center; margin-top:5px; font-size:0.9rem; color:#555; }
         .show-password input { margin-right:5px; }
@@ -42,7 +37,7 @@
 </head>
 <body>
 <div id="container">
-    <main class="column">
+    <main>
         <div class="main-contents">
             <div class="register-container">
                 <h1>新規店舗登録</h1>
@@ -53,8 +48,9 @@
                     </div>
                 <% } %>
 
-                <form action="${pageContext.request.contextPath}/foodloss/SignupStore.action" method="post" enctype="multipart/form-data">
-                    <!-- CSRF トークン -->
+                <form action="${pageContext.request.contextPath}/foodloss/SignupStore.action"
+                      method="post" enctype="multipart/form-data" onsubmit="return checkPasswordMatch()">
+                    <!-- CSRFトークン -->
                     <input type="hidden" name="csrfToken" value="<%= session.getAttribute("csrfToken") %>">
 
                     <div class="form-group">
@@ -63,31 +59,31 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="address">店舗住所</label>
+                        <label for="address">住所</label>
                         <input type="text" id="address" name="address" required placeholder="例:東京都新宿区〇〇1-2-3" value="${param.address}">
                     </div>
 
                     <div class="form-group">
-                        <label for="phone">店舗電話番号</label>
-                        <input type="tel" id="phone" name="phone" required placeholder="例:0312345678" pattern="[0-9]{10,11}" value="${param.phone}">
+                        <label for="phone">電話番号</label>
+                        <input type="tel" id="phone" name="phone" required pattern="[0-9]{10,11}" placeholder="0312345678" value="${param.phone}">
                     </div>
 
                     <div class="form-group">
-                        <label for="email">店舗メールアドレス</label>
-                        <input type="email" id="email" name="email" required placeholder="例:store@mail.com" value="${param.email}">
+                        <label for="email">メールアドレス</label>
+                        <input type="email" id="email" name="email" required placeholder="store@mail.com" value="${param.email}">
                     </div>
 
                     <div class="form-group">
                         <label for="password">パスワード</label>
                         <input type="password" id="password" name="password" required minlength="8" placeholder="8文字以上で入力してください">
                         <div class="show-password">
-                            <input type="checkbox" id="togglePassword">
-                            <label for="togglePassword">パスワードを表示する</label>
+                            <input type="checkbox" id="showPassword">
+                            <label for="showPassword">パスワードを表示する</label>
                         </div>
                     </div>
 
                     <div class="form-group">
-                        <label for="passwordConfirm">パスワード(確認)</label>
+                        <label for="passwordConfirm">パスワード（確認）</label>
                         <input type="password" id="passwordConfirm" name="passwordConfirm" required minlength="8" placeholder="もう一度入力してください">
                         <p id="passwordMessage" class="password-match"></p>
                     </div>
@@ -98,7 +94,8 @@
                     </div>
 
                     <button type="submit" class="btn-submit">申請する</button>
-                    <button type="button" class="btn-cancel" onclick="location.href='${pageContext.request.contextPath}/store_jsp/login_store.jsp'">ログインに戻る</button>
+                    <button type="button" class="btn-cancel"
+                            onclick="location.href='${pageContext.request.contextPath}/store_jsp/login_store.jsp'">ログインに戻る</button>
                 </form>
             </div>
         </div>
@@ -108,22 +105,18 @@
 </div>
 
 <!-- JS -->
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
-<script src="${pageContext.request.contextPath}/js/slick.js"></script>
-<script src="${pageContext.request.contextPath}/js/main.js"></script>
 <script>
     const passwordInput = document.getElementById("password");
     const confirmInput = document.getElementById("passwordConfirm");
     const message = document.getElementById("passwordMessage");
-    const toggle = document.getElementById("togglePassword");
+    const showCheckbox = document.getElementById("showPassword");
 
-    toggle.addEventListener("change", function() {
+    showCheckbox.addEventListener("change", function() {
         passwordInput.type = this.checked ? "text" : "password";
     });
 
     function checkPasswords() {
-        if (passwordInput.value.length === 0 || confirmInput.value.length === 0) {
+        if (confirmInput.value.length === 0) {
             message.textContent = "";
             return;
         }
@@ -137,6 +130,14 @@
 
     passwordInput.addEventListener("input", checkPasswords);
     confirmInput.addEventListener("input", checkPasswords);
+
+    function checkPasswordMatch() {
+        if (passwordInput.value !== confirmInput.value) {
+            alert("パスワードが一致していません。");
+            return false;
+        }
+        return true;
+    }
 </script>
 </body>
 </html>

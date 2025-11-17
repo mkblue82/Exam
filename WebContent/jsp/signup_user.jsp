@@ -14,7 +14,7 @@
     <title>新規ユーザー登録</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+		* { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             background: #f5f5f5;
