@@ -19,132 +19,64 @@ import tool.DBManager;
 public class SignupStoreAction extends Action {
 
     @Override
-    public void execute(HttpServletRequest req, HttpServletResponse res)
-            throws Exception {
+    public void execute(HttpServletRequest req, HttpServletResponse res) throws Exception {
 
         System.out.println("DEBUG: ========== SignupStoreAction START ==========");
         System.out.println("DEBUG: Method = " + req.getMethod());
 
-        // GETリクエストの場合 - フォーム表示
         if ("GET".equalsIgnoreCase(req.getMethod())) {
             req.getRequestDispatcher("/store_jsp/signup_store.jsp").forward(req, res);
             return;
         }
 
-        // POSTリクエストの場合 - 登録処理
         req.setCharacterEncoding("UTF-8");
+        HttpSession session = req.getSession();
 
-        // --- CSRFトークンチェック ---
-        HttpSession session = req.getSession();  // ← ここを修正
+        // --- CSRFチェック ---
         String token = req.getParameter("csrfToken");
         String sessionToken = (String) session.getAttribute("csrfToken");
-
-        System.out.println("DEBUG: token from request = " + token);
-        System.out.println("DEBUG: sessionToken = " + sessionToken);
-
         if (sessionToken == null || !sessionToken.equals(token)) {
-            System.out.println("DEBUG: CSRF token mismatch!");
-            req.setAttribute("errorMessage", "不正なアクセスです。");
-            req.getRequestDispatcher("/store_jsp/signup_store.jsp").forward(req, res);
+            forwardWithError(req, res, "不正なアクセスです。");
             return;
         }
 
-        // --- 入力値取得 ---
+        // --- 入力値 ---
         String storeName = req.getParameter("storeName");
         String address = req.getParameter("address");
         String phone = req.getParameter("phone");
         String email = req.getParameter("email");
         String passwordRaw = req.getParameter("password");
-        String passwordConfirm = req.getParameter("passwordConfirm"); // ← 追加
+        String passwordConfirm = req.getParameter("passwordConfirm");
 
-        // --- 未入力チェック ---
-        if (storeName == null || storeName.trim().isEmpty()) {
-            req.setAttribute("errorMessage", "店舗名を入力してください。");
-            req.getRequestDispatcher("/store_jsp/signup_store.jsp").forward(req, res);
-            return;
-        }
-        if (address == null || address.trim().isEmpty()) {
-            req.setAttribute("errorMessage", "店舗住所を入力してください。");
-            req.getRequestDispatcher("/store_jsp/signup_store.jsp").forward(req, res);
-            return;
-        }
-        if (phone == null || phone.trim().isEmpty()) {
-            req.setAttribute("errorMessage", "電話番号を入力してください。");
-            req.getRequestDispatcher("/store_jsp/signup_store.jsp").forward(req, res);
-            return;
-        }
-        if (email == null || email.trim().isEmpty()) {
-            req.setAttribute("errorMessage", "メールアドレスを入力してください。");
-            req.getRequestDispatcher("/store_jsp/signup_store.jsp").forward(req, res);
-            return;
-        }
-        if (passwordRaw == null || passwordRaw.trim().isEmpty()) {
-            req.setAttribute("errorMessage", "パスワードを入力してください。");
-            req.getRequestDispatcher("/store_jsp/signup_store.jsp").forward(req, res);
-            return;
-        }
-        if (passwordConfirm == null || passwordConfirm.trim().isEmpty()) { // ← 追加
-            req.setAttribute("errorMessage", "確認用パスワードを入力してください。");
-            req.getRequestDispatcher("/store_jsp/signup_store.jsp").forward(req, res);
-            return;
-        }
+        if (storeName == null || storeName.trim().isEmpty()) { forwardWithError(req, res, "店舗名を入力してください。"); return; }
+        if (address == null || address.trim().isEmpty()) { forwardWithError(req, res, "店舗住所を入力してください。"); return; }
+        if (phone == null || phone.trim().isEmpty()) { forwardWithError(req, res, "電話番号を入力してください。"); return; }
+        if (email == null || email.trim().isEmpty()) { forwardWithError(req, res, "メールアドレスを入力してください。"); return; }
+        if (passwordRaw == null || passwordRaw.trim().isEmpty()) { forwardWithError(req, res, "パスワードを入力してください。"); return; }
+        if (passwordConfirm == null || passwordConfirm.trim().isEmpty()) { forwardWithError(req, res, "確認用パスワードを入力してください。"); return; }
+        if (!passwordRaw.equals(passwordConfirm)) { forwardWithError(req, res, "パスワードが一致しません。"); return; }
+        if (passwordRaw.length() < 8) { forwardWithError(req, res, "パスワードは8文字以上で入力してください。"); return; }
+        if (!phone.matches("[0-9]{10,11}")) { forwardWithError(req, res, "電話番号は10桁または11桁の数字で入力してください。"); return; }
 
-        // --- パスワードチェック ---
-        if (!passwordRaw.equals(passwordConfirm)) {
-            req.setAttribute("errorMessage", "パスワードが一致しません。");
-            req.getRequestDispatcher("/store_jsp/signup_store.jsp").forward(req, res);
-            return;
-        }
-
-        if (passwordRaw.length() < 8) {
-            req.setAttribute("errorMessage", "パスワードは8文字以上で入力してください。");
-            req.getRequestDispatcher("/store_jsp/signup_store.jsp").forward(req, res);
-            return;
-        }
-
-        // 電話番号の形式チェック
-        if (!phone.matches("[0-9]{10,11}")) {
-            req.setAttribute("errorMessage", "電話番号は10桁または11桁の数字で入力してください。");
-            req.getRequestDispatcher("/store_jsp/signup_store.jsp").forward(req, res);
-            return;
-        }
-
-        // --- ファイルアップロード処理 ---
+        // --- ファイル ---
         Part permitFilePart = req.getPart("permitFile");
-        byte[] permitFileData = null;
-        String permitFileName = null;
+        if (permitFilePart == null || permitFilePart.getSize() == 0) { forwardWithError(req, res, "営業許可書をアップロードしてください。"); return; }
+        String permitFileName = getFileName(permitFilePart);
+        if (!isValidFileType(permitFileName)) { forwardWithError(req, res, "営業許可書はJPG、PNG、またはPDF形式でアップロードしてください。"); return; }
+        if (permitFilePart.getSize() > 5 * 1024 * 1024) { forwardWithError(req, res, "ファイルサイズは5MB以下にしてください。"); return; }
 
-        if (permitFilePart != null && permitFilePart.getSize() > 0) {
-            permitFileName = getFileName(permitFilePart);
-            if (!isValidFileType(permitFileName)) {
-                req.setAttribute("errorMessage", "営業許可書はJPG、PNG、またはPDF形式でアップロードしてください。");
-                req.getRequestDispatcher("/store_jsp/signup_store.jsp").forward(req, res);
-                return;
+        byte[] permitFileData;
+        try (InputStream is = permitFilePart.getInputStream();
+             java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream()) {
+            byte[] buffer = new byte[1024];
+            int len;
+            while ((len = is.read(buffer)) != -1) {
+                baos.write(buffer, 0, len);
             }
-            if (permitFilePart.getSize() > 5 * 1024 * 1024) {
-                req.setAttribute("errorMessage", "ファイルサイズは5MB以下にしてください。");
-                req.getRequestDispatcher("/store_jsp/signup_store.jsp").forward(req, res);
-                return;
-            }
-
-            // InputStreamを使ってバイト配列に変換
-            try (InputStream is = permitFilePart.getInputStream();
-                 java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream()) {
-                byte[] buffer = new byte[1024];
-                int length;
-                while ((length = is.read(buffer)) != -1) {
-                    baos.write(buffer, 0, length);
-                }
-                permitFileData = baos.toByteArray();
-            }
-        } else {
-            req.setAttribute("errorMessage", "営業許可書をアップロードしてください。");
-            req.getRequestDispatcher("/store_jsp/signup_store.jsp").forward(req, res);
-            return;
+            permitFileData = baos.toByteArray();
         }
 
-
-        // --- パスワードハッシュ化 ---
+        // --- パスワードハッシュ ---
         String password = hashPassword(passwordRaw);
 
         // --- DB登録 ---
@@ -152,26 +84,15 @@ public class SignupStoreAction extends Action {
         try (Connection conn = db.getConnection()) {
             StoreDAO dao = new StoreDAO(conn);
 
-            if (isPhoneExists(dao, phone)) {
-                req.setAttribute("errorMessage", "この電話番号は既に登録されています。");
-                req.getRequestDispatcher("/store_jsp/signup_store.jsp").forward(req, res);
-                return;
-            }
+            if (isPhoneExists(dao, phone)) { forwardWithError(req, res, "この電話番号は既に登録されています。"); return; }
+            if (isEmailExists(dao, email)) { forwardWithError(req, res, "このメールアドレスは既に登録されています。"); return; }
 
-            if (isEmailExists(dao, email)) {
-                req.setAttribute("errorMessage", "このメールアドレスは既に登録されています。");
-                req.getRequestDispatcher("/store_jsp/signup_store.jsp").forward(req, res);
-                return;
-            }
-
-            // Storeオブジェクト作成
             Store store = new Store();
             store.setStoreName(storeName);
             store.setAddress(address);
             store.setPhone(phone);
             store.setEmail(email);
             store.setLicense(permitFileData);
-            store.setLicenseFileName(permitFileName);
             store.setPassword(password);
 
             dao.insert(store);
@@ -180,27 +101,27 @@ public class SignupStoreAction extends Action {
             session.setAttribute("registeredStore", store);
 
             req.getRequestDispatcher("/store_jsp/signup_done_store.jsp").forward(req, res);
-
         } catch (SQLException e) {
             e.printStackTrace();
-            req.setAttribute("errorMessage", "システムエラーが発生しました。");
-            req.getRequestDispatcher("/store_jsp/signup_store.jsp").forward(req, res);
+            forwardWithError(req, res, "システムエラーが発生しました。");
         }
     }
 
+    private void forwardWithError(HttpServletRequest req, HttpServletResponse res, String message) throws Exception {
+        req.setAttribute("errorMessage", message);
+        req.getRequestDispatcher("/store_jsp/signup_store.jsp").forward(req, res);
+    }
+
     private boolean isPhoneExists(StoreDAO dao, String phone) throws Exception {
-        for (Store store : dao.selectAll()) {
-            if (store.getPhone() != null && store.getPhone().equals(phone)) return true;
-        }
+        for (Store s : dao.selectAll()) if (s.getPhone() != null && s.getPhone().equals(phone)) return true;
         return false;
     }
 
     private boolean isEmailExists(StoreDAO dao, String email) throws Exception {
-        for (Store store : dao.selectAll()) {
-            if (store.getEmail() != null && store.getEmail().equals(email)) return true;
-        }
+        for (Store s : dao.selectAll()) if (s.getEmail() != null && s.getEmail().equals(email)) return true;
         return false;
     }
+
 
     private String hashPassword(String password) {
         try {
@@ -219,11 +140,9 @@ public class SignupStoreAction extends Action {
     }
 
     private String getFileName(Part part) {
-        String contentDisposition = part.getHeader("content-disposition");
-        for (String element : contentDisposition.split(";")) {
-            if (element.trim().startsWith("filename")) {
-                return element.substring(element.indexOf('=') + 1).trim().replace("\"", "");
-            }
+        String cd = part.getHeader("content-disposition");
+        for (String elem : cd.split(";")) {
+            if (elem.trim().startsWith("filename")) return elem.substring(elem.indexOf('=') + 1).trim().replace("\"", "");
         }
         return null;
     }
@@ -234,4 +153,3 @@ public class SignupStoreAction extends Action {
         return lower.endsWith(".jpg") || lower.endsWith(".jpeg") || lower.endsWith(".png") || lower.endsWith(".pdf");
     }
 }
-
