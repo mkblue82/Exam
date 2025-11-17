@@ -65,7 +65,6 @@ public class StoreDAO {
             pstmt.setInt(6, store.getDiscountRate());
             pstmt.setString(7, store.getEmail());
             pstmt.setBytes(8, store.getLicense());
-            pstmt.setString(9, store.getLicenseFileName());
 
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
