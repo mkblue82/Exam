@@ -84,7 +84,7 @@
                     <p>0 P</p>
                 </div>
                 <div class="button-group">
-                    <a href="${pageContext.request.contextPath}/jsp/edit_info.jsp">情報変更</a>
+                    <a href="${pageContext.request.contextPath}/jsp/edit_info_user.jsp">情報変更</a>
                     <a href="${pageContext.request.contextPath}/foodloss/Logout.action">ログアウト</a>
                     <a href="${pageContext.request.contextPath}/foodloss/DeleteAccount.action">アカウント削除</a>
                 </div>
