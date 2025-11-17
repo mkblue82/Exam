@@ -171,9 +171,13 @@
                     </div>
 
                     <button type="submit" class="btn-login">ログイン</button>
-                    <button type="button" class="btn-register"
-                            onclick="location.href='${pageContext.request.contextPath}/foodloss/SignupUser.action'" method="post">新規登録</button>
                 </form>
+
+                <!-- フォームの外に配置 -->
+                <button type="button" class="btn-register"
+                        onclick="location.href='${pageContext.request.contextPath}/foodloss/SignupUser.action'">
+                    新規登録
+                </button>
             </div>
         </div>
     </main>
