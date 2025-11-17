@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="java.util.List" %>
+<%@ page import="bean.Favorite" %>
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -234,52 +235,10 @@
             </div>
           <% } %>
 
-          <form action="notificationSettings" method="post">
-            <!-- お気に入り店舗がない場合 -->
+          <form action="${pageContext.request.contextPath}/foodloss/NotificationSettings.action" method="post">
+            <!-- お気に入り店舗取得 -->
             <%
-            List favoriteStores = (List)request.getAttribute("favoriteStores");
-
-            // ===== 仮データ（プレビュー用） =====
-            // 実際の運用時はこのブロックを削除してください
-            if (favoriteStores == null) {
-                favoriteStores = new java.util.ArrayList();
-                java.util.Map store1 = new java.util.HashMap();
-                store1.put("storeId", "1");
-                store1.put("storeName", "ベーカリー山田");
-                store1.put("storeAddress", "東京都渋谷区代々木1-2-3");
-                store1.put("notificationEnabled", true);
-
-                java.util.Map store2 = new java.util.HashMap();
-                store2.put("storeId", "2");
-                store2.put("storeName", "カフェ＆レストラン グリーン");
-                store2.put("storeAddress", "東京都新宿区新宿3-10-5");
-                store2.put("notificationEnabled", true);
-
-                java.util.Map store3 = new java.util.HashMap();
-                store3.put("storeId", "3");
-                store3.put("storeName", "スーパーマーケット田中");
-                store3.put("storeAddress", "東京都世田谷区三軒茶屋2-15-8");
-                store3.put("notificationEnabled", false);
-
-                java.util.Map store4 = new java.util.HashMap();
-                store4.put("storeId", "4");
-                store4.put("storeName", "デリカテッセン佐藤");
-                store4.put("storeAddress", "東京都港区六本木7-18-12");
-                store4.put("notificationEnabled", true);
-
-                java.util.Map store5 = new java.util.HashMap();
-                store5.put("storeId", "5");
-                store5.put("storeName", "和食処 鈴木");
-                store5.put("storeAddress", "東京都中央区銀座4-5-6");
-                store5.put("notificationEnabled", false);
-
-                favoriteStores.add(store1);
-                favoriteStores.add(store2);
-                favoriteStores.add(store3);
-                favoriteStores.add(store4);
-                favoriteStores.add(store5);
-            }
-            // ===== 仮データここまで =====
+            List<Favorite> favoriteStores = (List<Favorite>)request.getAttribute("favoriteStores");
             %>
 
             <% if (favoriteStores == null || favoriteStores.isEmpty()) { %>
@@ -292,53 +251,15 @@
             <!-- お気に入り店舗リスト -->
             <% if (favoriteStores != null && !favoriteStores.isEmpty()) { %>
               <div class="store-list">
-                <% for (int i = 0; i < favoriteStores.size(); i++) { %>
-                  <%
-                    Object storeObj = favoriteStores.get(i);
-                    String storeId = "";
-                    String storeName = "";
-                    String storeAddress = "";
-                    boolean notificationEnabled = false;
-
-                    // Mapとして扱う場合（仮データ用）
-                    if (storeObj instanceof java.util.Map) {
-                        java.util.Map storeMap = (java.util.Map)storeObj;
-                        storeId = String.valueOf(storeMap.get("storeId"));
-                        storeName = String.valueOf(storeMap.get("storeName"));
-                        storeAddress = String.valueOf(storeMap.get("storeAddress"));
-                        notificationEnabled = (Boolean)storeMap.get("notificationEnabled");
-                    } else {
-                        // 実際のStoreクラスを使う場合
-                        // Store store = (Store)storeObj;
-                        // storeId = String.valueOf(store.getStoreId());
-                        // storeName = store.getStoreName();
-                        // storeAddress = store.getStoreAddress();
-                        // notificationEnabled = store.isNotificationEnabled();
-
-                        // リフレクション使用（汎用的な方法）
-                        try {
-                          java.lang.reflect.Method getStoreId = storeObj.getClass().getMethod("getStoreId");
-                          java.lang.reflect.Method getStoreName = storeObj.getClass().getMethod("getStoreName");
-                          java.lang.reflect.Method getStoreAddress = storeObj.getClass().getMethod("getStoreAddress");
-                          java.lang.reflect.Method isNotificationEnabled = storeObj.getClass().getMethod("isNotificationEnabled");
-
-                          storeId = String.valueOf(getStoreId.invoke(storeObj));
-                          storeName = (String)getStoreName.invoke(storeObj);
-                          storeAddress = (String)getStoreAddress.invoke(storeObj);
-                          notificationEnabled = (Boolean)isNotificationEnabled.invoke(storeObj);
-                        } catch (Exception e) {
-                          // エラーハンドリング
-                        }
-                    }
-                  %>
+                <% for (Favorite favorite : favoriteStores) { %>
                   <div class="store-item">
                     <div class="store-content">
                       <div class="store-header">
-                        <div class="store-name"><%= storeName %></div>
+                        <div class="store-name"><%= favorite.getStoreName() %></div>
                       </div>
-                      <% if (storeAddress != null && !storeAddress.isEmpty()) { %>
+                      <% if (favorite.getStoreAddress() != null && !favorite.getStoreAddress().isEmpty()) { %>
                       <div class="store-info">
-                        📍 <%= storeAddress %>
+                        📍 <%= favorite.getStoreAddress() %>
                       </div>
                       <% } %>
                     </div>
@@ -346,9 +267,9 @@
                       <span class="toggle-label">通知を受け取る</span>
                       <label class="switch">
                         <input type="checkbox"
-                               name="notification_<%= storeId %>"
+                               name="notification_<%= favorite.getStoreId() %>"
                                value="1"
-                               <%= notificationEnabled ? "checked" : "" %>>
+                               <%= favorite.getNotificationSetting() ? "checked" : "" %>>
                         <span class="slider"></span>
                       </label>
                     </div>

@@ -16,9 +16,9 @@
   <nav>
     <ul>
       <li><a href="${pageContext.request.contextPath}/foodloss/Menu.action">ホーム<span>Home</span></a></li>
-      <li><a href="${pageContext.request.contextPath}/jsp/mypage.jsp">マイページ<span>MyPage</span></a></li>
+      <li><a href="${pageContext.request.contextPath}/foodloss/MyPage.action">マイページ<span>MyPage</span></a></li>
       <li><a href="${pageContext.request.contextPath}/jsp/booking_list.jsp">予約リスト<span>Reservation List</span></a></li>
-      <li><a href="${pageContext.request.contextPath}/jsp/notification_setting.jsp">通知設定<span>Notification Settings</span></a></li>
+      <li><a href="${pageContext.request.contextPath}/foodloss/NotificationSetting.action">通知設定<span>Notification Settings</span></a></li>
     </ul>
   </nav>
 </div>
