@@ -182,7 +182,7 @@
 
                 <button type="submit" class="btn-login">ログイン</button>
                 <button type="button" class="btn-register"
-                        onclick="location.href='${pageContext.request.contextPath}/store_jsp/signup_store.jsp'">
+                        onclick="location.href='${pageContext.request.contextPath}/foodloss/SignupStore.action'">
                     新規登録
                 </button>
             </form>

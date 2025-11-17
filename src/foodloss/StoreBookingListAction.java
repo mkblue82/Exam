@@ -40,8 +40,7 @@ public class StoreBookingListAction extends HttpServlet {
         }
 
         request.setAttribute("bookingList", bookingList);
-        request.getRequestDispatcher("/store_jsp/booking_list.jsp")
+        request.getRequestDispatcher("/store_jsp/booking_list_store.jsp")
                .forward(request, response);
     }
 }
-

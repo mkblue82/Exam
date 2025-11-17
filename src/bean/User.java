@@ -6,9 +6,6 @@ public class User {
     private String email;
     private String phone;
     private String password;
-    private String favoriteStore;
-    private int storeId;
-    private boolean notification; // true=ON, false=OFF
 
     // --- getter/setter ---
     public int getUserId() {
@@ -46,24 +43,4 @@ public class User {
         this.password = password;
     }
 
-    public String getFavoriteStore() {
-        return favoriteStore;
-    }
-    public void setFavoriteStore(String favoriteStore) {
-        this.favoriteStore = favoriteStore;
-    }
-
-    public int getStoreId() {
-        return storeId;
-    }
-    public void setStoreId(int storeId) {
-        this.storeId = storeId;
-    }
-
-    public boolean isNotification() {
-        return notification;
-    }
-    public void setNotification(boolean notification) {
-        this.notification = notification;
-    }
 }

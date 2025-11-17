@@ -49,6 +49,7 @@
             color: #a65d36;
             margin-bottom: 20px;
         }
+
         table {
             width: 100%;
             border-collapse: collapse;
@@ -66,25 +67,15 @@
         tr:hover {
             background-color: #f5f5f5;
         }
-        .btn {
+
+        .pickup-btn {
             display: inline-block;
             padding: 8px 25px;
-            background-color: #c07148;
+            background-color: #007bff;
             color: white;
             border-radius: 8px;
             text-decoration: none;
             transition: 0.3s;
-        }
-        .btn:hover {
-            background-color: #c77c4a;
-        }
-
-        .pickup-btn {
-            padding: 8px 25px;
-            border-radius: 8px;
-            background-color: #007bff;
-            color: #fff;
-            text-decoration: none;
         }
         .pickup-btn:hover {
             background-color: #0056c7;
@@ -145,28 +136,36 @@
                                 <th>受け取り</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <% for (Booking b : bookingList) { %>
-                                <tr>
-                                    <td><%= b.getBookingId() %></td>
-                                    <td><%= b.getMerchandiseName() %></td>
-                                    <td><%= b.getUserId() %></td>
-                                    <td><%= b.getCount() %></td>
-                                    <td><%= b.getPickupTime() %></td>
-                                    <td><%= b.getBookingTime() %></td>
-                                    <td><%= b.isPickupStatus() ? "受取済" : "未受取" %></td>
 
-                                    <!-- 受け取りボタン -->
-                                    <td>
-                                        <a class="pickup-btn"
-                                           href="${pageContext.request.contextPath}/foodloss/PickupBooking.action?bookingId=<%= b.getBookingId() %>">
-                                            受け取り
-                                        </a>
-                                    </td>
-                                </tr>
-                            <% } %>
-                        </tbody>
+                        <tbody>
+						    <% for (Booking b : bookingList) { %>
+						        <tr>
+						            <td><%= b.getBookingId() %></td>
+						            <td><%= b.getMerchandiseName() %></td>
+						            <td><%= b.getUserId() %></td>
+						            <td><%= b.getCount() %></td>
+						            <td><%= b.getPickupTime() %></td>
+						            <td><%= b.getBookingTime() %></td>
+
+						            <!-- ★ ここ：getPickupStatus() に変更 -->
+						            <td><%= b.getPickupStatus() ? "受取済" : "未受取" %></td>
+
+						            <td>
+						                <% if (!b.getPickupStatus()) { %>
+						                    <a class="pickup-btn"
+						                       href="${pageContext.request.contextPath}/foodloss/PickupBooking.action?bookingId=<%= b.getBookingId() %>">
+						                        受け取り
+						                    </a>
+						                <% } else { %>
+						                    ー
+						                <% } %>
+						            </td>
+						        </tr>
+						    <% } %>
+						</tbody>
+
                     </table>
+
                 <% } else { %>
                     <p style="text-align:center; padding:20px; color:#999;">
                         現在、予約は登録されていません。
@@ -174,7 +173,7 @@
                 <% } %>
 
                 <div class="back-button">
-                    <a href="${pageContext.request.contextPath}/store_jsp/store_main.jsp">メインメニューへ戻る</a>
+                    <a href="${pageContext.request.contextPath}/store_jsp/main_store.jsp">メインメニューへ戻る</a>
                 </div>
 
             </div>
@@ -186,7 +185,6 @@
 
 </div>
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-<script src="${pageContext.request.contextPath}/js/main.js"></script>
+
 </body>
 </html>
