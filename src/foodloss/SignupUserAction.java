@@ -131,8 +131,6 @@ public class SignupUserAction extends Action {
         user.setEmail(email);
         user.setPhone(phone);
         user.setPassword(password);
-        user.setFavoriteStore(null);
-        user.setNotification(false);
 
         System.out.println("DEBUG: User object created");
 
