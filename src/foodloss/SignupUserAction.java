@@ -130,7 +130,10 @@ public class SignupUserAction extends Action {
         user.setEmail(email);
         user.setPhone(phone);
         user.setPassword(password);
+<<<<<<< HEAD
+=======
 
+>>>>>>> branch 'master' of https://github.com/mkblue82/Exam.git
 
         System.out.println("DEBUG: User object created");
 
