@@ -27,7 +27,7 @@ public class SignupStoreAction extends Action {
 
         // GETリクエストの場合 - フォーム表示
         if ("GET".equalsIgnoreCase(req.getMethod())) {
-            req.getRequestDispatcher("/jsp/signup_store.jsp").forward(req, res);
+            req.getRequestDispatcher("/store_jsp/signup_store.jsp").forward(req, res);
             return;
         }
 
@@ -41,7 +41,7 @@ public class SignupStoreAction extends Action {
 
         if (sessionToken == null || !sessionToken.equals(token)) {
             req.setAttribute("errorMessage", "不正なアクセスです。");
-            req.getRequestDispatcher("/jsp/signup_store.jsp").forward(req, res);
+            req.getRequestDispatcher("/store_jsp/signup_store.jsp").forward(req, res);
             return;
         }
 
@@ -56,45 +56,45 @@ public class SignupStoreAction extends Action {
         // --- 未入力チェック ---
         if (storeName == null || storeName.trim().isEmpty()) {
             req.setAttribute("errorMessage", "店舗名を入力してください。");
-            req.getRequestDispatcher("/jsp/signup_store.jsp").forward(req, res);
+            req.getRequestDispatcher("/store_jsp/signup_store.jsp").forward(req, res);
             return;
         }
         if (address == null || address.trim().isEmpty()) {
             req.setAttribute("errorMessage", "店舗住所を入力してください。");
-            req.getRequestDispatcher("/jsp/signup_store.jsp").forward(req, res);
+            req.getRequestDispatcher("/store_jsp/signup_store.jsp").forward(req, res);
             return;
         }
         if (phone == null || phone.trim().isEmpty()) {
             req.setAttribute("errorMessage", "電話番号を入力してください。");
-            req.getRequestDispatcher("/jsp/signup_store.jsp").forward(req, res);
+            req.getRequestDispatcher("/store_jsp/signup_store.jsp").forward(req, res);
             return;
         }
         if (email == null || email.trim().isEmpty()) {
             req.setAttribute("errorMessage", "メールアドレスを入力してください。");
-            req.getRequestDispatcher("/jsp/signup_store.jsp").forward(req, res);
+            req.getRequestDispatcher("/store_jsp/signup_store.jsp").forward(req, res);
             return;
         }
         if (passwordRaw == null || passwordRaw.trim().isEmpty()) {
             req.setAttribute("errorMessage", "パスワードを入力してください。");
-            req.getRequestDispatcher("/jsp/signup_store.jsp").forward(req, res);
+            req.getRequestDispatcher("/store_jsp/signup_store.jsp").forward(req, res);
             return;
         }
         if (passwordConfirm == null || passwordConfirm.trim().isEmpty()) { // ← 追加
             req.setAttribute("errorMessage", "確認用パスワードを入力してください。");
-            req.getRequestDispatcher("/jsp/signup_store.jsp").forward(req, res);
+            req.getRequestDispatcher("/store_jsp/signup_store.jsp").forward(req, res);
             return;
         }
 
         // --- パスワードチェック ---
-        if (!passwordRaw.equals(passwordConfirm)) { // ← 追加
+        if (!passwordRaw.equals(passwordConfirm)) {
             req.setAttribute("errorMessage", "パスワードが一致しません。");
-            req.getRequestDispatcher("/jsp/signup_store.jsp").forward(req, res);
+            req.getRequestDispatcher("/store_jsp/signup_store.jsp").forward(req, res);
             return;
         }
 
         if (passwordRaw.length() < 8) {
             req.setAttribute("errorMessage", "パスワードは8文字以上で入力してください。");
-            req.getRequestDispatcher("/jsp/signup_store.jsp").forward(req, res);
+            req.getRequestDispatcher("/store_jsp/signup_store.jsp").forward(req, res);
             return;
         }
 
@@ -114,12 +114,12 @@ public class SignupStoreAction extends Action {
             permitFileName = getFileName(permitFilePart);
             if (!isValidFileType(permitFileName)) {
                 req.setAttribute("errorMessage", "営業許可書はJPG、PNG、またはPDF形式でアップロードしてください。");
-                req.getRequestDispatcher("/jsp/signup_store.jsp").forward(req, res);
+                req.getRequestDispatcher("/store_jsp/signup_store.jsp").forward(req, res);
                 return;
             }
             if (permitFilePart.getSize() > 5 * 1024 * 1024) {
                 req.setAttribute("errorMessage", "ファイルサイズは5MB以下にしてください。");
-                req.getRequestDispatcher("/jsp/signup_store.jsp").forward(req, res);
+                req.getRequestDispatcher("/store_jsp/signup_store.jsp").forward(req, res);
                 return;
             }
 
@@ -135,7 +135,7 @@ public class SignupStoreAction extends Action {
             }
         } else {
             req.setAttribute("errorMessage", "営業許可書をアップロードしてください。");
-            req.getRequestDispatcher("/jsp/signup_store.jsp").forward(req, res);
+            req.getRequestDispatcher("/store_jsp/signup_store.jsp").forward(req, res);
             return;
         }
 
@@ -149,13 +149,13 @@ public class SignupStoreAction extends Action {
 
             if (isPhoneExists(dao, phone)) {
                 req.setAttribute("errorMessage", "この電話番号は既に登録されています。");
-                req.getRequestDispatcher("/jsp/signup_store.jsp").forward(req, res);
+                req.getRequestDispatcher("/store_jsp/signup_store.jsp").forward(req, res);
                 return;
             }
 
             if (isEmailExists(dao, email)) {
                 req.setAttribute("errorMessage", "このメールアドレスは既に登録されています。");
-                req.getRequestDispatcher("/jsp/signup_store.jsp").forward(req, res);
+                req.getRequestDispatcher("/store_jsp/signup_store.jsp").forward(req, res);
                 return;
             }
 
@@ -174,12 +174,12 @@ public class SignupStoreAction extends Action {
             session.removeAttribute("csrfToken");
             session.setAttribute("registeredStore", store);
 
-            req.getRequestDispatcher("/jsp/signup_done_store.jsp").forward(req, res);
+            req.getRequestDispatcher("/store_jsp/signup_done_store.jsp").forward(req, res);
 
         } catch (SQLException e) {
             e.printStackTrace();
             req.setAttribute("errorMessage", "システムエラーが発生しました。");
-            req.getRequestDispatcher("/jsp/signup_store.jsp").forward(req, res);
+            req.getRequestDispatcher("/store_jsp/signup_store.jsp").forward(req, res);
         }
     }
 

@@ -178,21 +178,21 @@
                     <div class="form-group">
                         <label for="storeName">店舗名</label>
                         <input type="text" id="storeName" name="storeName" required
-                               placeholder="例：Sample Bakery"
+                               placeholder="例:Sample Bakery"
                                value="${param.storeName}">
                     </div>
 
                     <div class="form-group">
                         <label for="address">店舗住所</label>
                         <input type="text" id="address" name="address" required
-                               placeholder="例：東京都新宿区〇〇1-2-3"
+                               placeholder="例:東京都新宿区〇〇1-2-3"
                                value="${param.address}">
                     </div>
 
                     <div class="form-group">
                         <label for="phone">店舗電話番号</label>
                         <input type="tel" id="phone" name="phone" required
-                               placeholder="例：0312345678"
+                               placeholder="例:0312345678"
                                pattern="[0-9]{10,11}"
                                value="${param.phone}">
                     </div>
@@ -200,7 +200,7 @@
                     <div class="form-group">
                         <label for="email">店舗メールアドレス</label>
                         <input type="email" id="email" name="email" required
-                               placeholder="例：store@mail.com"
+                               placeholder="例:store@mail.com"
                                value="${param.email}">
                     </div>
 
@@ -215,14 +215,14 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="passwordConfirm">パスワード（確認）</label>
+                        <label for="passwordConfirm">パスワード(確認)</label>
                         <input type="password" id="passwordConfirm" name="passwordConfirm" required minlength="8"
                                placeholder="もう一度入力してください">
                         <p id="passwordMessage" class="password-match"></p>
                     </div>
 
                     <div class="form-group">
-                        <label for="permitFile">営業許可書（画像またはPDF）</label>
+                        <label for="permitFile">営業許可書(画像またはPDF)</label>
                         <input type="file" id="permitFile" name="permitFile"
                                accept=".jpg,.jpeg,.png,.pdf" required>
                     </div>
@@ -235,6 +235,7 @@
         </div>
     </main>
 
+
     <jsp:include page="/jsp/footer.jsp" />
 </div>
 
@@ -242,8 +243,7 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
 <script src="${pageContext.request.contextPath}/js/slick.js"></script>
-<script src="${pageContext.request.contextPath}/js/main.js"></script>
-
+<parameter name="${pageContext.request.contextPath}/js/main.js"></script>
 
 <script>
     const passwordInput = document.getElementById("password");
@@ -251,14 +251,12 @@
     const message = document.getElementById("passwordMessage");
     const toggle = document.getElementById("togglePassword");
 
-    // パスワード表示切替
+    // パスワード表示切替（メインのパスワードのみ）
     toggle.addEventListener("change", function() {
-        const type = this.checked ? "text" : "password";
-        passwordInput.type = type;
-        confirmInput.type = type;
+        passwordInput.type = this.checked ? "text" : "password";
     });
 
-    // リアルタイム不一致チェック（不一致時のみ警告）
+    // リアルタイム不一致チェック
     function checkPasswords() {
         if (passwordInput.value.length === 0 || confirmInput.value.length === 0) {
             message.textContent = "";
@@ -278,4 +276,3 @@
 
 </body>
 </html>
-

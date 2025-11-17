@@ -57,9 +57,8 @@ public class SignupUserAction extends Action {
         String phone = req.getParameter("phone");
         String passwordRaw = req.getParameter("password");
 
-        // ▼▼ ここを修正：confirmPassword を取得 ▼▼
         String passwordConfirm = req.getParameter("confirmPassword");
-        // ▲▲ 修正完了 ▲▲
+      
 
         System.out.println("DEBUG: name = " + name);
         System.out.println("DEBUG: email = " + email);
@@ -131,7 +130,10 @@ public class SignupUserAction extends Action {
         user.setEmail(email);
         user.setPhone(phone);
         user.setPassword(password);
+<<<<<<< HEAD
+=======
 
+>>>>>>> branch 'master' of https://github.com/mkblue82/Exam.git
 
         System.out.println("DEBUG: User object created");
 
