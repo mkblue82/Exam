@@ -124,7 +124,7 @@ public class MerchandiseRegisterExecuteAction extends Action {
             m.setBookingStatus(false);
 
             System.out.println("★ Merchandise設定完了: name=" + m.getMerchandiseName() + ", storeId=" + storeId);
-
+//どうしてーーー
             // ★ DBManagerを使って接続 ★
             DBManager dbManager = new DBManager();
             connection = dbManager.getConnection();
