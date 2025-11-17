@@ -1,6 +1,9 @@
 package foodloss;
 
+import java.io.InputStream;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.Timestamp;
 import java.util.List;
 
@@ -14,7 +17,9 @@ import org.apache.tomcat.util.http.fileupload.servlet.ServletFileUpload;
 import org.apache.tomcat.util.http.fileupload.servlet.ServletRequestContext;
 
 import bean.Merchandise;
+import bean.MerchandiseImage;
 import dao.MerchandiseDAO;
+import dao.MerchandiseImageDAO;
 import tool.Action;
 import tool.DBManager;
 
@@ -124,15 +129,64 @@ public class MerchandiseRegisterExecuteAction extends Action {
             m.setBookingStatus(false);
 
             System.out.println("★ Merchandise設定完了: name=" + m.getMerchandiseName() + ", storeId=" + storeId);
-//どうしてーーー
-            // ★ DBManagerを使って接続 ★
+
+            // DBManagerを使って接続
             DBManager dbManager = new DBManager();
             connection = dbManager.getConnection();
 
+            // 商品を登録
             MerchandiseDAO dao = new MerchandiseDAO(connection);
             int result = dao.insert(m);
 
-            System.out.println("✅ 商品登録成功！");
+            // 登録された商品のIDを取得
+            int merchandiseId = 0;
+            PreparedStatement st = connection.prepareStatement(
+                "SELECT currval('t002_merchandise_t002_pk1_merchandise_seq')");
+            ResultSet rs = st.executeQuery();
+            if (rs.next()) {
+                merchandiseId = rs.getInt(1);
+            }
+            rs.close();
+            st.close();
+
+            System.out.println("✅ 商品登録成功！ merchandiseId = " + merchandiseId);
+
+            // 画像がアップロードされている場合、画像を保存
+            if (imageFile != null && imageFile.getSize() > 0) {
+                System.out.println("★ 画像アップロード開始");
+                System.out.println("★ ファイル名: " + imageFile.getName());
+                System.out.println("★ ファイルサイズ: " + imageFile.getSize() + " bytes");
+
+                InputStream inputStream = imageFile.getInputStream();
+                byte[] imageData = new byte[(int) imageFile.getSize()];
+                int bytesRead = inputStream.read(imageData);
+                inputStream.close();
+
+                System.out.println("★ 読み込んだバイト数: " + bytesRead);
+
+                MerchandiseImage img = new MerchandiseImage();
+                img.setMerchandiseId(merchandiseId);
+                img.setImageData(imageData);
+
+                // ファイル名を取得
+                String fileName = imageFile.getName();
+                if (fileName == null || fileName.isEmpty()) {
+                    fileName = "image_" + merchandiseId + ".jpg";
+                }
+                img.setFileName(fileName);
+                img.setDisplayOrder(1);
+
+                MerchandiseImageDAO imgDao = new MerchandiseImageDAO(connection);
+                int imgResult = imgDao.insert(img);
+
+                System.out.println("✅ 画像登録結果: " + imgResult + " 件");
+            } else {
+                System.out.println("⚠️ 画像ファイルが選択されていないか、サイズが0です");
+                if (imageFile != null) {
+                    System.out.println("   ファイルサイズ: " + imageFile.getSize());
+                }
+            }
+
             session.setAttribute("successMessage", "商品を登録しました");
             response.sendRedirect(request.getContextPath() + "/foodloss/Menu.action");
 
