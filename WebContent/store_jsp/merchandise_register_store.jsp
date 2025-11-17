@@ -205,8 +205,8 @@
 
                     <div class="button-group">
                         <button type="submit" class="btn btn-submit">登録する</button>
-						<button type="button" class="btn btn-cancel"
-						        onclick="location.href='${pageContext.request.contextPath}/store_jsp/store_main.jsp'">
+						<button type="button" class="btn-cancel"
+						       onclick="location.href='${pageContext.request.contextPath}/store_jsp/main_store.jsp'">
 						    キャンセル
 						</button>
                     </div>
