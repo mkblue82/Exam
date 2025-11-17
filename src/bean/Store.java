@@ -4,16 +4,16 @@ import java.sql.Time;
 
 public class Store implements java.io.Serializable {
 
-    private int storeId;          // T001_PK1_store（店舗ID）
-    private String storeName;     // T001_FD1_store（店舗名）
-    private String address;       // T001_FD2_store（住所）
-    private String phone;         // T001_FD3_store（電話番号）
-    private String password;      // T001_FD4_store（パスワード）
-    private Time discountTime;    // T001_FD5_store（割引時間）
-    private int discountRate;     // T001_FD6_store（割引率）
-    private String email;         // T001_FD7_store（メールアドレス）
-    private byte[] license;       // T001_FD8_store（営業許可証）
-    private String licenseFileName; // T001_FD9_store（営業許可証ファイル名）
+    private int storeId;        // T001_PK1_store（店舗ID）
+    private String storeName;   // T001_FD1_store（店舗名）
+    private String address;     // T001_FD2_store（住所）
+    private String phone;       // T001_FD3_store（電話番号）
+    private String password;    // T001_FD4_store（パスワード）
+    private Time discountTime;  // T001_FD5_store（割引時間）
+    private int discountRate;   // T001_FD6_store（割引率）
+    private String email;       // T001_FD7_store（メールアドレス）
+    private byte[] license;     // T001_FD8_store（営業許可証）
+
 
     // --- Getter ---
     public int getStoreId() {
@@ -43,9 +43,9 @@ public class Store implements java.io.Serializable {
     public byte[] getLicense() {
         return license;
     }
-    public String getLicenseFileName() {
-        return licenseFileName;
-    }
+    // public String getLicenseFileName() { // 削除
+    //     return licenseFileName;
+    // }
 
     // --- Setter ---
     public void setStoreId(int storeId) {
@@ -75,8 +75,6 @@ public class Store implements java.io.Serializable {
     public void setLicense(byte[] license) {
         this.license = license;
     }
-    public void setLicenseFileName(String licenseFileName) {
-        this.licenseFileName = licenseFileName;
-    }
+
 
 }
