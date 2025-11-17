@@ -93,7 +93,6 @@ public class SignupStoreAction extends Action {
             store.setPhone(phone);
             store.setEmail(email);
             store.setLicense(permitFileData);
-            store.setLicenseFileName(permitFileName);
             store.setPassword(password);
 
             dao.insert(store);
