@@ -30,6 +30,7 @@ public class PickupBookingAction extends HttpServlet {
 
         int bookingId = Integer.parseInt(request.getParameter("bookingId"));
 
+
         try {
             BookingDAO bookingDAO = new BookingDAO();
             Booking booking = bookingDAO.selectById(bookingId);

@@ -44,4 +44,3 @@ public class StoreBookingListAction extends HttpServlet {
                .forward(request, response);
     }
 }
-
