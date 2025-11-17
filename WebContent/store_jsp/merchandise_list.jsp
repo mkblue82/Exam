@@ -161,7 +161,7 @@
                 <!-- ▼ 戻る・商品登録ボタン -->
                 <div class="back-button">
                     <a href="${pageContext.request.contextPath}/store_jsp/main_store.jsp">メインメニューへ戻る</a>
-                    <a href="${pageContext.request.contextPath}/product_register.jsp">商品登録</a>
+                    <a href="${pageContext.request.contextPath}/store_jsp/merchandise_register_store.jsp">商品登録</a>
                 </div>
 
             </div>
