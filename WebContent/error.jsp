@@ -128,7 +128,7 @@
             <div class="button-group">
                 <% if (isLoggedIn) { %>
                     <!-- ログイン中: マイページへ戻る -->
-                    <a href="${pageContext.request.contextPath}/jsp/main_user.jsp" class="btn btn-home">ホームへ戻る</a>
+                    <a href="${pageContext.request.contextPath}/foodloss/Menu.action" class="btn btn-home">ホームへ戻る</a>
                     <button onclick="history.back()" class="btn btn-back">前のページに戻る</button>
                 <% } else { %>
                     <!-- 未ログイン: TOPページへ -->

@@ -16,8 +16,8 @@
 <div id="menubar">
   <nav>
     <ul>
-      <li><a href="${pageContext.request.contextPath}/store_jsp/main_store.jsp">ホーム<span>Home</span></a></li>
-      <li><a href="${pageContext.request.contextPath}/store_jsp/storepage.jsp">店舗詳細<span>STORE</span></a></li>
+      <li><a href="${pageContext.request.contextPath}/foodloss/Menu.action">ホーム<span>Home</span></a></li>
+      <li><a href="${pageContext.request.contextPath}/foodloss/StoreDetail.action">店舗詳細<span>STORE</span></a></li>
     </ul>
   </nav>
 </div>
