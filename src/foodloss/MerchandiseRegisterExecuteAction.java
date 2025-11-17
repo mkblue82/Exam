@@ -16,6 +16,7 @@ import org.apache.tomcat.util.http.fileupload.servlet.ServletRequestContext;
 import bean.Merchandise;
 import dao.MerchandiseDAO;
 import tool.Action;
+import tool.DBManager;
 
 public class MerchandiseRegisterExecuteAction extends Action {
 
@@ -33,13 +34,13 @@ public class MerchandiseRegisterExecuteAction extends Action {
             String quantityStr = null;
             String expirationDateStr = null;
             String tags = null;
+            FileItem imageFile = null;
 
             if (ServletFileUpload.isMultipartContent(request)) {
                 DiskFileItemFactory factory = new DiskFileItemFactory();
                 ServletFileUpload upload = new ServletFileUpload(factory);
                 upload.setHeaderEncoding("UTF-8");
 
-                // ★ ServletRequestContextでラップ ★
                 ServletRequestContext context = new ServletRequestContext(request);
                 List<FileItem> items = upload.parseRequest(context);
 
@@ -58,7 +59,10 @@ public class MerchandiseRegisterExecuteAction extends Action {
                             tags = fieldValue;
                         }
                     } else {
-                        // ファイルアップロード処理（必要に応じて実装）
+                        // 画像ファイル
+                        if ("merchandiseImage".equals(item.getFieldName())) {
+                            imageFile = item;
+                        }
                     }
                 }
             }
@@ -109,6 +113,7 @@ public class MerchandiseRegisterExecuteAction extends Action {
             int stock = Integer.parseInt(quantityStr);
             java.sql.Date useByDate = java.sql.Date.valueOf(expirationDateStr);
 
+            // 商品情報を登録
             Merchandise m = new Merchandise();
             m.setStoreId(storeId);
             m.setMerchandiseName(name);
@@ -120,12 +125,15 @@ public class MerchandiseRegisterExecuteAction extends Action {
 
             System.out.println("★ Merchandise設定完了: name=" + m.getMerchandiseName() + ", storeId=" + storeId);
 
-            connection = getConnection();
+            // ★ DBManagerを使って接続 ★
+            DBManager dbManager = new DBManager();
+            connection = dbManager.getConnection();
 
             MerchandiseDAO dao = new MerchandiseDAO(connection);
-            dao.insert(m);
+            int result = dao.insert(m);
 
             System.out.println("✅ 商品登録成功！");
+            session.setAttribute("successMessage", "商品を登録しました");
             response.sendRedirect(request.getContextPath() + "/foodloss/Menu.action");
 
         } catch (NumberFormatException e) {
@@ -138,7 +146,8 @@ public class MerchandiseRegisterExecuteAction extends Action {
             request.getRequestDispatcher("/store_jsp/merchandise_register_store.jsp").forward(request, response);
         } catch (Exception e) {
             e.printStackTrace();
-            throw e;
+            request.setAttribute("errorMessage", "商品登録中にエラーが発生しました: " + e.getMessage());
+            request.getRequestDispatcher("/store_jsp/merchandise_register_store.jsp").forward(request, response);
         } finally {
             if (connection != null) {
                 try {
