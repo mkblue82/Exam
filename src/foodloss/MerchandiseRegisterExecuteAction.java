@@ -148,7 +148,7 @@ public class MerchandiseRegisterExecuteAction extends Action {
             }
             rs.close();
             st.close();
-//majika
+
             System.out.println("✅ 商品登録成功！ merchandiseId = " + merchandiseId);
 
             // 画像がアップロードされている場合、画像を保存

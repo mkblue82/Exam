@@ -227,7 +227,7 @@ public class MerchandiseImageDAO extends DAO {
     public int countByMerchandiseId(int merchandiseId) throws Exception {
         Connection con = (connection != null) ? connection : getConnection();
         boolean shouldClose = (connection == null);
-//majika
+
         PreparedStatement st = con.prepareStatement(
             "SELECT COUNT(*) FROM t002_1_merchandise_image " +
             "WHERE t002_1_fd1_merchandise_id = ?");
