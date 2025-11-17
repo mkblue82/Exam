@@ -20,6 +20,7 @@ public class StoreDAO {
     // 全店舗を取得
     public List<Store> selectAll() throws SQLException {
         List<Store> list = new ArrayList<>();
+
         String sql = "SELECT * FROM T001_store ORDER BY T001_PK1_store";
 
         try (PreparedStatement st = con.prepareStatement(sql);
@@ -51,10 +52,11 @@ public class StoreDAO {
 
     // 店舗を登録
     public void insert(Store store) throws SQLException {
+        // T001_FD9_store を削除
         String sql = "INSERT INTO T001_store " +
-                     "(T001_FD1_store, T001_FD2_store, T001_FD3_store, T001_FD4_store, " +
-                     "T001_FD5_store, T001_FD6_store, T001_FD7_store, T001_FD8_store, T001_FD9_store) " +
-                     "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING T001_PK1_store";
+                      "(T001_FD1_store, T001_FD2_store, T001_FD3_store, T001_FD4_store, " +
+                      "T001_FD5_store, T001_FD6_store, T001_FD7_store, T001_FD8_store) " +
+                      "VALUES (?, ?, ?, ?, ?, ?, ?, ?) RETURNING T001_PK1_store"; // プレースホルダーを8つに減らす
 
         try (PreparedStatement pstmt = con.prepareStatement(sql)) {
             pstmt.setString(1, store.getStoreName());
@@ -64,7 +66,7 @@ public class StoreDAO {
             pstmt.setTime(5, store.getDiscountTime());
             pstmt.setInt(6, store.getDiscountRate());
             pstmt.setString(7, store.getEmail());
-            pstmt.setBytes(8, store.getLicense());
+            pstmt.setBytes(8, store.getLicense()); // 8番目の引数
 
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
@@ -76,10 +78,11 @@ public class StoreDAO {
 
     // 店舗を更新
     public void update(Store store) throws SQLException {
+        // T001_FD9_store = ? を削除
         String sql = "UPDATE T001_store SET " +
-                     "T001_FD1_store = ?, T001_FD2_store = ?, T001_FD3_store = ?, T001_FD4_store = ?, " +
-                     "T001_FD5_store = ?, T001_FD6_store = ?, T001_FD7_store = ?, T001_FD8_store = ?, T001_FD9_store = ? " +
-                     "WHERE T001_PK1_store = ?";
+                      "T001_FD1_store = ?, T001_FD2_store = ?, T001_FD3_store = ?, T001_FD4_store = ?, " +
+                      "T001_FD5_store = ?, T001_FD6_store = ?, T001_FD7_store = ?, T001_FD8_store = ? " +
+                      "WHERE T001_PK1_store = ?";
 
         try (PreparedStatement st = con.prepareStatement(sql)) {
             st.setString(1, store.getStoreName());
@@ -90,8 +93,7 @@ public class StoreDAO {
             st.setInt(6, store.getDiscountRate());
             st.setString(7, store.getEmail());
             st.setBytes(8, store.getLicense());
-            st.setString(9, store.getLicenseFileName());
-            st.setInt(10, store.getStoreId());
+            st.setInt(9, store.getStoreId()); // WHERE句の引数
 
             st.executeUpdate();
         }
@@ -119,6 +121,7 @@ public class StoreDAO {
                 if (rs.next()) {
                     Store store = new Store();
 
+
                     store.setStoreId(rs.getInt("t001_pk1_store"));
                     store.setStoreName(rs.getString("t001_fd1_store"));
                     store.setAddress(rs.getString("t001_fd2_store"));
@@ -130,6 +133,7 @@ public class StoreDAO {
                     store.setLicense(rs.getBytes("t001_fd8_store"));
 
 
+
                     return store;
                 }
             }
@@ -138,26 +142,20 @@ public class StoreDAO {
         return null; // 該当なし（ログイン失敗）
     }
 
+    // ResultSetからStoreオブジェクトへのマッピング（重複コード削減）
+    private Store mapResultSetToStore(ResultSet rs) throws SQLException {
+        Store s = new Store();
+        // 列名すべてを小文字に修正
+        s.setStoreId(rs.getInt("t001_pk1_store"));
+        s.setStoreName(rs.getString("t001_fd1_store"));
+        s.setAddress(rs.getString("t001_fd2_store"));
+        s.setPhone(rs.getString("t001_fd3_store"));
+        s.setPassword(rs.getString("t001_fd4_store"));
+        s.setDiscountTime(rs.getTime("t001_fd5_store"));
+        s.setDiscountRate(rs.getInt("t001_fd6_store"));
+        s.setEmail(rs.getString("t001_fd7_store"));
+        s.setLicense(rs.getBytes("t001_fd8_store"));
 
-
-
-// ResultSetからStoreオブジェクトへのマッピング（重複コード削減）
-private Store mapResultSetToStore(ResultSet rs) throws SQLException {
-    Store s = new Store();
-    s.setStoreId(rs.getInt("T001_PK1_store"));
-    s.setStoreName(rs.getString("T001_FD1_store"));
-    s.setAddress(rs.getString("T001_FD2_store"));
-    s.setPhone(rs.getString("T001_FD3_store"));
-    s.setPassword(rs.getString("T001_FD4_store"));
-    s.setDiscountTime(rs.getTime("T001_FD5_store"));
-    s.setDiscountRate(rs.getInt("T001_FD6_store"));
-    s.setEmail(rs.getString("T001_FD7_store"));
-    s.setLicense(rs.getBytes("T001_FD8_store"));
-    s.setLicenseFileName(rs.getString("T001_FD9_store"));
-    return s;
+        return s;
+    }
 }
-
-
-}
-
-
