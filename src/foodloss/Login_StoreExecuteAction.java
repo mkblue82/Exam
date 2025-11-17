@@ -23,7 +23,7 @@ public class Login_StoreExecuteAction extends Action {
 
         if (storeIdStr == null || storeIdStr.isEmpty()) {
             request.setAttribute("error", "店舗IDを入力してください。");
-            request.getRequestDispatcher("/jsp/store_login.jsp").forward(request, response);
+            request.getRequestDispatcher("/store_jsp/login_store.jsp").forward(request, response);
             return;
         }
 
