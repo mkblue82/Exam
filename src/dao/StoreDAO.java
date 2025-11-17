@@ -20,7 +20,7 @@ public class StoreDAO {
     // 全店舗を取得
     public List<Store> selectAll() throws SQLException {
         List<Store> list = new ArrayList<>();
-        // SQL文の列名も小文字に統一することを推奨しますが、現在のままでも動作します。
+
         String sql = "SELECT * FROM T001_store ORDER BY T001_PK1_store";
 
         try (PreparedStatement st = con.prepareStatement(sql);
@@ -121,7 +121,7 @@ public class StoreDAO {
                 if (rs.next()) {
                     Store store = new Store();
 
-                    // loginメソッド内の列名は既に小文字で問題ありません。
+
                     store.setStoreId(rs.getInt("t001_pk1_store"));
                     store.setStoreName(rs.getString("t001_fd1_store"));
                     store.setAddress(rs.getString("t001_fd2_store"));
@@ -132,7 +132,7 @@ public class StoreDAO {
                     store.setEmail(rs.getString("t001_fd7_store"));
                     store.setLicense(rs.getBytes("t001_fd8_store"));
 
-                    // T001_FD9_store は元々ここに含まれていなかったため変更なし
+
 
                     return store;
                 }

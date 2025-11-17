@@ -43,9 +43,7 @@ public class Store implements java.io.Serializable {
     public byte[] getLicense() {
         return license;
     }
-    // public String getLicenseFileName() { // 削除
-    //     return licenseFileName;
-    // }
+
 
     // --- Setter ---
     public void setStoreId(int storeId) {
