@@ -34,11 +34,6 @@
             width: 100%;
         }
 
-        .column {
-            flex: 1;
-            width: 100%;
-        }
-
         .main-contents {
             width: 100%;
             padding: 20px;
@@ -94,7 +89,6 @@
             border: 1px solid #ccc;
             border-radius: 5px;
             font-size: 1rem;
-            box-sizing: border-box;
             transition: 0.3s;
         }
 
@@ -102,6 +96,28 @@
             outline: none;
             border-color: #c07148;
             box-shadow: 0 0 0 3px rgba(192, 113, 72, 0.1);
+        }
+
+        .show-password {
+            display: flex;
+            align-items: center;
+            margin-top: 5px;
+            font-size: 0.9rem;
+            color: #555;
+        }
+
+        .show-password input {
+            margin-right: 5px;
+        }
+
+        .password-match {
+            font-size: 0.85rem;
+            margin-top: 5px;
+            font-weight: bold;
+        }
+
+        .mismatch {
+            color: #c62828;
         }
 
         .btn-submit,
@@ -139,23 +155,11 @@
             background: #c07148;
             color: #fff;
         }
-
-        @media screen and (max-width: 600px) {
-            .register-container {
-                margin: 40px 20px;
-                padding: 1.5rem;
-            }
-
-            .register-container h1 {
-                font-size: 1.5rem;
-            }
-        }
     </style>
 </head>
 
 <body>
 <div id="container">
-    <!-- 登録コンテンツ -->
     <main class="column">
         <div class="main-contents">
             <div class="register-container">
@@ -167,10 +171,8 @@
                     </div>
                 <% } %>
 
-                <!-- enctypeでファイルアップロードを許可 -->
                 <form action="${pageContext.request.contextPath}/StoreRegisterServlet"
-                      method="post" enctype="multipart/form-data" id="storeRegisterForm">
-
+                      method="post" enctype="multipart/form-data">
                     <input type="hidden" name="csrfToken" value="${sessionScope.csrfToken}">
 
                     <div class="form-group">
@@ -206,6 +208,17 @@
                         <label for="password">パスワード</label>
                         <input type="password" id="password" name="password" required minlength="8"
                                placeholder="8文字以上で入力してください">
+                        <div class="show-password">
+                            <input type="checkbox" id="togglePassword">
+                            <label for="togglePassword">パスワードを表示する</label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="passwordConfirm">パスワード（確認）</label>
+                        <input type="password" id="passwordConfirm" name="passwordConfirm" required minlength="8"
+                               placeholder="もう一度入力してください">
+                        <p id="passwordMessage" class="password-match"></p>
                     </div>
 
                     <div class="form-group">
@@ -222,7 +235,6 @@
         </div>
     </main>
 
-    <!-- フッター読み込み -->
     <jsp:include page="/jsp/footer.jsp" />
 </div>
 
@@ -232,5 +244,38 @@
 <script src="${pageContext.request.contextPath}/js/slick.js"></script>
 <script src="${pageContext.request.contextPath}/js/main.js"></script>
 
+
+<script>
+    const passwordInput = document.getElementById("password");
+    const confirmInput = document.getElementById("passwordConfirm");
+    const message = document.getElementById("passwordMessage");
+    const toggle = document.getElementById("togglePassword");
+
+    // パスワード表示切替
+    toggle.addEventListener("change", function() {
+        const type = this.checked ? "text" : "password";
+        passwordInput.type = type;
+        confirmInput.type = type;
+    });
+
+    // リアルタイム不一致チェック（不一致時のみ警告）
+    function checkPasswords() {
+        if (passwordInput.value.length === 0 || confirmInput.value.length === 0) {
+            message.textContent = "";
+            return;
+        }
+        if (passwordInput.value !== confirmInput.value) {
+            message.textContent = "⚠ パスワードが一致しません";
+            message.className = "password-match mismatch";
+        } else {
+            message.textContent = "";
+        }
+    }
+
+    passwordInput.addEventListener("input", checkPasswords);
+    confirmInput.addEventListener("input", checkPasswords);
+</script>
+
 </body>
 </html>
+

@@ -14,11 +14,7 @@
     <title>新規ユーザー登録</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             background: #f5f5f5;
@@ -34,15 +30,7 @@
             width: 100%;
         }
 
-        .column {
-            flex: 1;
-            width: 100%;
-        }
-
-        .main-contents {
-            width: 100%;
-            padding: 20px;
-        }
+        .main-contents { width: 100%; padding: 20px; }
 
         .register-container {
             max-width: 450px;
@@ -73,9 +61,7 @@
             font-size: 0.9rem;
         }
 
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
+        .form-group { margin-bottom: 1.5rem; }
 
         .form-group label {
             display: block;
@@ -93,7 +79,6 @@
             border: 1px solid #ccc;
             border-radius: 5px;
             font-size: 1rem;
-            box-sizing: border-box;
             transition: 0.3s;
         }
 
@@ -102,6 +87,24 @@
             border-color: #c07148;
             box-shadow: 0 0 0 3px rgba(192, 113, 72, 0.1);
         }
+
+        .show-password {
+            display: flex;
+            align-items: center;
+            margin-top: 5px;
+            font-size: 0.9rem;
+            color: #555;
+        }
+
+        .show-password input { margin-right: 5px; }
+
+        .password-match {
+            font-size: 0.85rem;
+            margin-top: 5px;
+            font-weight: bold;
+        }
+
+        .mismatch { color: #c62828; }
 
         .btn-submit,
         .btn-cancel {
@@ -138,23 +141,11 @@
             background: #c07148;
             color: #fff;
         }
-
-        @media screen and (max-width: 600px) {
-            .register-container {
-                margin: 40px 20px;
-                padding: 1.5rem;
-            }
-
-            .register-container h1 {
-                font-size: 1.5rem;
-            }
-        }
     </style>
 </head>
 <body>
 <div id="container">
-    <!-- 登録コンテンツ -->
-    <main class="column">
+    <main>
         <div class="main-contents">
             <div class="register-container">
                 <h1>新規ユーザー登録</h1>
@@ -165,7 +156,8 @@
                     </div>
                 <% } %>
 
-                <form action="${pageContext.request.contextPath}/foodloss/SignupUser.action" method="post">
+                <form action="${pageContext.request.contextPath}/foodloss/SignupUser.action"
+                      method="post" onsubmit="return checkPasswordMatch()">
                     <input type="hidden" name="csrfToken" value="${sessionScope.csrfToken}">
 
                     <div class="form-group">
@@ -179,21 +171,32 @@
                         <label for="email">メールアドレス</label>
                         <input type="email" id="email" name="email" required
                                placeholder="example@mail.com"
-                              value="${param.email}">
+                               value="${param.email}">
                     </div>
 
                     <div class="form-group">
                         <label for="phone">電話番号</label>
                         <input type="tel" id="phone" name="phone" required
-                              placeholder="09012345678"
-                              pattern="[0-9]{10,11}"
-                              value="${param.phone}">
+                               placeholder="09012345678"
+                               pattern="[0-9]{10,11}"
+                               value="${param.phone}">
                     </div>
 
                     <div class="form-group">
                         <label for="password">パスワード</label>
                         <input type="password" id="password" name="password" required minlength="8"
                                placeholder="8文字以上で入力してください">
+                        <div class="show-password">
+                            <input type="checkbox" id="showPassword">
+                            <label for="showPassword">パスワードを表示する</label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="confirmPassword">パスワード（確認）</label>
+                        <input type="password" id="confirmPassword" name="confirmPassword" required minlength="8"
+                               placeholder="もう一度入力してください">
+                        <p id="passwordMessage" class="password-match"></p>
                     </div>
 
                     <button type="submit" class="btn-submit">新規登録</button>
@@ -204,7 +207,6 @@
         </div>
     </main>
 
-    <!-- フッター読み込み -->
     <jsp:include page="footer.jsp" />
 </div>
 
@@ -213,6 +215,45 @@
 <script src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
 <script src="${pageContext.request.contextPath}/js/slick.js"></script>
 <script src="${pageContext.request.contextPath}/js/main.js"></script>
+
+<script>
+    const passwordInput = document.getElementById("password");
+    const confirmInput = document.getElementById("confirmPassword");
+    const message = document.getElementById("passwordMessage");
+    const showPasswordCheckbox = document.getElementById("showPassword");
+
+    // パスワード表示切替
+    showPasswordCheckbox.addEventListener("change", function() {
+        const type = this.checked ? "text" : "password";
+        passwordInput.type = type;
+    });
+
+    // リアルタイム一致チェック
+    function checkPasswords() {
+        if (confirmInput.value.length === 0) {
+            message.textContent = "";
+            return;
+        }
+        if (passwordInput.value !== confirmInput.value) {
+            message.textContent = "⚠ パスワードが一致しません";
+            message.className = "password-match mismatch";
+        } else {
+            message.textContent = "";
+        }
+    }
+
+    passwordInput.addEventListener("input", checkPasswords);
+    confirmInput.addEventListener("input", checkPasswords);
+
+    // 最終送信チェック
+    function checkPasswordMatch() {
+        if (passwordInput.value !== confirmInput.value) {
+            alert("パスワードが一致していません。");
+            return false;
+        }
+        return true;
+    }
+</script>
 
 </body>
 </html>
