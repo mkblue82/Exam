@@ -14,134 +14,149 @@
     <title>新規ユーザー登録</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
     <style>
-		* { margin: 0; padding: 0; box-sizing: border-box; }
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
 
-        body {
-            background: #f5f5f5;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
+    body {
+        background: #f5f5f5;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+    }
 
-        #container {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            width: 100%;
-        }
+    #container {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+    }
 
-        .main-contents { width: 100%; padding: 20px; }
+    .main-contents {
+        width: 100%;
+        padding: 20px;
+    }
 
-        .register-container {
-            max-width: 450px;
-            width: 100%;
-            margin: 80px auto;
-            padding: 2rem;
-            background: #fff;
-            border-radius: 10px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-        }
+    .register-container {
+        max-width: 450px;
+        width: 100%;
+        margin: 80px auto;
+        padding: 2rem;
+        background: #fff;
+        border-radius: 10px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+    }
 
-        .register-container h1 {
-            color: #c07148;
-            text-align: center;
-            margin-bottom: 2rem;
-            font-size: 2rem;
-            border-bottom: 2px solid #c07148;
-            padding-bottom: 1rem;
-        }
+    .register-container h1 {
+        color: #c07148;
+        text-align: center;
+        margin-bottom: 2rem;
+        font-size: 2rem;
+        border-bottom: 2px solid #c07148;
+        padding-bottom: 1rem;
+    }
 
-        .error-message {
-            background: #ffebee;
-            color: #c62828;
-            padding: 1rem;
-            border-radius: 5px;
-            margin-bottom: 1.5rem;
-            border-left: 4px solid #c62828;
-            font-size: 0.9rem;
-        }
+    .error-message {
+        background: #ffebee;
+        color: #c62828;
+        padding: 1rem;
+        border-radius: 5px;
+        margin-bottom: 1.5rem;
+        border-left: 4px solid #c62828;
+        font-size: 0.9rem;
+    }
 
-        .form-group { margin-bottom: 1.5rem; }
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
 
-        .form-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: bold;
-            color: #555;
-        }
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: bold;
+        color: #555;
+    }
 
-        .form-group input[type="text"],
-        .form-group input[type="email"],
-        .form-group input[type="tel"],
-        .form-group input[type="password"] {
-            width: 100%;
-            padding: 0.8rem;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            font-size: 1rem;
-            transition: 0.3s;
-        }
+    .form-group input[type="text"],
+    .form-group input[type="email"],
+    .form-group input[type="tel"],
+    .form-group input[type="password"],
+    .form-group input[type="file"] {
+        width: 100%;
+        padding: 0.8rem;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        font-size: 1rem;
+        transition: 0.3s;
+    }
 
-        .form-group input:focus {
-            outline: none;
-            border-color: #c07148;
-            box-shadow: 0 0 0 3px rgba(192, 113, 72, 0.1);
-        }
+    .form-group input:focus {
+        outline: none;
+        border-color: #c07148;
+        box-shadow: 0 0 0 3px rgba(192, 113, 72, 0.1);
+    }
 
-        .show-password {
-            display: flex;
-            align-items: center;
-            margin-top: 5px;
-            font-size: 0.9rem;
-            color: #555;
-        }
+    .show-password {
+        display: flex;
+        align-items: center;
+        margin-top: 5px;
+        font-size: 0.9rem;
+        color: #555;
+    }
 
-        .show-password input { margin-right: 5px; }
+    .show-password input {
+        margin-right: 5px;
+    }
 
-        .password-match {
-            font-size: 0.85rem;
-            margin-top: 5px;
-            font-weight: bold;
-        }
+    .password-match {
+        font-size: 0.85rem;
+        margin-top: 5px;
+        font-weight: bold;
+    }
 
-        .mismatch { color: #c62828; }
+    .mismatch {
+        color: #c62828;
+    }
 
-        .btn-submit,
-        .btn-cancel {
-            width: 100%;
-            padding: 0.8rem;
-            border: none;
-            border-radius: 5px;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: 0.3s;
-            font-weight: bold;
-            margin-bottom: 0.8rem;
-        }
+    .btn-submit,
+    .btn-cancel {
+        width: 100%;
+        padding: 0.8rem;
+        border: none;
+        border-radius: 5px;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: 0.3s;
+        font-weight: bold;
+        margin-bottom: 0.8rem;
+    }
 
-        .btn-submit {
-            background: #c07148;
-            color: #fff;
-            box-shadow: 0 3px 10px rgba(192, 113, 72, 0.3);
-        }
+    .btn-submit {
+        background: #c07148;
+        color: #fff;
+        box-shadow: 0 3px 10px rgba(192, 113, 72, 0.3);
+    }
 
-        .btn-submit:hover {
-            background: #a85d38;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(192, 113, 72, 0.4);
-        }
+    .btn-submit:hover {
+        background: #a85d38;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(192, 113, 72, 0.4);
+    }
 
-        .btn-cancel {
-            background: #fff;
-            color: #c07148;
-            border: 2px solid #c07148;
-        }
+    .btn-cancel {
+        background: #fff;
+        color: #c07148;
+        border: 2px solid #c07148;
+    }
 
-        .btn-cancel:hover {
-            background: #c07148;
-            color: #fff;
-        }
-    </style>
+    .btn-cancel:hover {
+        background: #c07148;
+        color: #fff;
+    }
+</style>
+
 </head>
 <body>
 <div id="container">

@@ -123,6 +123,7 @@ public class SignupStoreAction extends Action {
         return false;
     }
 
+
     private String hashPassword(String password) {
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-256");
