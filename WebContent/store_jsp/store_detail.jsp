@@ -39,7 +39,7 @@
 
     .detail-row {
         display: flex;
-        padding: 1rem 0;
+        padding: 1rem 0 1rem 50px;
         border-bottom: 1px solid #f0f0f0;
     }
 
@@ -48,7 +48,7 @@
     }
 
     .detail-label {
-        width: 250px;
+        width: 200px;
         font-weight: bold;
         color: #666;
         flex-shrink: 0;
@@ -168,7 +168,6 @@
                         <div class="detail-value">sample@example.com</div>
                     </div>
                 </div>
-
 
                 <!-- 営業許可証 -->
                 <div class="detail-section">
