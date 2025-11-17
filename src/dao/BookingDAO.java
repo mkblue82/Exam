@@ -161,6 +161,49 @@ public class BookingDAO extends DAO {
         return list;
     }
 
+ // 店舗IDで予約一覧を取得（商品名JOIN付き）
+    public List<Booking> selectByStoreId(int storeId) throws Exception {
+        List<Booking> list = new ArrayList<>();
+        Connection con = getConnection();
+
+        PreparedStatement st = con.prepareStatement(
+            "select b.T005_PK1_booking, b.T005_FD1_booking, b.T005_FD2_booking, " +
+            "b.T005_FD3_booking, b.T005_FD4_booking, b.T005_FD5_booking, b.T005_FD6_booking, " +
+            "m.T002_FD5_merchandise as merchandiseName " +        // ★ 商品名取得
+            "from T005_booking b " +
+            "join T002_merchandise m " +
+            "on b.T005_FD4_booking = m.T002_PK1_merchandise " +   // ★ 商品IDで結合
+            "where m.T002_FD8_merchandise = ? " +                 // ★ 店舗IDで絞る
+            "order by b.T005_PK1_booking"
+        );
+
+        st.setInt(1, storeId);
+        ResultSet rs = st.executeQuery();
+
+        while (rs.next()) {
+            Booking b = new Booking();
+            b.setBookingId(rs.getInt("T005_PK1_booking"));
+            b.setCount(rs.getInt("T005_FD1_booking"));
+            b.setUserId(rs.getInt("T005_FD2_booking"));
+            b.setPickupTime(rs.getTimestamp("T005_FD3_booking"));
+            b.setProductId(rs.getInt("T005_FD4_booking"));
+            b.setBookingTime(rs.getTimestamp("T005_FD5_booking"));
+            b.setPickupStatus(rs.getBoolean("T005_FD6_booking"));
+
+            // ★ 商品名セット
+            b.setMerchandiseName(rs.getString("merchandiseName"));
+
+            list.add(b);
+        }
+
+        rs.close();
+        st.close();
+        con.close();
+        return list;
+    }
+
+
+
     // 予約を作成
     public int insert(Booking booking) throws Exception {
         Connection con = getConnection();

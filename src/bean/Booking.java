@@ -10,6 +10,16 @@ public class Booking {
 	private int productId; // 商品ID
 	private Timestamp bookingTime; // 予約時間
 	private boolean pickupStatus; // 受け取りステータス
+	private String merchandiseName;
+
+	public String getMerchandiseName() {
+	    return merchandiseName;
+	}
+
+	public void setMerchandiseName(String merchandiseName) {
+	    this.merchandiseName = merchandiseName;
+	}
+
 
 	// コンストラクタ
 	public Booking(){
