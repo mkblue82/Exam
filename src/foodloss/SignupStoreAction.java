@@ -143,6 +143,7 @@ public class SignupStoreAction extends Action {
             return;
         }
 
+
         // --- パスワードハッシュ化 ---
         String password = hashPassword(passwordRaw);
 
