@@ -14,7 +14,6 @@ import dao.UserDAO;
 import tool.Action;
 import tool.DBManager;
 
-
 public class SignupUserAction extends Action {
 
     @Override
@@ -57,54 +56,61 @@ public class SignupUserAction extends Action {
         String email = req.getParameter("email");
         String phone = req.getParameter("phone");
         String passwordRaw = req.getParameter("password");
+        String passwordConfirm = req.getParameter("passwordConfirm"); // ← 追加
 
         System.out.println("DEBUG: name = " + name);
         System.out.println("DEBUG: email = " + email);
         System.out.println("DEBUG: phone = " + phone);
         System.out.println("DEBUG: passwordRaw = " + (passwordRaw != null ? "***" : "null"));
+        System.out.println("DEBUG: passwordConfirm = " + (passwordConfirm != null ? "***" : "null"));
 
         // --- 未入力チェック ---
         if (name == null || name.trim().isEmpty()) {
-            System.out.println("DEBUG: name is empty");
             req.setAttribute("errorMessage", "氏名を入力してください。");
             req.getRequestDispatcher("/jsp/signup_user.jsp").forward(req, res);
             return;
         }
 
         if (email == null || email.trim().isEmpty()) {
-            System.out.println("DEBUG: email is empty");
             req.setAttribute("errorMessage", "メールアドレスを入力してください。");
             req.getRequestDispatcher("/jsp/signup_user.jsp").forward(req, res);
             return;
         }
 
         if (phone == null || phone.trim().isEmpty()) {
-            System.out.println("DEBUG: phone is empty");
             req.setAttribute("errorMessage", "電話番号を入力してください。");
             req.getRequestDispatcher("/jsp/signup_user.jsp").forward(req, res);
             return;
         }
 
         if (passwordRaw == null || passwordRaw.trim().isEmpty()) {
-            System.out.println("DEBUG: password is empty");
             req.setAttribute("errorMessage", "パスワードを入力してください。");
+            req.getRequestDispatcher("/jsp/signup_user.jsp").forward(req, res);
+            return;
+        }
+
+        if (passwordConfirm == null || passwordConfirm.trim().isEmpty()) {
+            req.setAttribute("errorMessage", "確認用パスワードを入力してください。");
+            req.getRequestDispatcher("/jsp/signup_user.jsp").forward(req, res);
+            return;
+        }
+
+        // --- パスワード一致チェック ---
+        if (!passwordRaw.equals(passwordConfirm)) {
+            req.setAttribute("errorMessage", "パスワードが一致しません。");
             req.getRequestDispatcher("/jsp/signup_user.jsp").forward(req, res);
             return;
         }
 
         // パスワードの桁数チェック
         if (passwordRaw.length() < 8) {
-            System.out.println("DEBUG: password too short");
             req.setAttribute("errorMessage", "パスワードは8文字以上で入力してください。");
             req.getRequestDispatcher("/jsp/signup_user.jsp").forward(req, res);
             return;
         }
 
-
-
         // 電話番号の形式チェック
         if (!phone.matches("[0-9]{10,11}")) {
-            System.out.println("DEBUG: phone format invalid");
             req.setAttribute("errorMessage", "電話番号は10桁または11桁の数字で入力してください。");
             req.getRequestDispatcher("/jsp/signup_user.jsp").forward(req, res);
             return;
@@ -112,7 +118,7 @@ public class SignupUserAction extends Action {
 
         System.out.println("DEBUG: All validation passed");
 
-        // パスワードのハッシュ化
+        // --- パスワードのハッシュ化 ---
         String password = hashPassword(passwordRaw);
         System.out.println("DEBUG: Password hashed successfully");
 
@@ -123,7 +129,6 @@ public class SignupUserAction extends Action {
         user.setPhone(phone);
         user.setPassword(password);
         user.setFavoriteStore(null);
-        // user.setStoreId(0); // ← この行を削除（デフォルト値0のままにする）
         user.setNotification(false);
 
         System.out.println("DEBUG: User object created");
@@ -131,45 +136,33 @@ public class SignupUserAction extends Action {
         // --- DB登録 ---
         DBManager db = new DBManager();
         try (Connection conn = db.getConnection()) {
-            System.out.println("DEBUG: DB connection established");
             UserDAO dao = new UserDAO(conn);
 
-         // 電話番号の重複チェック
-            System.out.println("DEBUG: Checking phone duplication");
+            // 電話番号の重複チェック
             if (isPhoneExists(dao, phone)) {
-                System.out.println("DEBUG: Phone already exists");
                 req.setAttribute("errorMessage", "この電話番号は既に登録されています。");
                 req.getRequestDispatcher("/jsp/signup_user.jsp").forward(req, res);
                 return;
             }
 
-
-
             // メールアドレスの重複チェック
-            System.out.println("DEBUG: Checking email duplication");
             if (isEmailExists(dao, email)) {
-                System.out.println("DEBUG: Email already exists");
                 req.setAttribute("errorMessage", "このメールアドレスは既に登録されています。");
                 req.getRequestDispatcher("/jsp/signup_user.jsp").forward(req, res);
                 return;
             }
 
-            System.out.println("DEBUG: Email is unique, proceeding with insert");
-
             // ユーザー登録（SERIAL型でユーザーIDが自動生成される）
             dao.insert(user);
             System.out.println("DEBUG: User inserted successfully");
 
-            // 成功時：CSRFトークンを削除
+            // 成功時：CSRFトークン削除
             session.removeAttribute("csrfToken");
             session.setAttribute("registeredUser", user);
 
-            System.out.println("DEBUG: Forwarding to success page");
-            // 登録完了画面へ遷移
             req.getRequestDispatcher("/jsp/signup_done_user.jsp").forward(req, res);
 
         } catch (SQLException e) {
-            System.out.println("DEBUG: SQLException occurred");
             e.printStackTrace();
             req.setAttribute("errorMessage", "システムエラーが発生しました。");
             req.getRequestDispatcher("/jsp/signup_user.jsp").forward(req, res);
@@ -178,45 +171,27 @@ public class SignupUserAction extends Action {
         System.out.println("DEBUG: ========== SignupUserAction END ==========");
     }
 
-
-    /**
-     * 電話番号の重複チェック ← ここに追加！
-     */
+    /** 電話番号の重複チェック */
     private boolean isPhoneExists(UserDAO dao, String phone) throws SQLException {
-        System.out.println("DEBUG: isPhoneExists called for phone: " + phone);
         for (User user : dao.findAll()) {
             if (user.getPhone().equals(phone)) {
-                System.out.println("DEBUG: Found duplicate phone");
                 return true;
             }
         }
-        System.out.println("DEBUG: No duplicate phone found");
         return false;
     }
 
-
-
-    /**
-     * メールアドレスの重複チェック
-     */
+    /** メールアドレスの重複チェック */
     private boolean isEmailExists(UserDAO dao, String email) throws SQLException {
-        System.out.println("DEBUG: isEmailExists called for email: " + email);
         for (User user : dao.findAll()) {
             if (user.getEmail().equals(email)) {
-                System.out.println("DEBUG: Found duplicate email");
                 return true;
             }
         }
-        System.out.println("DEBUG: No duplicate email found");
         return false;
     }
 
-
-
-
-    /**
-     * パスワードハッシュ化
-     */
+    /** パスワードハッシュ化 */
     private String hashPassword(String password) {
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-256");
@@ -233,3 +208,5 @@ public class SignupUserAction extends Action {
         }
     }
 }
+
+
