@@ -150,6 +150,7 @@
         Store store = (Store) request.getAttribute("store");
         Boolean isFavorite = (Boolean) request.getAttribute("isFavorite");
 
+        // 店舗申請できるようになったらまた再調整します
         // storeがnullの場合、ダミーデータ（画面確認用）
         boolean isDummy = false;
         if (store == null) {

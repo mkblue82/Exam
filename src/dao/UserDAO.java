@@ -19,23 +19,13 @@ public class UserDAO {
 
     // ユーザー登録
     public void insert(User user) throws SQLException {
-        String sql = "INSERT INTO t004_user (t004_fd1_user, t004_fd2_user, t004_fd3_user, t004_fd4_user, t004_fd5_user, t004_fd6_user, t004_fd7_user) "
-                   + "VALUES (?, ?, ?, ?, ?, ?, ?) RETURNING t004_pk1_user";
+        String sql = "INSERT INTO t004_user (t004_fd1_user, t004_fd2_user, t004_fd3_user, t004_fd4_user) "
+                   + "VALUES (?, ?, ?, ?) RETURNING t004_pk1_user";
         try (PreparedStatement pstmt = con.prepareStatement(sql)) {
             pstmt.setString(1, user.getName());
             pstmt.setString(2, user.getEmail());
             pstmt.setString(3, user.getPhone());
             pstmt.setString(4, user.getPassword());
-            pstmt.setString(5, user.getFavoriteStore());
-
-            // storeIdが0の場合はNULLを設定
-            if (user.getStoreId() == 0) {
-                pstmt.setNull(6, java.sql.Types.INTEGER);
-            } else {
-                pstmt.setInt(6, user.getStoreId());
-            }
-
-            pstmt.setBoolean(7, user.isNotification());
 
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()){
@@ -58,13 +48,6 @@ public class UserDAO {
                 user.setEmail(rs.getString("t004_fd2_user"));
                 user.setPhone(rs.getString("t004_fd3_user"));
                 user.setPassword(rs.getString("t004_fd4_user"));
-                user.setFavoriteStore(rs.getString("t004_fd5_user"));
-
-                // NULLチェックを追加
-                Integer storeId = (Integer) rs.getObject("t004_fd6_user");
-                user.setStoreId(storeId != null ? storeId : 0);
-
-                user.setNotification(rs.getBoolean("t004_fd7_user"));
                 list.add(user);
             }
         }
@@ -84,13 +67,6 @@ public class UserDAO {
 	                user.setEmail(rs.getString("t004_fd2_user"));
 	                user.setPhone(rs.getString("t004_fd3_user"));
 	                user.setPassword(rs.getString("t004_fd4_user"));
-	                user.setFavoriteStore(rs.getString("t004_fd5_user"));
-
-	                // NULLチェックを追加
-	                Integer storeId = (Integer) rs.getObject("t004_fd6_user");
-	                user.setStoreId(storeId != null ? storeId : 0);
-
-	                user.setNotification(rs.getBoolean("t004_fd7_user"));
 	                return user;
 	            }
             }
@@ -100,24 +76,14 @@ public class UserDAO {
 
     // 更新
     public void update(User user) throws SQLException {
-        String sql = "UPDATE t004_user SET t004_fd1_user=?, t004_fd2_user=?, t004_fd3_user=?, t004_fd4_user=?, "
-                   + "t004_fd5_user=?, t004_fd6_user=?, t004_fd7_user=? WHERE t004_pk1_user=?";
+        String sql = "UPDATE t004_user SET t004_fd1_user=?, t004_fd2_user=?, t004_fd3_user=?, t004_fd4_user=? "
+                   + "WHERE t004_pk1_user=?";
         try (PreparedStatement pstmt = con.prepareStatement(sql)) {
             pstmt.setString(1, user.getName());
             pstmt.setString(2, user.getEmail());
             pstmt.setString(3, user.getPhone());
             pstmt.setString(4, user.getPassword());
-            pstmt.setString(5, user.getFavoriteStore());
-
-            // storeIdが0の場合はNULLを設定
-            if (user.getStoreId() == 0) {
-                pstmt.setNull(6, java.sql.Types.INTEGER);
-            } else {
-                pstmt.setInt(6, user.getStoreId());
-            }
-
-            pstmt.setBoolean(7, user.isNotification());
-            pstmt.setInt(8, user.getUserId());
+            pstmt.setInt(5, user.getUserId());
             pstmt.executeUpdate();
         }
     }
@@ -149,13 +115,6 @@ public class UserDAO {
                     user.setEmail(rs.getString("t004_fd2_user"));
                     user.setPhone(rs.getString("t004_fd3_user"));
                     user.setPassword(rs.getString("t004_fd4_user"));
-                    user.setFavoriteStore(rs.getString("t004_fd5_user"));
-
-                    // NULLチェックを追加
-                    Integer storeId = (Integer) rs.getObject("t004_fd6_user");
-                    user.setStoreId(storeId != null ? storeId : 0);
-
-                    user.setNotification(rs.getBoolean("t004_fd7_user"));
                     return user;
                 } else {
                     System.out.println("DEBUG: No user found for email=" + email);
