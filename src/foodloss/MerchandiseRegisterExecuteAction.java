@@ -2,10 +2,16 @@ package foodloss;
 
 import java.sql.Connection;
 import java.sql.Timestamp;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+
+import org.apache.tomcat.util.http.fileupload.FileItem;
+import org.apache.tomcat.util.http.fileupload.disk.DiskFileItemFactory;
+import org.apache.tomcat.util.http.fileupload.servlet.ServletFileUpload;
+import org.apache.tomcat.util.http.fileupload.servlet.ServletRequestContext;
 
 import bean.Merchandise;
 import dao.MerchandiseDAO;
@@ -22,7 +28,41 @@ public class MerchandiseRegisterExecuteAction extends Action {
         try {
             request.setCharacterEncoding("UTF-8");
 
-            // ✅ セッションから店舗情報を取得（ユーザーログインの場合は仮ID）
+            // マルチパートリクエストの処理
+            String name = null;
+            String quantityStr = null;
+            String expirationDateStr = null;
+            String tags = null;
+
+            if (ServletFileUpload.isMultipartContent(request)) {
+                DiskFileItemFactory factory = new DiskFileItemFactory();
+                ServletFileUpload upload = new ServletFileUpload(factory);
+                upload.setHeaderEncoding("UTF-8");
+
+                // ★ ServletRequestContextでラップ ★
+                ServletRequestContext context = new ServletRequestContext(request);
+                List<FileItem> items = upload.parseRequest(context);
+
+                for (FileItem item : items) {
+                    if (item.isFormField()) {
+                        String fieldName = item.getFieldName();
+                        String fieldValue = item.getString("UTF-8");
+
+                        if ("merchandiseName".equals(fieldName)) {
+                            name = fieldValue;
+                        } else if ("quantity".equals(fieldName)) {
+                            quantityStr = fieldValue;
+                        } else if ("expirationDate".equals(fieldName)) {
+                            expirationDateStr = fieldValue;
+                        } else if ("tags".equals(fieldName)) {
+                            tags = fieldValue;
+                        }
+                    } else {
+                        // ファイルアップロード処理（必要に応じて実装）
+                    }
+                }
+            }
+
             HttpSession session = request.getSession();
             bean.Store store = (bean.Store) session.getAttribute("store");
 
@@ -32,23 +72,16 @@ public class MerchandiseRegisterExecuteAction extends Action {
                 storeId = store.getStoreId();
                 System.out.println("✅ セッションからstoreId取得: " + storeId);
             } else {
-                // 🔧 テスト用：ユーザーログインの場合は仮のstoreId=2を使用
                 bean.User user = (bean.User) session.getAttribute("user");
                 if (user != null) {
-                    storeId = 2;  // テスト用の店舗ID（データベースに存在する店舗IDに変更）
+                    storeId = 2;
                     System.out.println("⚠️ ユーザーログイン中のため、テスト用storeId=2 を使用");
                 } else {
-                    // どちらもログインしていない
                     request.setAttribute("errorMessage", "ログインしてください");
                     response.sendRedirect(request.getContextPath() + "/foodloss/Login_Store.action");
                     return;
                 }
             }
-
-            String name = request.getParameter("merchandiseName");
-            String quantityStr = request.getParameter("quantity");
-            String expirationDateStr = request.getParameter("expirationDate");
-            String tags = request.getParameter("tags");
 
             System.out.println("★ merchandiseName = [" + name + "]");
             System.out.println("★ quantity = [" + quantityStr + "]");
@@ -87,14 +120,13 @@ public class MerchandiseRegisterExecuteAction extends Action {
 
             System.out.println("★ Merchandise設定完了: name=" + m.getMerchandiseName() + ", storeId=" + storeId);
 
-            // tool.Actionのメソッドを使用
             connection = getConnection();
 
             MerchandiseDAO dao = new MerchandiseDAO(connection);
             dao.insert(m);
 
             System.out.println("✅ 商品登録成功！");
-            response.sendRedirect(request.getContextPath() + "/store_jsp/merchandise_list_store.jsp");
+            response.sendRedirect(request.getContextPath() + "/foodloss/Menu.action");
 
         } catch (NumberFormatException e) {
             e.printStackTrace();
