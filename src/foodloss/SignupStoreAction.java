@@ -35,11 +35,15 @@ public class SignupStoreAction extends Action {
         req.setCharacterEncoding("UTF-8");
 
         // --- CSRFトークンチェック ---
-        HttpSession session = req.getSession();
+        HttpSession session = req.getSession();  // ← ここを修正
         String token = req.getParameter("csrfToken");
         String sessionToken = (String) session.getAttribute("csrfToken");
 
+        System.out.println("DEBUG: token from request = " + token);
+        System.out.println("DEBUG: sessionToken = " + sessionToken);
+
         if (sessionToken == null || !sessionToken.equals(token)) {
+            System.out.println("DEBUG: CSRF token mismatch!");
             req.setAttribute("errorMessage", "不正なアクセスです。");
             req.getRequestDispatcher("/store_jsp/signup_store.jsp").forward(req, res);
             return;
@@ -101,7 +105,7 @@ public class SignupStoreAction extends Action {
         // 電話番号の形式チェック
         if (!phone.matches("[0-9]{10,11}")) {
             req.setAttribute("errorMessage", "電話番号は10桁または11桁の数字で入力してください。");
-            req.getRequestDispatcher("/jsp/signup_store.jsp").forward(req, res);
+            req.getRequestDispatcher("/store_jsp/signup_store.jsp").forward(req, res);
             return;
         }
 
@@ -138,6 +142,7 @@ public class SignupStoreAction extends Action {
             req.getRequestDispatcher("/store_jsp/signup_store.jsp").forward(req, res);
             return;
         }
+
 
         // --- パスワードハッシュ化 ---
         String password = hashPassword(passwordRaw);

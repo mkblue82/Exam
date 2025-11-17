@@ -182,10 +182,10 @@
                 </div>
 
                 <button type="submit" class="btn-login">ログイン</button>
-                <button type="button" class="btn-register"
-                        onclick="location.href='${pageContext.request.contextPath}/foodloss/SignupStore.action'">
-                    新規登録
-                </button>
+				<button type="button" class="btn-register"
+				        onclick="location.href='${pageContext.request.contextPath}/foodloss/SignupStore.action'">
+				    新規登録
+				</button>
             </form>
 
             <div class="user-login-link">
@@ -193,6 +193,7 @@
             </div>
         </div>
     </div>
+
 
 
     <jsp:include page="../jsp/footer.jsp" />
