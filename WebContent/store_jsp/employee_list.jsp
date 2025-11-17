@@ -154,7 +154,7 @@
                 <% } %>
 
                 <div class="back-button">
-                    <a href="${pageContext.request.contextPath}/store_jsp/store_main.jsp">メインメニューへ戻る</a>
+                    <a href="${pageContext.request.contextPath}/store_jsp/main_store.jsp">メインメニューへ戻る</a>
                     <a href="${pageContext.request.contextPath}/foodloss/EmployeeRegister.action">社員登録</a>
                 </div>
 

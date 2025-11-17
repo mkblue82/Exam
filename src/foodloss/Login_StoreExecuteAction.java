@@ -7,8 +7,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import bean.Store; // 店舗用のBean
-import dao.StoreDAO; // 店舗用DAO
+import bean.Store;
+import dao.StoreDAO;
 import tool.Action;
 import tool.DBManager;
 
@@ -17,7 +17,6 @@ public class Login_StoreExecuteAction extends Action {
     @Override
     public void execute(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
-        // フォームから送信された店舗IDとパスワードを取得
         String storeIdStr = request.getParameter("storeId");
         String password = request.getParameter("password");
 
@@ -32,29 +31,36 @@ public class Login_StoreExecuteAction extends Action {
             storeId = Integer.parseInt(storeIdStr);
         } catch (NumberFormatException e) {
             request.setAttribute("error", "店舗IDは数字で入力してください。");
-            request.getRequestDispatcher("/jsp/store_login.jsp").forward(request, response);
+            request.getRequestDispatcher("/store_jsp/login_store.jsp").forward(request, response);
             return;
         }
 
-        // パスワードをハッシュ化
         String hashedPassword = hashPassword(password);
 
         DBManager db = new DBManager();
         StoreDAO dao = new StoreDAO(db.getConnection());
-        Store store = dao.login(storeId, hashedPassword); // 店舗IDとハッシュ化パスワードで認証
+        Store store = dao.login(storeId, hashedPassword);
 
         if (store != null) {
+
             HttpSession session = request.getSession();
+
+            // ★★★★★【重要】商品一覧・予約一覧が必要とするセッション変数を追加
             session.setAttribute("store", store);
-            // ログイン成功 → 店舗メニュー画面にリダイレクト
-            response.sendRedirect(request.getContextPath() + "/foodloss/Menu.action");
+            session.setAttribute("storeId", store.getStoreId());       // int
+            session.setAttribute("storeName", store.getStoreName());   // String
+            session.setAttribute("storeCode", String.valueOf(store.getStoreId())); // EmployeeList 用
+
+            // ★ 店舗メインページへ遷移
+            response.sendRedirect(request.getContextPath() + "/store_jsp/main_store.jsp");
+
         } else {
             request.setAttribute("error", "店舗IDまたはパスワードが違います。");
             request.getRequestDispatcher("/store_jsp/login_store.jsp").forward(request, response);
         }
     }
 
-    // SHA-256でハッシュ化
+
     private String hashPassword(String password) {
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-256");
@@ -71,3 +77,4 @@ public class Login_StoreExecuteAction extends Action {
         }
     }
 }
+

@@ -16,8 +16,11 @@ public class EmployeeRegisterAction extends Action {
             throws Exception {
 
         // JSPから値取得
-        String employeeCode = request.getParameter("employeeCode");
+        String employeeCodeStr = request.getParameter("employeeCode"); // 入力は文字列
         String employeeName = request.getParameter("employeeName");
+
+        // PK は integer なので変換
+        int employeeCode = Integer.parseInt(employeeCodeStr);
 
         // セッションから店舗情報を取得
         HttpSession session = request.getSession();
@@ -30,16 +33,16 @@ public class EmployeeRegisterAction extends Action {
             return;
         }
 
-        // DB登録処理
+        // DB登録
         EmployeeDAO dao = new EmployeeDAO();
         Employee emp = new Employee();
-        emp.setEmployeeCode(employeeCode);
+        emp.setId(employeeCode);               // ← PK（int）
+        emp.setEmployeeCode(employeeCodeStr);  // ← 表示用に文字列も残してOK（DAO側が使わなければ大丈夫）
         emp.setEmployeeName(employeeName);
-        emp.setStoreCode(String.valueOf(store.getStoreId())); // 店舗IDを文字列に変換してセット
+        emp.setStoreCode(String.valueOf(store.getStoreId()));
 
         int result = dao.insert(emp);
 
-        // 結果
         if (result > 0) {
             response.sendRedirect(request.getContextPath() + "/foodloss/EmployeeList.action");
         } else {
