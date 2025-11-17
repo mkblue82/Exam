@@ -7,163 +7,142 @@ import java.util.ArrayList;
 import java.util.List;
 
 import bean.Employee;
+import tool.DBManager;
 
-public class EmployeeDAO extends DAO {
+public class EmployeeDAO {
 
-    // 全従業員を取得（店舗名も取得）
+    // ▼ DB接続を返す
+    private Connection getConnection() throws Exception {
+        return new DBManager().getConnection();
+    }
+
+    // 全従業員取得
     public List<Employee> selectAll() throws Exception {
         List<Employee> list = new ArrayList<>();
-        Connection con = getConnection();
-        PreparedStatement st = con.prepareStatement(
+        String sql =
             "select T003_ID_employee, T003_PK1_employee, T003_FD1_employee, " +
             "T003_FD2_employee, T001_FD1_store " +
             "from T003_employee " +
             "join T001_store on T003_employee.T003_FD2_employee = T001_store.T001_PK1_store " +
-            "order by T003_ID_employee");
-        ResultSet rs = st.executeQuery();
+            "order by T003_ID_employee";
 
-        while (rs.next()) {
-            Employee e = new Employee();
-            e.setId(rs.getInt("T003_ID_employee"));
-            e.setEmployeeCode(rs.getString("T003_PK1_employee"));
-            e.setEmployeeName(rs.getString("T003_FD1_employee"));
-            e.setStoreCode(rs.getString("T003_FD2_employee"));
-            e.setStoreName(rs.getString("T001_FD1_store"));
-            list.add(e);
+        try (Connection con = getConnection();
+             PreparedStatement st = con.prepareStatement(sql);
+             ResultSet rs = st.executeQuery()) {
+
+            while (rs.next()) {
+                Employee e = new Employee();
+                e.setId(rs.getInt("T003_ID_employee"));
+                e.setEmployeeCode(rs.getString("T003_PK1_employee"));
+                e.setEmployeeName(rs.getString("T003_FD1_employee"));
+                e.setStoreCode(rs.getString("T003_FD2_employee"));
+                e.setStoreName(rs.getString("T001_FD1_store"));
+                list.add(e);
+            }
         }
-
-        st.close();
-        con.close();
         return list;
     }
 
-    // 従業員コードで検索
+    // 社員コードで検索
     public Employee selectByCode(String employeeCode) throws Exception {
-        Connection con = getConnection();
-        PreparedStatement st = con.prepareStatement(
+        String sql =
             "select T003_ID_employee, T003_PK1_employee, T003_FD1_employee, " +
             "T003_FD2_employee, T001_FD1_store " +
             "from T003_employee " +
             "join T001_store on T003_employee.T003_FD2_employee = T001_store.T001_PK1_store " +
-            "where T003_PK1_employee = ?");
-        st.setString(1, employeeCode);
-        ResultSet rs = st.executeQuery();
+            "where T003_PK1_employee = ?";
 
-        Employee e = null;
-        if (rs.next()) {
-            e = new Employee();
-            e.setId(rs.getInt("T003_ID_employee"));
-            e.setEmployeeCode(rs.getString("T003_PK1_employee"));
-            e.setEmployeeName(rs.getString("T003_FD1_employee"));
-            e.setStoreCode(rs.getString("T003_FD2_employee"));
-            e.setStoreName(rs.getString("T001_FD1_store"));
+        try (Connection con = getConnection();
+             PreparedStatement st = con.prepareStatement(sql)) {
+
+            st.setString(1, employeeCode);
+            ResultSet rs = st.executeQuery();
+
+            if (rs.next()) {
+                Employee e = new Employee();
+                e.setId(rs.getInt("T003_ID_employee"));
+                e.setEmployeeCode(rs.getString("T003_PK1_employee"));
+                e.setEmployeeName(rs.getString("T003_FD1_employee"));
+                e.setStoreCode(rs.getString("T003_FD2_employee"));
+                e.setStoreName(rs.getString("T001_FD1_store"));
+                return e;
+            }
         }
-
-        st.close();
-        con.close();
-        return e;
+        return null;
     }
 
-    // IDで検索
-    public Employee selectById(int id) throws Exception {
-        Connection con = getConnection();
-        PreparedStatement st = con.prepareStatement(
-            "select T003_ID_employee, T003_PK1_employee, T003_FD1_employee, " +
-            "T003_FD2_employee, T001_FD1_store " +
-            "from T003_employee " +
-            "join T001_store on T003_employee.T003_FD2_employee = T001_store.T001_PK1_store " +
-            "where T003_ID_employee = ?");
-        st.setInt(1, id);
-        ResultSet rs = st.executeQuery();
-
-        Employee e = null;
-        if (rs.next()) {
-            e = new Employee();
-            e.setId(rs.getInt("T003_ID_employee"));
-            e.setEmployeeCode(rs.getString("T003_PK1_employee"));
-            e.setEmployeeName(rs.getString("T003_FD1_employee"));
-            e.setStoreCode(rs.getString("T003_FD2_employee"));
-            e.setStoreName(rs.getString("T001_FD1_store"));
-        }
-
-        st.close();
-        con.close();
-        return e;
-    }
-
-    // 店舗IDで従業員一覧を取得
+    // 店舗コードで一覧取得
     public List<Employee> selectByStoreCode(String storeCode) throws Exception {
         List<Employee> list = new ArrayList<>();
-        Connection con = getConnection();
-        PreparedStatement st = con.prepareStatement(
+        String sql =
             "select T003_ID_employee, T003_PK1_employee, T003_FD1_employee, " +
             "T003_FD2_employee, T001_FD1_store " +
             "from T003_employee " +
             "join T001_store on T003_employee.T003_FD2_employee = T001_store.T001_PK1_store " +
-            "where T003_FD2_employee = ? " +
-            "order by T003_ID_employee");
-        st.setString(1, storeCode);
-        ResultSet rs = st.executeQuery();
+            "where T003_FD2_employee = ? order by T003_ID_employee";
 
-        while (rs.next()) {
-            Employee e = new Employee();
-            e.setId(rs.getInt("T003_ID_employee"));
-            e.setEmployeeCode(rs.getString("T003_PK1_employee"));
-            e.setEmployeeName(rs.getString("T003_FD1_employee"));
-            e.setStoreCode(rs.getString("T003_FD2_employee"));
-            e.setStoreName(rs.getString("T001_FD1_store"));
-            list.add(e);
+        try (Connection con = getConnection();
+             PreparedStatement st = con.prepareStatement(sql)) {
+
+            st.setString(1, storeCode);
+            ResultSet rs = st.executeQuery();
+
+            while (rs.next()) {
+                Employee e = new Employee();
+                e.setId(rs.getInt("T003_ID_employee"));
+                e.setEmployeeCode(rs.getString("T003_PK1_employee"));
+                e.setEmployeeName(rs.getString("T003_FD1_employee"));
+                e.setStoreCode(rs.getString("T003_FD2_employee"));
+                e.setStoreName(rs.getString("T001_FD1_store"));
+                list.add(e);
+            }
         }
-
-        st.close();
-        con.close();
         return list;
     }
 
-    // 従業員を登録
     public int insert(Employee employee) throws Exception {
-        Connection con = getConnection();
-        PreparedStatement st = con.prepareStatement(
+        String sql =
             "insert into T003_employee (T003_PK1_employee, T003_FD1_employee, T003_FD2_employee) " +
-            "values (?, ?, ?)");
+            "values (?, ?, ?)";
 
-        st.setString(1, employee.getEmployeeCode());
-        st.setString(2, employee.getEmployeeName());
-        st.setString(3, employee.getStoreCode());
+        try (Connection con = getConnection();
+             PreparedStatement st = con.prepareStatement(sql)) {
 
-        int line = st.executeUpdate();
-        st.close();
-        con.close();
-        return line;
+            st.setInt(1, employee.getId());  // ← integer PK
+            st.setString(2, employee.getEmployeeName());
+            st.setString(3, employee.getStoreCode());
+
+            return st.executeUpdate();
+        }
     }
 
-    // 従業員を更新
+
+    // 更新
     public int update(Employee employee) throws Exception {
-        Connection con = getConnection();
-        PreparedStatement st = con.prepareStatement(
+        String sql =
             "update T003_employee set T003_FD1_employee = ?, T003_FD2_employee = ? " +
-            "where T003_PK1_employee = ?");
+            "where T003_PK1_employee = ?";
 
-        st.setString(1, employee.getEmployeeName());
-        st.setString(2, employee.getStoreCode());
-        st.setString(3, employee.getEmployeeCode());
+        try (Connection con = getConnection();
+             PreparedStatement st = con.prepareStatement(sql)) {
 
-        int line = st.executeUpdate();
-        st.close();
-        con.close();
-        return line;
+            st.setString(1, employee.getEmployeeName());
+            st.setString(2, employee.getStoreCode());
+            st.setString(3, employee.getEmployeeCode());
+            return st.executeUpdate();
+        }
     }
 
-    // 従業員を削除
+    // 削除
     public int delete(String employeeCode) throws Exception {
-        Connection con = getConnection();
-        PreparedStatement st = con.prepareStatement(
-            "delete from T003_employee where T003_PK1_employee = ?");
-        st.setString(1, employeeCode);
+        String sql =
+            "delete from T003_employee where T003_PK1_employee = ?";
 
-        int line = st.executeUpdate();
-        st.close();
-        con.close();
-        return line;
+        try (Connection con = getConnection();
+             PreparedStatement st = con.prepareStatement(sql)) {
+
+            st.setString(1, employeeCode);
+            return st.executeUpdate();
+        }
     }
 }
