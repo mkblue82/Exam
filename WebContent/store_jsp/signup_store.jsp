@@ -171,7 +171,7 @@
                     </div>
                 <% } %>
 
-                <form action="${pageContext.request.contextPath}/StoreRegisterServlet"
+                <form action="${pageContext.request.contextPath}/SignupStore.action"
                       method="post" enctype="multipart/form-data">
                     <input type="hidden" name="csrfToken" value="${sessionScope.csrfToken}">
 
