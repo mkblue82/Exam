@@ -189,7 +189,7 @@
             </form>
 
             <div class="user-login-link">
-                <a href="${pageContext.request.contextPath}/jsp/login_user.jsp">← ユーザーログインはこちら</a>
+                <a href="${pageContext.request.contextPath}/jsp/login_user.jsp">ユーザーログインはこちら</a>
             </div>
         </div>
     </div>
