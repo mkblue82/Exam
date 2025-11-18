@@ -6,6 +6,7 @@ public class User {
     private String email;
     private String phone;
     private String password;
+    private int point; // 所持ポイント(初期値は0)
 
     // --- getter/setter ---
     public int getUserId() {
@@ -41,6 +42,13 @@ public class User {
     }
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public int getPoint(){
+    	return point;
+    }
+    public void setPoint(int point){
+    	this.point = point;
     }
 
 }

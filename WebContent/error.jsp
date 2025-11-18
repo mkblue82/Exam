@@ -3,6 +3,7 @@
     // セッション状態を確認
     HttpSession userSession = request.getSession(false);
     boolean isLoggedIn = (userSession != null && userSession.getAttribute("user") != null);
+    boolean isStoreLoggedIn = (userSession != null && userSession.getAttribute("store") != null);
 
     // キャッシュ制御
     response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
@@ -102,8 +103,12 @@
 </head>
 <body>
 <div id="container">
-    <!-- ヘッダー(ログイン中のみ表示) -->
-    <% if (isLoggedIn) { %>
+    <!-- ヘッダー(ログイン状態に応じて表示) -->
+    <% if (isStoreLoggedIn) { %>
+        <!-- 店舗ユーザー用ヘッダー -->
+        <jsp:include page="/store_jsp/header_store.jsp" />
+    <% } else if (isLoggedIn) { %>
+        <!-- 一般ユーザー用ヘッダー -->
         <jsp:include page="/jsp/header_user.jsp" />
     <% } %>
 
@@ -126,8 +131,8 @@
             %>
 
             <div class="button-group">
-                <% if (isLoggedIn) { %>
-                    <!-- ログイン中 マイページへ戻る -->
+                <% if (isStoreLoggedIn || isLoggedIn) { %>
+                    <!-- ログイン中(店舗・一般共通) -->
                     <a href="${pageContext.request.contextPath}/foodloss/Menu.action" class="btn btn-home">ホームへ戻る</a>
                     <button onclick="history.back()" class="btn btn-back">前のページに戻る</button>
                 <% } else { %>
