@@ -8,7 +8,6 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
 
     <style>
-        /* 基本デザインは login_store.jsp を踏襲 */
         * {
             margin: 0;
             padding: 0;
@@ -114,15 +113,20 @@
         .back-link a:hover {
             color: #c77c4a;
         }
+
+        .error-msg {
+            color: red;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
 
 <div id="container">
-    <!-- ✅ 共通ヘッダー -->
     <jsp:include page="/store_jsp/header_store.jsp" />
 
-    <!-- ✅ メイン部分 -->
     <main class="column">
         <div class="register-wrapper">
             <div class="register-container">
@@ -130,11 +134,15 @@
                     <h1>社員登録</h1>
                 </div>
 
-                <!-- 登録フォーム -->
+                <!-- ✅ エラー表示 -->
+                <c:if test="${not empty error}">
+                    <p class="error-msg">${error}</p>
+                </c:if>
+
                 <form action="${pageContext.request.contextPath}/foodloss/EmployeeRegister.action" method="post">
                     <div class="form-group">
-                        <label for="employeeId">社員番号</label>
-                        <input type="text" id="employeeId" name="employeeId" required>
+                        <label for="employeeCode">社員番号</label>
+                        <input type="text" id="employeeCode" name="employeeCode" required>
                     </div>
 
                     <div class="form-group">
@@ -146,21 +154,14 @@
                 </form>
 
                 <div class="back-link">
-                    <a href="${pageContext.request.contextPath}/store_jsp/employee_list.jsp">← 戻る</a>
+                    <a href="${pageContext.request.contextPath}/foodloss/EmployeeList.action">← 戻る</a>
                 </div>
             </div>
         </div>
     </main>
 
-    <!-- ✅ 共通フッター -->
     <jsp:include page="/jsp/footer.jsp" />
 </div>
-
-<!-- JS（共通） -->
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
-<script src="${pageContext.request.contextPath}/js/slick.js"></script>
-<script src="${pageContext.request.contextPath}/js/main.js"></script>
 
 </body>
 </html>
