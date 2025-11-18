@@ -132,6 +132,7 @@ public class SignupUserAction extends Action {
         user.setPassword(password);
 
 
+
         System.out.println("DEBUG: User object created");
 
         // --- DB登録 ---
