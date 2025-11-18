@@ -7,22 +7,51 @@
     <title>商品登録</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
     <style>
-        .register-wrapper {
-            max-width: 600px;
-            margin: 40px auto;
-            padding: 2rem;
-            background: #fff;
-            border-radius: 10px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
-        .register-wrapper h1 {
-            color: #c07148;
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .register-wrapper {
+            width: 100%;
+            max-width: 600px;
+            margin: 3rem auto;
+        }
+
+        .register-container {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            padding: 3rem 2.5rem;
+        }
+
+        .register-header {
             text-align: center;
             margin-bottom: 2rem;
-            font-size: 1.8rem;
-            border-bottom: 2px solid #c07148;
-            padding-bottom: 1rem;
+        }
+
+        .register-header h1 {
+            color: #c77c4a;
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 0 0 1rem 0;
+        }
+
+        .register-header::after {
+            content: '';
+            display: block;
+            width: 70%;
+            height: 3px;
+            background: #c77c4a;
+            margin: 0 auto;
         }
 
         .form-group {
@@ -37,6 +66,10 @@
             font-size: 1rem;
         }
 
+        .form-group label span {
+            color: red;
+        }
+
         .form-group input[type="text"],
         .form-group input[type="number"],
         .form-group input[type="date"],
@@ -44,14 +77,15 @@
             width: 100%;
             padding: 0.8rem;
             border: 2px solid #ddd;
-            border-radius: 5px;
+            border-radius: 4px;
             font-size: 1rem;
+            transition: border-color 0.3s ease;
             background: #fff;
         }
 
         .form-group input:focus {
             outline: none;
-            border-color: #c07148;
+            border-color: #c77c4a;
         }
 
         .image-preview {
@@ -66,41 +100,37 @@
             border: 2px solid #ddd;
         }
 
-        .button-group {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-            margin-top: 2rem;
-        }
-
-        .btn {
-            padding: 0.8rem 2rem;
+        .btn-register {
+            width: 100%;
+            padding: 1rem;
             border: none;
-            border-radius: 5px;
+            border-radius: 4px;
             font-size: 1rem;
             cursor: pointer;
-            text-decoration: none;
-            transition: 0.3s;
-            font-weight: bold;
-            width: 100%;
-        }
-
-        .btn-submit {
-            background-color: #c07148;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            background: #c77c4a;
             color: #fff;
+            margin-top: 1rem;
         }
 
-        .btn-submit:hover {
-            background-color: #a85d38;
+        .btn-register:hover {
+            background: #b56c3a;
         }
 
-        .btn-cancel {
-            background-color: #ccc;
-            color: #333;
+        .back-link {
+            text-align: center;
+            margin-top: 1.5rem;
         }
 
-        .btn-cancel:hover {
-            background-color: #bbb;
+        .back-link a {
+            color: #666;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .back-link a:hover {
+            color: #c77c4a;
         }
 
         .error-message {
@@ -110,15 +140,19 @@
             border-radius: 5px;
             margin-bottom: 1.5rem;
             border-left: 4px solid #c62828;
+            font-weight: bold;
+            text-align: center;
         }
 
         @media screen and (max-width: 600px) {
             .register-wrapper {
                 margin: 20px;
-                padding: 1.5rem;
             }
-            .register-wrapper h1 {
-                font-size: 1.3rem;
+            .register-container {
+                padding: 2rem 1.5rem;
+            }
+            .register-header h1 {
+                font-size: 1.5rem;
             }
         }
     </style>
@@ -142,9 +176,11 @@
     <jsp:include page="/store_jsp/header_store.jsp" />
 
     <main class="column">
-        <div class="main-contents">
-            <div class="register-wrapper">
-                <h1>商品登録</h1>
+        <div class="register-wrapper">
+            <div class="register-container">
+                <div class="register-header">
+                    <h1>商品登録</h1>
+                </div>
 
                 <%-- エラーメッセージ表示 --%>
                 <% if (request.getAttribute("errorMessage") != null) { %>
@@ -163,7 +199,7 @@
                     <input type="hidden" name="storeId" value="${sessionScope.store.storeId}">
 
                     <div class="form-group">
-                        <label for="merchandiseName">商品名 <span style="color: red;">*</span></label>
+                        <label for="merchandiseName">商品名 <span>*</span></label>
                         <input type="text"
                                id="merchandiseName"
                                name="merchandiseName"
@@ -174,7 +210,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="price">価格（円） <span style="color: red;">*</span></label>
+                        <label for="price">価格（円） <span>*</span></label>
                         <input type="number"
                                id="price"
                                name="price"
@@ -187,7 +223,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="quantity">個数 <span style="color: red;">*</span></label>
+                        <label for="quantity">個数 <span>*</span></label>
                         <input type="number"
                                id="quantity"
                                name="quantity"
@@ -198,7 +234,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="expirationDate">消費期限 <span style="color: red;">*</span></label>
+                        <label for="expirationDate">消費期限 <span>*</span></label>
                         <input type="date"
                                id="expirationDate"
                                name="expirationDate"
@@ -207,7 +243,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="employeeNumber">社員番号 <span style="color: red;">*</span></label>
+                        <label for="employeeNumber">社員番号 <span>*</span></label>
                         <input type="text"
                                id="employeeNumber"
                                name="employeeNumber"
@@ -228,7 +264,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="merchandiseImage">画像 <span style="color: red;">*</span></label>
+                        <label for="merchandiseImage">画像 <span>*</span></label>
                         <input type="file"
                                id="merchandiseImage"
                                name="merchandiseImage"
@@ -240,18 +276,16 @@
                         </div>
                     </div>
 
-                    <div class="button-group">
-                        <button type="submit" class="btn btn-submit">登録する</button>
-                        <button type="button" class="btn btn-cancel"
-                               onclick="location.href='${pageContext.request.contextPath}/store_jsp/main_store.jsp'">
-                            キャンセル
-                        </button>
-                    </div>
+                    <button type="submit" class="btn-register">登録</button>
                 </form>
+
+                <div class="back-link">
+                    <a href="${pageContext.request.contextPath}/store_jsp/main_store.jsp">← 戻る</a>
+                </div>
             </div>
         </div>
     </main>
-<%--ｌ--%>
+
     <%-- フッター読み込み --%>
     <jsp:include page="/jsp/footer.jsp" />
 
