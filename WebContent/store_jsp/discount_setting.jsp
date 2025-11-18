@@ -146,7 +146,7 @@
                                        id="time"
                                        name="time"
                                        min="0"
-                                      
+
                                        placeholder="例: 18"
                                        required>
                                 <span class="unit">時</span>
