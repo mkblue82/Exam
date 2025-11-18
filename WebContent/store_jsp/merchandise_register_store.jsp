@@ -251,7 +251,7 @@
             </div>
         </div>
     </main>
-<%--q--%>
+<%----%>
     <%-- フッター読み込み --%>
     <jsp:include page="/jsp/footer.jsp" />
 
