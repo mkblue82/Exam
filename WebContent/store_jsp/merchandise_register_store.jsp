@@ -122,6 +122,18 @@
             }
         }
     </style>
+    <script>
+        function previewImage(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('preview').src = e.target.result;
+                    document.getElementById('imagePreview').style.display = 'block';
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+    </script>
 </head>
 <body>
 <div id="container">
@@ -157,7 +169,21 @@
                                name="merchandiseName"
                                required
                                maxlength="100"
+                               placeholder="例: トマトジュース"
                                value="${param.merchandiseName != null ? param.merchandiseName : ''}">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="price">価格（円） <span style="color: red;">*</span></label>
+                        <input type="number"
+                               id="price"
+                               name="price"
+                               required
+                               min="0"
+                               max="999999"
+                               step="1"
+                               placeholder="例: 500"
+                               value="${param.price != null ? param.price : ''}">
                     </div>
 
                     <div class="form-group">
@@ -178,6 +204,17 @@
                                name="expirationDate"
                                required
                                value="${param.expirationDate != null ? param.expirationDate : ''}">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="employeeNumber">社員番号 <span style="color: red;">*</span></label>
+                        <input type="text"
+                               id="employeeNumber"
+                               name="employeeNumber"
+                               required
+                               maxlength="20"
+                               placeholder="例:12345"
+                               value="${param.employeeNumber != null ? param.employeeNumber : ''}">
                     </div>
 
                     <div class="form-group">
@@ -205,10 +242,10 @@
 
                     <div class="button-group">
                         <button type="submit" class="btn btn-submit">登録する</button>
-						<button type="button" class="btn-cancel"
-						       onclick="location.href='${pageContext.request.contextPath}/store_jsp/main_store.jsp'">
-						    キャンセル
-						</button>
+                        <button type="button" class="btn btn-cancel"
+                               onclick="location.href='${pageContext.request.contextPath}/store_jsp/main_store.jsp'">
+                            キャンセル
+                        </button>
                     </div>
                 </form>
             </div>
@@ -219,55 +256,5 @@
     <jsp:include page="/jsp/footer.jsp" />
 
 </div>
-
-<script>
-    function previewImage(input) {
-        const preview = document.getElementById('preview');
-        const previewContainer = document.getElementById('imagePreview');
-
-        if (input.files && input.files[0]) {
-            const reader = new FileReader();
-
-            reader.onload = function(e) {
-                preview.src = e.target.result;
-                previewContainer.style.display = 'block';
-            }
-
-            reader.readAsDataURL(input.files[0]);
-        } else {
-            previewContainer.style.display = 'none';
-        }
-    }
-
-    document.getElementById('merchandiseRegisterForm').addEventListener('submit', function(e) {
-        const expirationDate = new Date(document.getElementById('expirationDate').value);
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-
-        if (expirationDate < today) {
-            e.preventDefault();
-            alert('消費期限は今日以降の日付を指定してください。');
-            return false;
-        }
-
-        const fileInput = document.getElementById('merchandiseImage');
-        if (fileInput.files.length > 0) {
-            const fileSize = fileInput.files[0].size;
-            const maxSize = 5 * 1024 * 1024; // 5MB
-
-            if (fileSize > maxSize) {
-                e.preventDefault();
-                alert('画像ファイルのサイズは5MB以下にしてください。');
-                return false;
-            }
-        }
-    });
-</script>
-
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
-<script src="${pageContext.request.contextPath}/js/slick.js"></script>
-<parameter name="${pageContext.request.contextPath}/js/main.js"></script>
-<script src="${pageContext.request.contextPath}/js/validation.js"></script>
 </body>
 </html>

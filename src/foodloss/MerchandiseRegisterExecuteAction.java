@@ -36,8 +36,10 @@ public class MerchandiseRegisterExecuteAction extends Action {
 
             // マルチパートリクエストの処理
             String name = null;
+            String priceStr = null;
             String quantityStr = null;
             String expirationDateStr = null;
+            String employeeNumberStr = null;
             String tags = null;
             FileItem imageFile = null;
 
@@ -56,10 +58,14 @@ public class MerchandiseRegisterExecuteAction extends Action {
 
                         if ("merchandiseName".equals(fieldName)) {
                             name = fieldValue;
+                        } else if ("price".equals(fieldName)) {
+                            priceStr = fieldValue;
                         } else if ("quantity".equals(fieldName)) {
                             quantityStr = fieldValue;
                         } else if ("expirationDate".equals(fieldName)) {
                             expirationDateStr = fieldValue;
+                        } else if ("employeeNumber".equals(fieldName)) {
+                            employeeNumberStr = fieldValue;
                         } else if ("tags".equals(fieldName)) {
                             tags = fieldValue;
                         }
@@ -93,12 +99,21 @@ public class MerchandiseRegisterExecuteAction extends Action {
             }
 
             System.out.println("★ merchandiseName = [" + name + "]");
+            System.out.println("★ price = [" + priceStr + "]");
             System.out.println("★ quantity = [" + quantityStr + "]");
             System.out.println("★ expirationDate = [" + expirationDateStr + "]");
+            System.out.println("★ employeeNumber = [" + employeeNumberStr + "]");
             System.out.println("★ tags = [" + tags + "]");
 
+            // バリデーション
             if (name == null || name.trim().isEmpty()) {
                 request.setAttribute("errorMessage", "商品名を入力してください");
+                request.getRequestDispatcher("/store_jsp/merchandise_register_store.jsp").forward(request, response);
+                return;
+            }
+
+            if (priceStr == null || priceStr.trim().isEmpty()) {
+                request.setAttribute("errorMessage", "価格を入力してください");
                 request.getRequestDispatcher("/store_jsp/merchandise_register_store.jsp").forward(request, response);
                 return;
             }
@@ -115,20 +130,41 @@ public class MerchandiseRegisterExecuteAction extends Action {
                 return;
             }
 
+            if (employeeNumberStr == null || employeeNumberStr.trim().isEmpty()) {
+                request.setAttribute("errorMessage", "社員番号を入力してください");
+                request.getRequestDispatcher("/store_jsp/merchandise_register_store.jsp").forward(request, response);
+                return;
+            }
+
+            // 数値変換
+            int price = Integer.parseInt(priceStr);
             int stock = Integer.parseInt(quantityStr);
+            int employeeId = Integer.parseInt(employeeNumberStr);
             java.sql.Date useByDate = java.sql.Date.valueOf(expirationDateStr);
+
+            // 価格の妥当性チェック
+            if (price < 0) {
+                request.setAttribute("errorMessage", "価格は0円以上で入力してください");
+                request.getRequestDispatcher("/store_jsp/merchandise_register_store.jsp").forward(request, response);
+                return;
+            }
 
             // 商品情報を登録
             Merchandise m = new Merchandise();
             m.setStoreId(storeId);
             m.setMerchandiseName(name);
+            m.setPrice(price);
             m.setStock(stock);
             m.setUseByDate(useByDate);
+            m.setEmployeeId(employeeId);
             m.setMerchandiseTag(tags != null ? tags : "");
             m.setRegistrationTime(new Timestamp(System.currentTimeMillis()));
             m.setBookingStatus(false);
 
-            System.out.println("★ Merchandise設定完了: name=" + m.getMerchandiseName() + ", storeId=" + storeId);
+            System.out.println("★ Merchandise設定完了: name=" + m.getMerchandiseName()
+                + ", price=" + m.getPrice()
+                + ", employeeId=" + m.getEmployeeId()
+                + ", storeId=" + storeId);
 
             // DBManagerを使って接続
             DBManager dbManager = new DBManager();
@@ -192,7 +228,7 @@ public class MerchandiseRegisterExecuteAction extends Action {
 
         } catch (NumberFormatException e) {
             e.printStackTrace();
-            request.setAttribute("errorMessage", "個数は数値で入力してください");
+            request.setAttribute("errorMessage", "価格、個数、社員番号は数値で入力してください");
             request.getRequestDispatcher("/store_jsp/merchandise_register_store.jsp").forward(request, response);
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
