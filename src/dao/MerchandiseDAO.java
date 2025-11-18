@@ -435,4 +435,5 @@ public class MerchandiseDAO {
         st.close();
         return line;
     }
+
 }
