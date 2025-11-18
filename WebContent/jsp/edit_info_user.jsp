@@ -92,10 +92,17 @@
             <div class="main-content">
                 <div class="edit-section">
                     <h2>登録情報の変更</h2>
+					<form action="${pageContext.request.contextPath}/foodloss/EditInfo.action" method="post">
+				    <!-- エラーメッセージ表示 -->
+				    <c:if test="${not empty error}">
+				        <p style="color:red; text-align:center; margin-bottom:20px;">
+				            ${error}
+				        </p>
+				    </c:if>
 
                     <form action="${pageContext.request.contextPath}/foodloss/EditInfo.action" method="post">
                         <label for="username">ユーザー名</label>
-                        <input type="text" id="username" name="username" value="${user.name}" required>
+                        <input type="text" id="name" name="name" value="${user.name}" required>
 
                         <label for="email">メールアドレス</label>
                         <input type="email" id="email" name="email" value="${user.email}" required>
