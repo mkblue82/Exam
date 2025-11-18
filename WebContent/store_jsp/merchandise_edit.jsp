@@ -138,6 +138,24 @@
                     <label for="useByDate">消費期限</label>
                     <input type="date" id="useByDate" name="useByDate" value="<%= useByDateStr %>" required>
                 </div>
+                <div class="form-group">
+				    <label for="employeeId">担当社員番号</label>
+				    <input type="number" id="employeeId" name="employeeId" value="<%= m.getEmployeeId() %>" required>
+				</div>
+				<div class="form-group">
+				    <label for="merchandiseTag">タグ</label>
+				    <input type="text" id="merchandiseTag" name="merchandiseTag" value="<%= m.getMerchandiseTag() %>">
+				</div>
+				<div class="form-group">
+				    <label>現在の画像</label><br>
+				    <img src="${pageContext.request.contextPath}/images/<%= m.getImagePath() %>"
+				         alt="商品画像" style="max-width:120px; max-height:120px;">
+				</div>
+				<div class="form-group">
+				    <label for="imageFile">画像を変更</label>
+				    <input type="file" id="imageFile" name="imageFile">
+				</div>
+
 
                 <button type="submit" class="btn-update">更新する</button>
             </form>
