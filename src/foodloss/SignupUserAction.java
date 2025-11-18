@@ -58,7 +58,7 @@ public class SignupUserAction extends Action {
         String passwordRaw = req.getParameter("password");
 
         String passwordConfirm = req.getParameter("confirmPassword");
-      
+
 
         System.out.println("DEBUG: name = " + name);
         System.out.println("DEBUG: email = " + email);
@@ -130,10 +130,8 @@ public class SignupUserAction extends Action {
         user.setEmail(email);
         user.setPhone(phone);
         user.setPassword(password);
-<<<<<<< HEAD
-=======
 
->>>>>>> branch 'master' of https://github.com/mkblue82/Exam.git
+
 
         System.out.println("DEBUG: User object created");
 
