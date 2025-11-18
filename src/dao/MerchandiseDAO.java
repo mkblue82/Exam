@@ -375,4 +375,64 @@ public class MerchandiseDAO {
         st.close();
         return exists;
     }
+
+    // ========== 割引設定関連メソッド ==========
+
+    /**
+     * 商品IDで商品を取得（Actionで使用）
+     * @param merchandiseId 商品ID
+     * @return Merchandise
+     */
+    public Merchandise getMerchandiseById(int merchandiseId) throws Exception {
+        return selectById(merchandiseId);
+    }
+
+    /**
+     * 商品の割引設定を更新
+     * @param merchandiseId 商品ID
+     * @param discountTime 割引開始時間（0-23）
+     * @param discountRate 割引率（1-100）
+     * @return 更新行数
+     */
+    public int updateDiscount(int merchandiseId, int discountTime, int discountRate) throws Exception {
+        // 割引後の価格を計算
+        Merchandise merchandise = selectById(merchandiseId);
+        if (merchandise == null) {
+            return 0;
+        }
+
+        int originalPrice = merchandise.getPrice();
+        int discountedPrice = originalPrice - (originalPrice * discountRate / 100);
+
+        // 商品の価格を更新（割引適用）
+        PreparedStatement st = connection.prepareStatement(
+            "UPDATE T002_merchandise SET T002_FD2_merchandise = ? WHERE T002_PK1_merchandise = ?");
+        st.setInt(1, discountedPrice);
+        st.setInt(2, merchandiseId);
+
+        int line = st.executeUpdate();
+        st.close();
+
+        return line;
+    }
+
+    /**
+     * 店舗の全商品に割引を適用
+     * @param storeId 店舗ID
+     * @param discountTime 割引開始時間
+     * @param discountRate 割引率
+     * @return 更新行数
+     */
+    public int updateDiscountByStore(int storeId, int discountTime, int discountRate) throws Exception {
+        PreparedStatement st = connection.prepareStatement(
+            "UPDATE T002_merchandise " +
+            "SET T002_FD2_merchandise = T002_FD2_merchandise - (T002_FD2_merchandise * ? / 100) " +
+            "WHERE T002_FD8_merchandise = ?");
+        st.setInt(1, discountRate);
+        st.setInt(2, storeId);
+
+        int line = st.executeUpdate();
+        st.close();
+        return line;
+    }
 }
