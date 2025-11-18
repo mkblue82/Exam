@@ -136,7 +136,7 @@
                     割引設定が完了しました。
                 </div>
 
-                <form id="discountForm" method="post" action="${pageContext.request.contextPath}/foodloss/DiscountSetting.action">
+                <form id="discountForm" method="post" action="${pageContext.request.contextPath}/DiscountSettingServlet">
                     <!-- 時間入力 -->
                     <div class="form-group">
                         <div class="form-row">
@@ -146,7 +146,7 @@
                                        id="time"
                                        name="time"
                                        min="0"
-
+                                       max="23"
                                        placeholder="例: 18"
                                        required>
                                 <span class="unit">時</span>
@@ -165,6 +165,7 @@
                                        name="discount"
                                        min="1"
                                        max="100"
+                                       placeholder="例: 30"
                                        required>
                                 <span class="unit">%</span>
                             </div>
@@ -178,7 +179,7 @@
             </div>
         </div>
     </main>
-
+</div>
 
 <!-- JS -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
