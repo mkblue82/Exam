@@ -143,9 +143,9 @@
                                     <td><%= m.getRegistrationTime() %></td>
                                     <td>
                                         <a class="btn"
-                                           href="${pageContext.request.contextPath}/product_edit?id=<%= m.getMerchandiseId() %>">
-                                           編集
-                                        </a>
+										   href="${pageContext.request.contextPath}/foodloss/MerchandiseEdit.action?id=<%= m.getMerchandiseId() %>">
+										   編集
+										</a>
                                     </td>
                                 </tr>
                             <% } %>

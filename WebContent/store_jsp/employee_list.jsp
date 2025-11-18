@@ -95,6 +95,19 @@
             background-color: #a65d36;
             color: #fff;
         }
+        .btn {
+		    display: inline-block;
+		    padding: 8px 25px;
+		    background-color: #c07148;
+		    color: white;
+		    border-radius: 8px;
+		    text-decoration: none;
+		    transition: 0.3s;
+		}
+		.btn:hover {
+		    background-color: #c77c4a;
+		}
+
     </style>
 </head>
 <body>
@@ -134,8 +147,8 @@
                                     <td><%= emp.getEmployeeCode() %></td>
                                     <td><%= emp.getEmployeeName() %></td>
                                     <td>
-                                        <a href="${pageContext.request.contextPath}/foodloss/EmployeeEdit.action?id=<%= emp.getId() %>">編集</a>
-                                    </td>
+									    <a class="btn" href="${pageContext.request.contextPath}/foodloss/EmployeeEdit.action?id=<%= emp.getId() %>">編集</a>
+									</td>
                                 </tr>
                             <% } %>
                         </tbody>
