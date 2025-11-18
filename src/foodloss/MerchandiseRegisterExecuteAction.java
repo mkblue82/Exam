@@ -192,7 +192,7 @@ public class MerchandiseRegisterExecuteAction extends Action {
                 System.out.println("★ 画像アップロード開始");
                 System.out.println("★ ファイル名: " + imageFile.getName());
                 System.out.println("★ ファイルサイズ: " + imageFile.getSize() + " bytes");
-//sd
+//sｋd
                 InputStream inputStream = imageFile.getInputStream();
                 byte[] imageData = new byte[(int) imageFile.getSize()];
                 int bytesRead = inputStream.read(imageData);
