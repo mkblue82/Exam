@@ -123,4 +123,22 @@ public class UserDAO {
         }
         return null;
     }
+    public User findByEmail(String email) throws SQLException {
+        String sql = "SELECT * FROM t004_user WHERE t004_fd2_user = ?";
+        try (PreparedStatement pstmt = con.prepareStatement(sql)) {
+            pstmt.setString(1, email);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                User user = new User();
+                user.setUserId(rs.getInt("t004_pk1_user"));
+                user.setName(rs.getString("t004_fd1_user"));
+                user.setEmail(rs.getString("t004_fd2_user"));
+                user.setPhone(rs.getString("t004_fd3_user"));
+                user.setPassword(rs.getString("t004_fd4_user"));
+                return user;
+            }
+        }
+        return null;
+    }
+
 }

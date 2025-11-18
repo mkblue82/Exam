@@ -1,7 +1,7 @@
 package foodloss;
 
+import java.security.MessageDigest;
 import java.sql.Connection;
-import java.sql.SQLException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -10,66 +10,97 @@ import javax.servlet.http.HttpSession;
 import bean.User;
 import dao.UserDAO;
 import tool.Action;
+import tool.DBManager;
 
 public class EditInfoExecuteAction extends Action {
 
     @Override
-    public String execute(HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public void execute(HttpServletRequest request, HttpServletResponse response) throws Exception {
         request.setCharacterEncoding("UTF-8");
         HttpSession session = request.getSession();
 
-        // セッションからログイン中のユーザー情報を取得
         User loginUser = (User) session.getAttribute("user");
         if (loginUser == null) {
-            return "login.jsp"; // 未ログイン時はログイン画面へ
+            request.getRequestDispatcher("login.jsp").forward(request, response);
+            return;
         }
 
-        // フォーム入力の取得（対象：氏名・メールアドレス・パスワード）
         String name = request.getParameter("name");
         String email = request.getParameter("email");
         String password = request.getParameter("password");
 
-        // 入力チェック
-        if (name == null || email == null || password == null ||
-            name.isEmpty() || email.isEmpty() || password.isEmpty()) {
-            request.setAttribute("error", "すべての項目を入力してください。");
-            return "/jsp/edit_info.jsp";
+        // 入力なし
+        if ((name == null || name.isEmpty()) &&
+            (email == null || email.isEmpty()) &&
+            (password == null || password.isEmpty())) {
+
+            request.setAttribute("error", "変更する内容がありません。");
+            request.getRequestDispatcher("/jsp/edit_info_user.jsp").forward(request, response);
+            return;
         }
 
         Connection con = null;
         try {
-            con = DBManager.getConnection();
+            DBManager dbm = new DBManager();
+            con = dbm.getConnection();
             UserDAO dao = new UserDAO(con);
 
-            // DB登録済みのユーザー情報を取得（更新のため最新状態に）
             User dbUser = dao.findById(loginUser.getUserId());
             if (dbUser == null) {
                 request.setAttribute("error", "ユーザー情報が見つかりません。");
-                return "/jsp/edit_info.jsp";
+                request.getRequestDispatcher("/jsp/edit_info_user.jsp").forward(request, response);
+                return;
             }
 
-            // 更新する項目だけ上書き
-            dbUser.setName(name);
-            dbUser.setEmail(email);
-            dbUser.setPassword(password);
+            // --- 名前更新 ---
+            if (name != null && !name.isEmpty()) {
+                dbUser.setName(name);
+            }
 
-            dao.update(dbUser); // DB更新実行
+            // --- メールアドレス重複チェック ---
+            if (email != null && !email.isEmpty()) {
 
-            // セッションのユーザー情報も更新
+                User exist = dao.findByEmail(email);
+
+                // 自分以外に使っているユーザーがいたらNG
+                if (exist != null && exist.getUserId() != loginUser.getUserId()) {
+                    request.setAttribute("error", "このメールアドレスはすでに使用されています。");
+                    request.getRequestDispatcher("/jsp/edit_info_user.jsp").forward(request, response);
+                    return;
+                }
+
+                dbUser.setEmail(email);
+            }
+
+            // --- パスワードハッシュ化して更新 ---
+            if (password != null && !password.isEmpty()) {
+                dbUser.setPassword(hashPassword(password));
+            }
+
+            // DB更新
+            dao.update(dbUser);
+
+            // セッション更新
             session.setAttribute("user", dbUser);
 
-            // 完了メッセージを設定して結果画面へ
+            // 完了画面へ
             request.setAttribute("message", "ユーザー情報を更新しました。");
-            return "/jsp/edit_info_result.jsp";
+            request.getRequestDispatcher("/jsp/edit_info_result_user.jsp").forward(request, response);
 
-        } catch (SQLException e) {
-            e.printStackTrace();
-            request.setAttribute("error", "更新中にエラーが発生しました。");
-            return "/jsp/edit_info.jsp";
         } finally {
-            if (con != null) {
-                try { con.close(); } catch (SQLException ignore) {}
-            }
+            if (con != null) con.close();
         }
+    }
+
+    // ★ SHA-256 ハッシュ化メソッド
+    private String hashPassword(String password) throws Exception {
+        MessageDigest md = MessageDigest.getInstance("SHA-256");
+        byte[] bytes = md.digest(password.getBytes("UTF-8"));
+
+        StringBuilder sb = new StringBuilder();
+        for (byte b : bytes) {
+            sb.append(String.format("%02x", b));
+        }
+        return sb.toString();
     }
 }
