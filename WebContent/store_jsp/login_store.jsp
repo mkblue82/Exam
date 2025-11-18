@@ -184,6 +184,7 @@
                        aria-required="true">
             </div>
 
+
             <button type="submit" class="btn-login">ログイン</button>
             <button type="button" class="btn-register"
                     onclick="location.href='${pageContext.request.contextPath}/foodloss/SignupStore.action'">

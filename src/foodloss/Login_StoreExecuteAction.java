@@ -46,6 +46,7 @@ public class Login_StoreExecuteAction extends Action {
         StoreDAO dao = new StoreDAO(db.getConnection());
 
 
+
         Store store = dao.login(storeId, hashedPassword);
 
         if (store != null) {
