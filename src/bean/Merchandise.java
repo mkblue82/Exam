@@ -4,6 +4,8 @@ import java.sql.Date;
 import java.sql.Timestamp;
 
 public class Merchandise implements java.io.Serializable {
+
+    // 既存のフィールド（そのまま）
     private int merchandiseId;
     private int stock;
     private int price;
@@ -15,104 +17,142 @@ public class Merchandise implements java.io.Serializable {
     private int storeId;
     private boolean bookingStatus;
 
-    // コンストラクタ
-    public Merchandise(){
-        ;
-    }
+    // ========== 追加: 割引関連フィールド ==========
+    private Integer originalPrice;      // 元の価格（割引前）
+    private int discountPercent;        // 割引率（0-100）
+    private Integer discountStartTime;  // 割引開始時刻（0-23、null可）
 
-    public Merchandise(int merchandiseId, int stock, int price, Date useByDate,
-            String merchandiseTag, String merchandiseName, int employeeId, Timestamp registrationTime,
-            int storeId, boolean bookingStatus){
-        this.merchandiseId = merchandiseId;
-        this.stock = stock;
-        this.price = price;
-        this.useByDate = useByDate;
-        this.merchandiseTag = merchandiseTag;
-        this.merchandiseName = merchandiseName;
-        this.employeeId = employeeId;
-        this.registrationTime = registrationTime;
-        this.storeId = storeId;
-        this.bookingStatus = bookingStatus;
-    }
 
-    // 商品IDのゲッター・セッター
-    public int getMerchandiseId(){
+    // ========== 既存のgetter/setter（そのまま） ==========
+
+    public int getMerchandiseId() {
         return merchandiseId;
     }
-    public void setMerchandiseId(int merchandiseId){
 
+    public void setMerchandiseId(int merchandiseId) {
         this.merchandiseId = merchandiseId;
     }
 
-    // 在庫数のゲッター・セッター
-    public int getStock(){
+    public int getStock() {
         return stock;
     }
-    public void setStock(int stock){
+
+    public void setStock(int stock) {
         this.stock = stock;
     }
 
-    // 価格のゲッター・セッター
-    public int getPrice(){
+    public int getPrice() {
         return price;
     }
-    public void setPrice(int price){
+
+    public void setPrice(int price) {
         this.price = price;
     }
 
-    // 消費期限のゲッター・セッター
-    public Date getUseByDate(){
+    public Date getUseByDate() {
         return useByDate;
     }
-    public void setUseByDate(Date useByDate){
+
+    public void setUseByDate(Date useByDate) {
         this.useByDate = useByDate;
     }
 
-    // タグのゲッター・セッター
-    public String getMerchandiseTag(){
+    public String getMerchandiseTag() {
         return merchandiseTag;
     }
-    public void setMerchandiseTag(String merchandiseTag){
+
+    public void setMerchandiseTag(String merchandiseTag) {
         this.merchandiseTag = merchandiseTag;
     }
 
-    // 商品名のゲッター・セッター
-    public String getMerchandiseName(){
+    public String getMerchandiseName() {
         return merchandiseName;
     }
-    public void setMerchandiseName(String merchandiseName){
+
+    public void setMerchandiseName(String merchandiseName) {
         this.merchandiseName = merchandiseName;
     }
 
-    // 社員番号のゲッター・セッター
-    public int getEmployeeId(){
+    public int getEmployeeId() {
         return employeeId;
     }
-    public void setEmployeeId(int employeeId){
+
+    public void setEmployeeId(int employeeId) {
         this.employeeId = employeeId;
     }
 
-    // 登録時刻のゲッター・セッター
-    public Timestamp getRegistrationTime(){
+    public Timestamp getRegistrationTime() {
         return registrationTime;
     }
-    public void setRegistrationTime(Timestamp registrationTime){
+
+    public void setRegistrationTime(Timestamp registrationTime) {
         this.registrationTime = registrationTime;
     }
 
-    // 店舗IDのゲッター・セッター
-    public int getStoreId(){
+    public int getStoreId() {
         return storeId;
     }
-    public void setStoreId(int storeId){
+
+    public void setStoreId(int storeId) {
         this.storeId = storeId;
     }
 
-    // 予約ステータスのゲッター・セッター
-    public boolean getBookingStatus(){
+    public boolean getBookingStatus() {
         return bookingStatus;
     }
-    public void setBookingStatus(boolean bookingStatus){
+
+    public void setBookingStatus(boolean bookingStatus) {
         this.bookingStatus = bookingStatus;
+    }
+
+
+    // ========== 追加: 割引関連のgetter/setter ==========
+
+    /**
+     * 元の価格を取得
+     * @return 元の価格（割引前の価格）
+     */
+    public Integer getOriginalPrice() {
+        return originalPrice;
+    }
+
+    /**
+     * 元の価格を設定
+     * @param originalPrice 元の価格
+     */
+    public void setOriginalPrice(Integer originalPrice) {
+        this.originalPrice = originalPrice;
+    }
+
+    /**
+     * 割引率を取得
+     * @return 割引率（0-100）
+     */
+    public int getDiscountPercent() {
+        return discountPercent;
+    }
+
+    /**
+     * 割引率を設定
+     * @param discountPercent 割引率（0-100）
+     */
+    public void setDiscountPercent(int discountPercent) {
+        this.discountPercent = discountPercent;
+    }
+
+    /**
+     * 割引開始時刻を取得
+     * @return 割引開始時刻（0-23、設定なしの場合null）
+     */
+    public Integer getDiscountStartTime() {
+        return discountStartTime;
+    }
+
+    /**
+     * 割引開始時刻を設定
+     * @param discountStartTime 割引開始時刻（0-23）
+     */
+    public void setDiscountStartTime(Integer discountStartTime) {
+        this.discountStartTime = discountStartTime;
     }
 }
