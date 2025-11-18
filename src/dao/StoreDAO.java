@@ -50,31 +50,27 @@ public class StoreDAO {
         return null;
     }
 
-    // 店舗を登録
-    public void insert(Store store) throws SQLException {
-        // T001_FD9_store を削除
-        String sql = "INSERT INTO T001_store " +
-                      "(T001_FD1_store, T001_FD2_store, T001_FD3_store, T001_FD4_store, " +
-                      "T001_FD5_store, T001_FD6_store, T001_FD7_store, T001_FD8_store) " +
-                      "VALUES (?, ?, ?, ?, ?, ?, ?, ?) RETURNING T001_PK1_store"; // プレースホルダーを8つに減らす
+	 // 店舗を登録
+	 public void insert(Store store) throws SQLException {
+	     String sql = "INSERT INTO T001_store " +
+	                  "(T001_FD1_store, T001_FD2_store, T001_FD3_store, T001_FD4_store, T001_FD7_store, T001_FD8_store) " +
+	                  "VALUES (?, ?, ?, ?, ?, ?) RETURNING T001_PK1_store";
 
-        try (PreparedStatement pstmt = con.prepareStatement(sql)) {
-            pstmt.setString(1, store.getStoreName());
-            pstmt.setString(2, store.getAddress());
-            pstmt.setString(3, store.getPhone());
-            pstmt.setString(4, store.getPassword());
-            pstmt.setTime(5, store.getDiscountTime());
-            pstmt.setInt(6, store.getDiscountRate());
-            pstmt.setString(7, store.getEmail());
-            pstmt.setBytes(8, store.getLicense()); // 8番目の引数
+	     try (PreparedStatement pstmt = con.prepareStatement(sql)) {
+	         pstmt.setString(1, store.getStoreName());   // 店舗名
+	         pstmt.setString(2, store.getAddress());     // 住所
+	         pstmt.setString(3, store.getPhone());       // 電話番号
+	         pstmt.setString(4, store.getPassword());    // パスワード
+	         pstmt.setString(5, store.getEmail());       // メールアドレス
+	         pstmt.setBytes(6, store.getLicense());      // 営業許可証 (bytea)
 
-            try (ResultSet rs = pstmt.executeQuery()) {
-                if (rs.next()) {
-                    store.setStoreId(rs.getInt(1));
-                }
-            }
-        }
-    }
+	         try (ResultSet rs = pstmt.executeQuery()) {
+	             if (rs.next()) {
+	                 store.setStoreId(rs.getInt(1));    // 生成されたPKをセット
+	             }
+	         }
+	     }
+	 }
 
     // 店舗を更新
     public void update(Store store) throws SQLException {
