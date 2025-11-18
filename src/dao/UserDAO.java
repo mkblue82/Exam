@@ -123,6 +123,7 @@ public class UserDAO {
         }
         return null;
     }
+
     public User findByEmail(String email) throws SQLException {
         String sql = "SELECT * FROM t004_user WHERE t004_fd2_user = ?";
         try (PreparedStatement pstmt = con.prepareStatement(sql)) {
