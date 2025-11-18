@@ -124,8 +124,6 @@
                                 <th>ID</th>
                                 <th>社員コード</th>
                                 <th>氏名</th>
-                                <th>店舗コード</th>
-                                <th>店舗名</th>
                                 <th>編集</th>
                             </tr>
                         </thead>
@@ -135,13 +133,8 @@
                                     <td><%= emp.getId() %></td>
                                     <td><%= emp.getEmployeeCode() %></td>
                                     <td><%= emp.getEmployeeName() %></td>
-                                    <td><%= emp.getStoreCode() %></td>
-                                    <td><%= emp.getStoreName() %></td>
                                     <td>
-                                        <a class="btn"
-                                           href="${pageContext.request.contextPath}/employee_edit?id=<%= emp.getId() %>">
-                                           編集
-                                        </a>
+                                        <a href="${pageContext.request.contextPath}/foodloss/EmployeeEdit.action?id=<%= emp.getId() %>">編集</a>
                                     </td>
                                 </tr>
                             <% } %>
