@@ -19,13 +19,14 @@ public class UserDAO {
 
     // ユーザー登録
     public void insert(User user) throws SQLException {
-        String sql = "INSERT INTO t004_user (t004_fd1_user, t004_fd2_user, t004_fd3_user, t004_fd4_user) "
-                   + "VALUES (?, ?, ?, ?) RETURNING t004_pk1_user";
+        String sql = "INSERT INTO t004_user (t004_fd1_user, t004_fd2_user, t004_fd3_user, t004_fd4_user, t004_fd5_user) "
+                   + "VALUES (?, ?, ?, ?, ?) RETURNING t004_pk1_user";
         try (PreparedStatement pstmt = con.prepareStatement(sql)) {
             pstmt.setString(1, user.getName());
             pstmt.setString(2, user.getEmail());
             pstmt.setString(3, user.getPhone());
             pstmt.setString(4, user.getPassword());
+            pstmt.setInt(5, user.getPoint()); // ポイント追加
 
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()){
@@ -48,6 +49,7 @@ public class UserDAO {
                 user.setEmail(rs.getString("t004_fd2_user"));
                 user.setPhone(rs.getString("t004_fd3_user"));
                 user.setPassword(rs.getString("t004_fd4_user"));
+                user.setPoint(rs.getInt("t004_fd5_user")); // ポイント追加
                 list.add(user);
             }
         }
@@ -67,6 +69,7 @@ public class UserDAO {
 	                user.setEmail(rs.getString("t004_fd2_user"));
 	                user.setPhone(rs.getString("t004_fd3_user"));
 	                user.setPassword(rs.getString("t004_fd4_user"));
+	                user.setPoint(rs.getInt("t004_fd5_user")); // ポイント追加
 	                return user;
 	            }
             }
@@ -76,14 +79,15 @@ public class UserDAO {
 
     // 更新
     public void update(User user) throws SQLException {
-        String sql = "UPDATE t004_user SET t004_fd1_user=?, t004_fd2_user=?, t004_fd3_user=?, t004_fd4_user=? "
+        String sql = "UPDATE t004_user SET t004_fd1_user=?, t004_fd2_user=?, t004_fd3_user=?, t004_fd4_user=?, t004_fd5_user=? "
                    + "WHERE t004_pk1_user=?";
         try (PreparedStatement pstmt = con.prepareStatement(sql)) {
             pstmt.setString(1, user.getName());
             pstmt.setString(2, user.getEmail());
             pstmt.setString(3, user.getPhone());
             pstmt.setString(4, user.getPassword());
-            pstmt.setInt(5, user.getUserId());
+            pstmt.setInt(5, user.getPoint()); // ポイント追加
+            pstmt.setInt(6, user.getUserId());
             pstmt.executeUpdate();
         }
     }
@@ -115,6 +119,7 @@ public class UserDAO {
                     user.setEmail(rs.getString("t004_fd2_user"));
                     user.setPhone(rs.getString("t004_fd3_user"));
                     user.setPassword(rs.getString("t004_fd4_user"));
+                    user.setPoint(rs.getInt("t004_fd5_user")); // ポイント追加
                     return user;
                 } else {
                     System.out.println("DEBUG: No user found for email=" + email);
@@ -136,10 +141,20 @@ public class UserDAO {
                 user.setEmail(rs.getString("t004_fd2_user"));
                 user.setPhone(rs.getString("t004_fd3_user"));
                 user.setPassword(rs.getString("t004_fd4_user"));
+                user.setPoint(rs.getInt("t004_fd5_user")); // ポイント追加
                 return user;
             }
         }
         return null;
     }
 
+    // ポイント更新用メソッド
+    public void updatePoint(int userId, int point) throws SQLException {
+        String sql = "UPDATE t004_user SET t004_fd5_user = t004_fd5_user + ? WHERE t004_pk1_user = ?";
+        try (PreparedStatement pstmt = con.prepareStatement(sql)) {
+            pstmt.setInt(1, point);
+            pstmt.setInt(2, userId);
+            pstmt.executeUpdate();
+        }
+    }
 }
