@@ -86,6 +86,7 @@
     <!-- ✅ 共通ヘッダー -->
     <jsp:include page="header_user.jsp" />
 
+
     <!-- ✅ メインエリア -->
     <main class="column">
         <div class="main-contents">
