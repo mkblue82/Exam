@@ -12,6 +12,7 @@ import dao.UserDAO;
 import tool.Action;
 import tool.DBManager;
 
+
 public class EditInfoExecuteAction extends Action {
 
     @Override
@@ -21,7 +22,7 @@ public class EditInfoExecuteAction extends Action {
 
         User loginUser = (User) session.getAttribute("user");
         if (loginUser == null) {
-            request.getRequestDispatcher("login.jsp").forward(request, response);
+            request.getRequestDispatcher("/login.jsp").forward(request, response);
             return;
         }
 
@@ -29,11 +30,9 @@ public class EditInfoExecuteAction extends Action {
         String email = request.getParameter("email");
         String password = request.getParameter("password");
 
-        // 入力なし
         if ((name == null || name.isEmpty()) &&
             (email == null || email.isEmpty()) &&
             (password == null || password.isEmpty())) {
-
             request.setAttribute("error", "変更する内容がありません。");
             request.getRequestDispatcher("/jsp/edit_info_user.jsp").forward(request, response);
             return;
@@ -41,8 +40,7 @@ public class EditInfoExecuteAction extends Action {
 
         Connection con = null;
         try {
-            DBManager dbm = new DBManager();
-            con = dbm.getConnection();
+            con = new DBManager().getConnection();
             UserDAO dao = new UserDAO(con);
 
             User dbUser = dao.findById(loginUser.getUserId());
@@ -57,19 +55,16 @@ public class EditInfoExecuteAction extends Action {
                 dbUser.setName(name);
             }
 
-            // --- メールアドレス重複チェック ---
+            // --- メール重複チェック ---
             if (email != null && !email.isEmpty()) {
-
                 User exist = dao.findByEmail(email);
-
-                // 自分以外に使っているユーザーがいたらNG
                 if (exist != null && exist.getUserId() != loginUser.getUserId()) {
-                    request.setAttribute("error", "このメールアドレスはすでに使用されています。");
+                    // 他ユーザーが使っている場合はエラー
+                    request.setAttribute("error", "このメールアドレスは既に使用されています。");
                     request.getRequestDispatcher("/jsp/edit_info_user.jsp").forward(request, response);
                     return;
                 }
-
-                dbUser.setEmail(email);
+                dbUser.setEmail(email); // 自分用の場合は更新
             }
 
             // --- パスワードハッシュ化して更新 ---
@@ -92,11 +87,10 @@ public class EditInfoExecuteAction extends Action {
         }
     }
 
-    // ★ SHA-256 ハッシュ化メソッド
+    // SHA-256 ハッシュ化
     private String hashPassword(String password) throws Exception {
         MessageDigest md = MessageDigest.getInstance("SHA-256");
         byte[] bytes = md.digest(password.getBytes("UTF-8"));
-
         StringBuilder sb = new StringBuilder();
         for (byte b : bytes) {
             sb.append(String.format("%02x", b));

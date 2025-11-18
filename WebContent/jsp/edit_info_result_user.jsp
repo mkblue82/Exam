@@ -73,7 +73,7 @@
 
         <div class="button-group">
           <a href="${pageContext.request.contextPath}/jsp/mypage.jsp">マイページに戻る</a>
-          <a href="${pageContext.request.contextPath}/jsp/main.jsp">トップページへ</a>
+          <a href="${pageContext.request.contextPath}/jsp/main_user.jsp">トップページへ</a>
         </div>
       </div>
     </div>
