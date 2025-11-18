@@ -1,6 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
-
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -118,8 +117,6 @@
             background: #b56c3a;
         }
 
-
-
         .btn-register {
             background: #fff;
             color: #c77c4a;
@@ -150,59 +147,63 @@
     </style>
 </head>
 <body>
-    <div class="login-wrapper">
-        <div class="login-container">
-            <div class="login-header">
-                <h1>店舗ログイン</h1>
+<div class="login-wrapper">
+    <div class="login-container">
+        <div class="login-header">
+            <h1>店舗ログイン</h1>
+        </div>
+
+        <%-- エラーメッセージ表示 --%>
+        <% if (request.getAttribute("error") != null) { %>
+            <div class="error-message">
+                <%= request.getAttribute("error") %>
+            </div>
+        <% } %>
+
+        <form action="${pageContext.request.contextPath}/foodloss/Login_StoreExecute.action" method="post" id="loginForm">
+            <input type="hidden" name="csrfToken" value="${sessionScope.csrfToken}">
+
+            <div class="form-group">
+                <label for="storeId">店舗ID</label>
+                <input type="text"
+                       id="storeId"
+                       name="storeId"
+                       required
+                       aria-required="true"
+                       value="${param.storeId != null ? param.storeId : ''}">
             </div>
 
-
-            <form action="${pageContext.request.contextPath}/foodloss/Login_StoreExecute.action" method="post" id="loginForm">
-                <input type="hidden" name="csrfToken" value="${sessionScope.csrfToken}">
-
-                <div class="form-group">
-                    <label for="storeId">店舗ID</label>
-                    <input type="text"
-                           id="storeId"
-                           name="storeId"
-                           required
-                           aria-required="true"
-                           value="${storeId}">
-                </div>
-
-                <div class="form-group">
-                    <label for="password">パスワード</label>
-                    <input type="password"
-                           id="password"
-                           name="password"
-                           required
-                           minlength="8"
-                           autocomplete="current-password"
-                           aria-required="true">
-                </div>
-
-                <button type="submit" class="btn-login">ログイン</button>
-				<button type="button" class="btn-register"
-				        onclick="location.href='${pageContext.request.contextPath}/foodloss/SignupStore.action'">
-				    新規登録
-				</button>
-            </form>
-
-            <div class="user-login-link">
-                <a href="${pageContext.request.contextPath}/jsp/login_user.jsp">ユーザーログインはこちら</a>
+            <div class="form-group">
+                <label for="password">パスワード</label>
+                <input type="password"
+                       id="password"
+                       name="password"
+                       required
+                       minlength="8"
+                       autocomplete="current-password"
+                       aria-required="true">
             </div>
+
+            <button type="submit" class="btn-login">ログイン</button>
+            <button type="button" class="btn-register"
+                    onclick="location.href='${pageContext.request.contextPath}/foodloss/SignupStore.action'">
+                新規登録
+            </button>
+        </form>
+
+        <div class="user-login-link">
+            <a href="${pageContext.request.contextPath}/jsp/login_user.jsp">ユーザーログインはこちら</a>
         </div>
     </div>
+</div>
 
+<jsp:include page="../jsp/footer.jsp" />
 
-
-    <jsp:include page="../jsp/footer.jsp" />
-
- <!-- JS -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
-    <script src="../js/slick.js"></script>
-    <script src="../js/main.js"></script>
-    <script src="${pageContext.request.contextPath}/js/validation.js"></script>
+<!-- JS -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
+<script src="../js/slick.js"></script>
+<script src="../js/main.js"></script>
+<script src="${pageContext.request.contextPath}/js/validation.js"></script>
 </body>
 </html>
