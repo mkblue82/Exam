@@ -403,7 +403,6 @@ public class MerchandiseDAO {
 
         int originalPrice = merchandise.getPrice();
         int discountedPrice = originalPrice - (originalPrice * discountRate / 100);
-
         // 商品の価格を更新（割引適用）
         PreparedStatement st = connection.prepareStatement(
             "UPDATE T002_merchandise SET T002_FD2_merchandise = ? WHERE T002_PK1_merchandise = ?");
