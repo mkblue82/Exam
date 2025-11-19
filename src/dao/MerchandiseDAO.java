@@ -436,4 +436,43 @@ public class MerchandiseDAO {
         return line;
     }
 
+ // 店舗IDで商品一覧を取得
+ // 下のメソッド（後から追加した方）
+    public List<Merchandise> selectByStoreId2(int storeId) throws Exception {
+        List<Merchandise> list = new ArrayList<>();
+
+        PreparedStatement st = connection.prepareStatement(
+            "select T002_PK1_merchandise, T002_FD1_merchandise, " +
+            "T002_FD2_merchandise, T002_FD3_merchandise, T002_FD4_merchandise, " +
+            "T002_FD5_merchandise, T002_FD6_merchandise, T002_FD7_merchandise, " +
+            "T002_FD8_merchandise, T002_FD9_merchandise " +
+            "from T002_merchandise " +
+            "where T002_FD8_merchandise = ? " +
+            "order by T002_PK1_merchandise"
+        );
+
+        st.setInt(1, storeId);
+        ResultSet rs = st.executeQuery();
+
+        while (rs.next()) {
+            Merchandise m = new Merchandise();
+            m.setMerchandiseId(rs.getInt(1));
+            m.setStock(rs.getInt(2));
+            m.setPrice(rs.getInt(3));
+            m.setUseByDate(rs.getDate(4));
+            m.setMerchandiseTag(rs.getString(5));
+            m.setMerchandiseName(rs.getString(6));
+            m.setEmployeeId(rs.getInt(7));
+            m.setRegistrationTime(rs.getTimestamp(8));
+            m.setStoreId(rs.getInt(9));
+            m.setBookingStatus(rs.getBoolean(10));
+            list.add(m);
+        }
+
+        st.close();
+        return list;
+    }
+
+
+
 }
