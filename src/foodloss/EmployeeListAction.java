@@ -20,7 +20,7 @@ public class EmployeeListAction extends Action {
 
         // ★ ログインチェック（storeCodeがない場合はログインページにリダイレクト）
         if (session == null || session.getAttribute("storeCode") == null) {
-            res.sendRedirect(req.getContextPath() + "/login_store.jsp");
+            res.sendRedirect(req.getContextPath() + "/store_jsp/login_store.jsp");
             return;
         }
 

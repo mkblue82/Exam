@@ -1,12 +1,21 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="bean.Merchandise" %>
+<%@ page import="bean.MerchandiseImage" %>
+<%@ page import="dao.MerchandiseImageDAO" %>
+<%@ page import="tool.DBManager" %>
+<%@ page import="java.util.List" %>
+<%@ page import="java.util.Base64" %>
 
 <%
     Merchandise m = (Merchandise) request.getAttribute("merchandise");
+    String useByDateStr = (m.getUseByDate() != null) ? m.getUseByDate().toString() : "";
 
-    String useByDateStr = "";
-    if (m.getUseByDate() != null) {
-        useByDateStr = m.getUseByDate().toString();
+    List<MerchandiseImage> images = null;
+    try {
+        MerchandiseImageDAO imageDao = new MerchandiseImageDAO(new DBManager().getConnection());
+        images = imageDao.selectByMerchandiseId(m.getMerchandiseId());
+    } catch (Exception e) {
+        e.printStackTrace();
     }
 %>
 
@@ -64,7 +73,8 @@
         }
         .form-group input[type="text"],
         .form-group input[type="number"],
-        .form-group input[type="date"] {
+        .form-group input[type="date"],
+        .form-group input[type="file"] {
             width: 100%;
             padding: 0.8rem;
             border: 2px solid #ddd;
@@ -116,12 +126,13 @@
                 <h1>商品情報編集</h1>
             </div>
 
-            <form action="${pageContext.request.contextPath}/foodloss/MerchandiseEdit.action" method="post">
+            <form action="${pageContext.request.contextPath}/foodloss/MerchandiseEdit.action" method="post" enctype="multipart/form-data">
                 <input type="hidden" name="merchandiseId" value="<%= m.getMerchandiseId() %>">
 
                 <div class="form-group">
                     <label for="merchandiseName">商品名</label>
-                    <input type="text" id="merchandiseName" name="merchandiseName" value="<%= m.getMerchandiseName() %>" required>
+                    <input type="text" id="merchandiseName" name="merchandiseName"
+                           value="<%= m.getMerchandiseName() %>" required>
                 </div>
 
                 <div class="form-group">
@@ -137,6 +148,35 @@
                 <div class="form-group">
                     <label for="useByDate">消費期限</label>
                     <input type="date" id="useByDate" name="useByDate" value="<%= useByDateStr %>" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="employeeId">担当社員番号</label>
+                    <input type="number" id="employeeId" name="employeeId"
+                           value="<%= m.getEmployeeId() %>" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="merchandiseTag">タグ</label>
+                    <input type="text" id="merchandiseTag" name="merchandiseTag"
+                           value="<%= m.getMerchandiseTag() %>">
+                </div>
+
+                <div class="form-group">
+                    <label>現在の画像</label><br>
+                    <% if (images != null && !images.isEmpty() && images.get(0).getImageData() != null) {
+					    String base64 = Base64.getEncoder().encodeToString(images.get(0).getImageData());
+					%>
+					    <img src="data:image/jpeg;base64,<%= base64 %>"
+					         alt="商品画像" style="max-width:120px; max-height:120px;">
+					<% } else { %>
+					    <p>画像なし</p>
+					<% } %>
+                </div>
+
+                <div class="form-group">
+                    <label for="imageFile">画像を変更</label>
+                    <input type="file" id="imageFile" name="imageFile">
                 </div>
 
                 <button type="submit" class="btn-update">更新する</button>
