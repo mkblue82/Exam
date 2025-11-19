@@ -1,4 +1,4 @@
-package action;
+package foodloss;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
