@@ -358,7 +358,7 @@ public class MerchandiseDAO {
         return list;
     }
 
-    // 同一店舗内で同じ商品名が存在するか確認
+    // 同一店舗内で同じ商品名が存在する確認
     public boolean isDuplicateMerchandise(int storeId, String merchandiseName) throws Exception {
         PreparedStatement st = connection.prepareStatement(
             "SELECT COUNT(*) FROM T002_merchandise WHERE T002_FD8_merchandise = ? AND T002_FD5_merchandise = ?");
