@@ -143,9 +143,9 @@
                                     <td><%= m.getRegistrationTime() %></td>
                                     <td>
                                         <a class="btn"
-                                           href="${pageContext.request.contextPath}/product_edit?id=<%= m.getMerchandiseId() %>">
-                                           編集
-                                        </a>
+										   href="${pageContext.request.contextPath}/foodloss/MerchandiseEdit.action?id=<%= m.getMerchandiseId() %>">
+										   編集
+										</a>
                                     </td>
                                 </tr>
                             <% } %>
@@ -157,12 +157,13 @@
                         登録された商品はありません。
                     </p>
                 <% } %>
-
-                <!-- ▼ 戻る・商品登録ボタン -->
-                <div class="back-button">
-                    <a href="${pageContext.request.contextPath}/store_jsp/main_store.jsp">メインメニューへ戻る</a>
-                    <a href="${pageContext.request.contextPath}/store_jsp/merchandise_register_store.jsp">商品登録</a>
-                </div>
+<!-- ん」 -->
+               <!-- ▼ 戻る・商品登録・割引設定ボタン -->
+					<div class="back-button">
+					    <a href="${pageContext.request.contextPath}/store_jsp/main_store.jsp">メインメニューへ戻る</a>
+					    <a href="${pageContext.request.contextPath}/store_jsp/merchandise_register_store.jsp">商品登録</a>
+					    <a href="${pageContext.request.contextPath}/store_jsp/discount_setting.jsp">割引設定</a>
+					</div>
 
             </div>
         </div>

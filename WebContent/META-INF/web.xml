@@ -59,6 +59,14 @@
     <servlet-name>MerchandiseRegisterAction</servlet-name>
     <url-pattern>/MerchandiseRegister.action</url-pattern>
 </servlet-mapping>
+<servlet>
+    <servlet-name>DiscountSettingAction</servlet-name>
+    <servlet-class>foodloss.DiscountSettingAction</servlet-class>
+</servlet>
+<servlet-mapping>
+    <servlet-name>DiscountSettingAction</servlet-name>
+    <url-pattern>/DiscountSetting.action</url-pattern>
+</servlet-mapping>
     <welcome-file-list>
         <welcome-file>index.jsp</welcome-file>
     </welcome-file-list>

@@ -14,16 +14,17 @@ import tool.Action;
 public class EmployeeListAction extends Action {
 
     @Override
-    public void execute(HttpServletRequest req, HttpServletResponse res)
-            throws Exception {
+    public void execute(HttpServletRequest req, HttpServletResponse res) throws Exception {
 
         HttpSession session = req.getSession(false);
-        String storeCode = null;
 
-        if (session != null) {
-            storeCode = (String) session.getAttribute("storeCode");
+        // ★ ログインチェック（storeCodeがない場合はログインページにリダイレクト）
+        if (session == null || session.getAttribute("storeCode") == null) {
+            res.sendRedirect(req.getContextPath() + "/store_jsp/login_store.jsp");
+            return;
         }
 
+        String storeCode = (String) session.getAttribute("storeCode");
         String employeeCode = req.getParameter("employeeCode");
 
         EmployeeDAO dao = new EmployeeDAO();
@@ -35,7 +36,7 @@ public class EmployeeListAction extends Action {
                 if (e != null && e.getStoreCode().equals(storeCode)) {
                     list.add(e);
                 }
-            } else if (storeCode != null && !storeCode.isEmpty()) {
+            } else {
                 list = dao.selectByStoreCode(storeCode);
             }
 
@@ -48,7 +49,6 @@ public class EmployeeListAction extends Action {
             req.setAttribute("errorMessage", "社員情報の取得中にエラーが発生しました。");
         }
 
-        req.getRequestDispatcher("/store_jsp/employee_list.jsp")
-           .forward(req, res);
+        req.getRequestDispatcher("/store_jsp/employee_list.jsp").forward(req, res);
     }
 }
