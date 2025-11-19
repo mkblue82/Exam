@@ -475,7 +475,7 @@ public class MerchandiseDAO {
     }
 
     /**
-     * 割引を元に戻す（翌日リセット用）
+     * 割引を元に戻す（翌日リセット用
      * @return 更新行数
      */
     public int resetDiscounts() throws Exception {
