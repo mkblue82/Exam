@@ -223,6 +223,11 @@ public class MerchandiseRegisterExecuteAction extends Action {
                 }
             }
 
+            m.setMerchandiseId(merchandiseId);
+            session.setAttribute("registeredMerchandise", m);
+
+            System.out.println("セッションに商品情報を保存しました");
+
             session.setAttribute("successMessage", "商品を登録しました");
             response.sendRedirect(request.getContextPath() + "/store_jsp/merchandise_register_store_done.jsp");
 
