@@ -36,7 +36,7 @@ try {
 int imageId = Integer.parseInt(idStr);
 
 
-MerchandiseImageDAO dao = new MerchandiseImageDAO(DBManager.getInstance().getConnection());
+MerchandiseImageDAO dao = new MerchandiseImageDAO(new DBManager().getConnection());
 MerchandiseImage image = dao.selectById(imageId);
 
 
