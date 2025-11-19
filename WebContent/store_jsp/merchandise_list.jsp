@@ -157,7 +157,7 @@
                         登録された商品はありません。
                     </p>
                 <% } %>
-<!-- ｊ＠ --> -->>
+<!-- ｊっｋ --> -->>
                <!-- ▼ 戻る・商品登録・割引設定ボタン -->
 					<div class="back-button">
 					    <a href="${pageContext.request.contextPath}/store_jsp/main_store.jsp">メインメニューへ戻る</a>
