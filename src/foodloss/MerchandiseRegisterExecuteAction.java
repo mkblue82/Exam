@@ -224,7 +224,7 @@ public class MerchandiseRegisterExecuteAction extends Action {
             }
 
             session.setAttribute("successMessage", "商品を登録しました");
-            response.sendRedirect(request.getContextPath() + "/foodloss/Menu.action");
+            response.sendRedirect(request.getContextPath() + "/store_jsp/merchandise_register_store_done.jsp");
 
         } catch (NumberFormatException e) {
             e.printStackTrace();
