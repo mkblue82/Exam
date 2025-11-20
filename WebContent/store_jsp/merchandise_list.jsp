@@ -6,7 +6,7 @@
     // サーブレットから受け取った商品一覧
     List<Merchandise> products = (List<Merchandise>) request.getAttribute("merchandiseList");
 
-    // セッショん情報
+    // セッショ情報
     Integer storeId = (session.getAttribute("storeId") != null)
                         ? (Integer) session.getAttribute("storeId")
                         : null;
