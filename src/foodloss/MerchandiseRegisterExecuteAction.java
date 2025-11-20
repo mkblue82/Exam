@@ -1,7 +1,6 @@
 package foodloss;
 
 import java.io.File;
-import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -43,7 +42,7 @@ public class MerchandiseRegisterExecuteAction extends Action {
             String expirationDateStr = null;
             String employeeNumberStr = null;
             String tags = null;
-            List<FileItem> imageFiles = new ArrayList<>();  // 複数画像対応
+            List<FileItem> imageFiles = new ArrayList<>();
 
             if (ServletFileUpload.isMultipartContent(request)) {
                 DiskFileItemFactory factory = new DiskFileItemFactory();
@@ -53,7 +52,13 @@ public class MerchandiseRegisterExecuteAction extends Action {
                 ServletRequestContext context = new ServletRequestContext(request);
                 List<FileItem> items = upload.parseRequest(context);
 
+                System.out.println("★★★ 受信したFileItem数: " + items.size());
+
                 for (FileItem item : items) {
+                    System.out.println("★ FileItem: name=" + item.getFieldName() +
+                                     ", isFormField=" + item.isFormField() +
+                                     ", size=" + item.getSize());
+
                     if (item.isFormField()) {
                         String fieldName = item.getFieldName();
                         String fieldValue = item.getString("UTF-8");
@@ -72,9 +77,14 @@ public class MerchandiseRegisterExecuteAction extends Action {
                             tags = fieldValue;
                         }
                     } else {
-                        // 画像ファイル（複数対応）
-                        if ("merchandiseImage".equals(item.getFieldName()) && item.getSize() > 0) {
-                            imageFiles.add(item);
+                        // 画像ファイル
+                        if ("merchandiseImage".equals(item.getFieldName())) {
+                            if (item.getSize() > 0) {
+                                imageFiles.add(item);
+                                System.out.println("✅ 画像ファイル追加: " + item.getName() + " (" + item.getSize() + " bytes)");
+                            } else {
+                                System.out.println("⚠️ サイズ0のファイルをスキップ: " + item.getName());
+                            }
                         }
                     }
                 }
@@ -106,7 +116,7 @@ public class MerchandiseRegisterExecuteAction extends Action {
             System.out.println("★ expirationDate = [" + expirationDateStr + "]");
             System.out.println("★ employeeNumber = [" + employeeNumberStr + "]");
             System.out.println("★ tags = [" + tags + "]");
-            System.out.println("★ 画像ファイル数 = " + imageFiles.size());
+            System.out.println("★★★ 最終的な画像ファイル数 = " + imageFiles.size());
 
             // バリデーション
             if (name == null || name.trim().isEmpty()) {
@@ -135,6 +145,12 @@ public class MerchandiseRegisterExecuteAction extends Action {
 
             if (employeeNumberStr == null || employeeNumberStr.trim().isEmpty()) {
                 request.setAttribute("errorMessage", "社員番号を入力してください");
+                request.getRequestDispatcher("/store_jsp/merchandise_register_store.jsp").forward(request, response);
+                return;
+            }
+
+            if (imageFiles.isEmpty()) {
+                request.setAttribute("errorMessage", "少なくとも1枚の画像を選択してください");
                 request.getRequestDispatcher("/store_jsp/merchandise_register_store.jsp").forward(request, response);
                 return;
             }
@@ -191,100 +207,118 @@ public class MerchandiseRegisterExecuteAction extends Action {
             System.out.println("✅ 商品登録成功！ merchandiseId = " + merchandiseId);
 
             // 複数画像の保存処理
-            if (!imageFiles.isEmpty()) {
-                System.out.println("★ 画像アップロード開始（" + imageFiles.size() + "枚）");
+            System.out.println("★ 画像アップロード開始（" + imageFiles.size() + "枚）");
 
+            // プロジェクトのWebContentディレクトリに保存
+            String projectPath = request.getServletContext().getRealPath("/");
+            System.out.println("★ projectPath = " + projectPath);
+
+            String uploadPath;
+
+            if (projectPath.contains("tmp0")) {
+                // Eclipse開発環境の場合
+                String workspacePath = projectPath.substring(0, projectPath.indexOf("\\.metadata"));
+                uploadPath = workspacePath + "\\foodloss\\WebContent\\uploads\\merchandise";
+                System.out.println("★ Eclipse環境検出");
+            } else {
+                // 本番環境の場合
+                uploadPath = request.getServletContext().getRealPath("/uploads/merchandise");
+                System.out.println("★ 本番環境検出");
+            }
+
+            System.out.println("★ アップロードパス: " + uploadPath);
+
+            File uploadDir = new File(uploadPath);
+
+            // ディレクトリが存在しない場合は作成
+            if (!uploadDir.exists()) {
+                boolean created = uploadDir.mkdirs();
+                System.out.println("★ ディレクトリ作成: " + uploadPath + " -> " + (created ? "成功" : "失敗"));
+                if (!created) {
+                    throw new Exception("ディレクトリの作成に失敗しました: " + uploadPath);
+                }
+            } else {
+                System.out.println("★ ディレクトリ存在確認: OK");
+            }
+
+            MerchandiseImageDAO imgDao = new MerchandiseImageDAO(connection);
+            int displayOrder = 1;
+            int successCount = 0;
+
+            // 各画像を保存
+            for (FileItem imageFile : imageFiles) {
                 try {
-                    // プロジェクトのWebContentディレクトリに保存
-                    String projectPath = request.getServletContext().getRealPath("/");
-                    String uploadPath;
+                    System.out.println("★ 画像" + displayOrder + "処理開始: " + imageFile.getName() + " (" + imageFile.getSize() + " bytes)");
 
-                    if (projectPath.contains("tmp0")) {
-                        // Eclipse開発環境の場合
-                        String workspacePath = projectPath.substring(0, projectPath.indexOf("\\.metadata"));
-                        uploadPath = workspacePath + "\\foodloss\\WebContent\\uploads\\merchandise";
+                    // 元のファイル名を取得
+                    String originalFileName = imageFile.getName();
+
+                    // フルパスの場合、ファイル名だけを取得
+                    if (originalFileName.contains("\\")) {
+                        originalFileName = originalFileName.substring(originalFileName.lastIndexOf("\\") + 1);
+                    }
+                    if (originalFileName.contains("/")) {
+                        originalFileName = originalFileName.substring(originalFileName.lastIndexOf("/") + 1);
+                    }
+
+                    if (originalFileName == null || originalFileName.isEmpty()) {
+                        originalFileName = "image.jpg";
+                    }
+
+                    System.out.println("★ 元のファイル名: " + originalFileName);
+
+                    // 拡張子を取得
+                    String extension = "";
+                    int lastDot = originalFileName.lastIndexOf('.');
+                    if (lastDot > 0) {
+                        extension = originalFileName.substring(lastDot);
                     } else {
-                        // 本番環境の場合
-                        uploadPath = request.getServletContext().getRealPath("/uploads/merchandise");
+                        extension = ".jpg"; // デフォルト拡張子
                     }
 
-                    System.out.println("★ アップロードパス: " + uploadPath);
+                    // 一意なファイル名を生成
+                    String fileName = merchandiseId + "_" + displayOrder + "_" + System.currentTimeMillis() + extension;
+                    String filePath = uploadPath + File.separator + fileName;
 
-                    File uploadDir = new File(uploadPath);
+                    System.out.println("★ 保存先フルパス: " + filePath);
 
-                    // ディレクトリが存在しない場合は作成
-                    if (!uploadDir.exists()) {
-                        boolean created = uploadDir.mkdirs();
-                        System.out.println("★ ディレクトリ作成: " + uploadPath + " -> " + (created ? "成功" : "失敗"));
+                    // ファイルに書き込み
+                    File savedFile = new File(filePath);
+
+                    // FileItem.write()メソッドを使用（より確実）
+                    imageFile.write(savedFile);
+
+                    long fileSize = savedFile.length();
+                    System.out.println("✅ ファイル保存成功: " + fileName + " (" + fileSize + " bytes)");
+
+                    if (fileSize == 0) {
+                        System.err.println("❌ 警告: ファイルサイズが0です");
+                        continue;
                     }
 
-                    MerchandiseImageDAO imgDao = new MerchandiseImageDAO(connection);
-                    int displayOrder = 1;
+                    // DBに画像情報を登録
+                    MerchandiseImage img = new MerchandiseImage();
+                    img.setMerchandiseId(merchandiseId);
+                    img.setFileName(fileName);
+                    img.setDisplayOrder(displayOrder);
 
-                    // 各画像を保存
-                    for (FileItem imageFile : imageFiles) {
-                        System.out.println("★ 画像" + displayOrder + ": " + imageFile.getName() + " (" + imageFile.getSize() + " bytes)");
+                    int imgResult = imgDao.insert(img);
+                    System.out.println("✅ DB画像パス登録結果(" + displayOrder + "): " + imgResult + " 件");
 
-                        // 元のファイル名を取得
-                        String originalFileName = imageFile.getName();
-                        if (originalFileName == null || originalFileName.isEmpty()) {
-                            originalFileName = "image.jpg";
-                        }
-
-                        // 拡張子を取得
-                        String extension = "";
-                        int lastDot = originalFileName.lastIndexOf('.');
-                        if (lastDot > 0) {
-                            extension = originalFileName.substring(lastDot);
-                        }
-
-                        // 一意なファイル名を生成
-                        String fileName = merchandiseId + "_" + displayOrder + "_" + System.currentTimeMillis() + extension;
-                        String filePath = uploadPath + File.separator + fileName;
-
-                        System.out.println("★ 保存先: " + filePath);
-
-                        // ファイルに書き込み
-                        File savedFile = new File(filePath);
-                        InputStream inputStream = imageFile.getInputStream();
-                        java.io.FileOutputStream outputStream = new java.io.FileOutputStream(savedFile);
-
-                        byte[] buffer = new byte[4096];
-                        int bytesRead;
-                        long totalBytes = 0;
-
-                        while ((bytesRead = inputStream.read(buffer)) != -1) {
-                            outputStream.write(buffer, 0, bytesRead);
-                            totalBytes += bytesRead;
-                        }
-
-                        outputStream.close();
-                        inputStream.close();
-
-                        System.out.println("✅ ファイル保存成功: " + fileName + " (" + totalBytes + " bytes)");
-
-                        // DBに画像情報を登録
-                        MerchandiseImage img = new MerchandiseImage();
-                        img.setMerchandiseId(merchandiseId);
-                        img.setFileName("/uploads/merchandise/" + fileName);
-                        img.setDisplayOrder(displayOrder);
-
-                        int imgResult = imgDao.insert(img);
-                        System.out.println("✅ DB画像パス登録結果(" + displayOrder + "): " + imgResult + " 件");
-
-                        displayOrder++;
-                    }
-
-                    System.out.println("✅ 全画像保存完了！");
+                    successCount++;
+                    displayOrder++;
 
                 } catch (Exception imgEx) {
-                    System.err.println("❌ 画像保存エラー: " + imgEx.getMessage());
+                    System.err.println("❌ 画像" + displayOrder + "の保存エラー: " + imgEx.getMessage());
                     imgEx.printStackTrace();
-                    // 画像保存失敗でも商品登録は継続
+                    // 1枚失敗しても続行
                 }
+            }
 
-            } else {
-                System.out.println("⚠️ 画像ファイルが選択されていません");
+            System.out.println("✅ 画像保存完了！ 成功: " + successCount + "/" + imageFiles.size() + "枚");
+
+            if (successCount == 0) {
+                throw new Exception("画像の保存に失敗しました");
             }
 
             m.setMerchandiseId(merchandiseId);
@@ -292,7 +326,7 @@ public class MerchandiseRegisterExecuteAction extends Action {
 
             System.out.println("セッションに商品情報を保存しました");
 
-            session.setAttribute("successMessage", "商品を登録しました");
+            session.setAttribute("successMessage", "商品を登録しました（画像" + successCount + "枚）");
             response.sendRedirect(request.getContextPath() + "/store_jsp/merchandise_register_store_done.jsp");
 
         } catch (NumberFormatException e) {

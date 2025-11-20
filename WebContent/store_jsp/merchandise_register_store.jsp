@@ -52,8 +52,7 @@
 
         .form-group input[type="text"],
         .form-group input[type="number"],
-        .form-group input[type="date"],
-        .form-group input[type="file"] {
+        .form-group input[type="date"] {
             width: 100%;
             padding: 0.8rem;
             border: 1px solid #ccc;
@@ -90,30 +89,6 @@
             object-fit: cover;
         }
 
-        .image-preview-item .remove-btn {
-            position: absolute;
-            top: 5px;
-            right: 5px;
-            background: rgba(255, 0, 0, 0.8);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 25px;
-            height: 25px;
-            cursor: pointer;
-            font-size: 16px;
-            line-height: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: 0.3s;
-        }
-
-        .image-preview-item .remove-btn:hover {
-            background: rgba(255, 0, 0, 1);
-            transform: scale(1.1);
-        }
-
         .image-preview-item .image-number {
             position: absolute;
             bottom: 5px;
@@ -144,6 +119,10 @@
         .file-input-label:hover {
             background: #fef3ed;
             border-color: #a85d38;
+        }
+
+        .file-input-label input[type="file"] {
+            display: none;
         }
 
         .btn-submit,
@@ -204,67 +183,6 @@
             }
         }
     </style>
-    <script>
-        // 画像プレビュー管理
-        let imagePreviewData = [];
-
-        function handleFileSelect(input) {
-            const files = Array.from(input.files);
-
-            if (files.length === 0) return;
-
-            // 新しいファイルをプレビューデータに追加
-            files.forEach(file => {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    imagePreviewData.push({
-                        dataUrl: e.target.result,
-                        name: file.name
-                    });
-                    updatePreview();
-                };
-                reader.readAsDataURL(file);
-            });
-        }
-
-        function removeImage(index) {
-            imagePreviewData.splice(index, 1);
-            updatePreview();
-        }
-
-        function updatePreview() {
-            const container = document.getElementById('imagePreviewContainer');
-            container.innerHTML = '';
-
-            imagePreviewData.forEach((data, index) => {
-                const div = document.createElement('div');
-                div.className = 'image-preview-item';
-                div.innerHTML = `
-                    <img src="${data.dataUrl}" alt="プレビュー${index + 1}">
-                    <button type="button" class="remove-btn" onclick="removeImage(${index})" title="削除">×</button>
-                    <span class="image-number">${index + 1}</span>
-                `;
-                container.appendChild(div);
-            });
-        }
-
-        function validateForm(event) {
-            const fileInput = document.getElementById('merchandiseImage');
-
-            if (!fileInput.files || fileInput.files.length === 0) {
-                alert('少なくとも1枚の画像を選択してください。');
-                event.preventDefault();
-                return false;
-            }
-
-            console.log('送信するファイル数:', fileInput.files.length);
-            for (let i = 0; i < fileInput.files.length; i++) {
-                console.log(`ファイル${i+1}:`, fileInput.files[i].name, fileInput.files[i].size + ' bytes');
-            }
-
-            return true;
-        }
-    </script>
 </head>
 <body>
 <div id="container">
@@ -287,8 +205,7 @@
                 <form action="${pageContext.request.contextPath}/foodloss/MerchandiseRegisterExecute.action"
                       method="post"
                       enctype="multipart/form-data"
-                      id="merchandiseRegisterForm"
-                      onsubmit="return validateForm(event)">
+                      id="merchandiseRegisterForm">
 
                     <%-- 店舗ID（セッションから取得） --%>
                     <input type="hidden" name="storeId" value="${sessionScope.store.storeId}">
@@ -364,16 +281,14 @@
                         <div class="file-input-wrapper">
                             <label class="file-input-label" for="merchandiseImage">
                                 📷 画像を選択（複数可）
+                                <input type="file"
+                                       id="merchandiseImage"
+                                       name="merchandiseImage"
+                                       accept="image/*"
+                                       multiple
+                                       required
+                                       onchange="previewImages(this)">
                             </label>
-                            <%-- 直接multipleで複数ファイルを受け取る --%>
-                            <input type="file"
-                                   id="merchandiseImage"
-                                   name="merchandiseImage"
-                                   accept="image/*"
-                                   multiple
-                                   required
-                                   onchange="handleFileSelect(this)"
-                                   style="display: none;">
                         </div>
 
                         <div id="imagePreviewContainer" class="image-preview-container"></div>
@@ -393,7 +308,63 @@
 <!-- JS -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
-<parameter name="contextPath}/js/slick.js"></script>
+<script src="${pageContext.request.contextPath}/js/slick.js"></script>
 <script src="${pageContext.request.contextPath}/js/main.js"></script>
+
+<script>
+function previewImages(input) {
+    const container = document.getElementById('imagePreviewContainer');
+    container.innerHTML = '';
+
+    if (input.files && input.files.length > 0) {
+        console.log('========================================');
+        console.log('選択されたファイル数:', input.files.length);
+        console.log('========================================');
+
+        // 各ファイルの詳細をログ出力
+        for (let i = 0; i < input.files.length; i++) {
+            const file = input.files[i];
+            console.log('ファイル' + (i+1) + ':');
+            console.log('  名前:', file.name);
+            console.log('  サイズ:', file.size, 'bytes');
+            console.log('  タイプ:', file.type);
+        }
+        console.log('========================================');
+
+        // プレビュー表示
+        for (let i = 0; i < input.files.length; i++) {
+            const file = input.files[i];
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const div = document.createElement('div');
+                div.className = 'image-preview-item';
+                div.innerHTML = '<img src="' + e.target.result + '" alt="プレビュー' + (i+1) + '">' +
+                               '<span class="image-number">' + (i+1) + '</span>';
+                container.appendChild(div);
+            };
+            reader.readAsDataURL(file);
+        }
+    } else {
+        console.log('ファイルが選択されていません');
+    }
+}
+
+// フォーム送信前の確認
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('merchandiseRegisterForm');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            const fileInput = document.getElementById('merchandiseImage');
+            console.log('========================================');
+            console.log('フォーム送信時のファイル数:', fileInput.files.length);
+            for (let i = 0; i < fileInput.files.length; i++) {
+                console.log('送信ファイル' + (i+1) + ':', fileInput.files[i].name);
+            }
+            console.log('========================================');
+        });
+    }
+});
+</script>
 </body>
 </html>
