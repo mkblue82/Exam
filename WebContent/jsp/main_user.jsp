@@ -10,6 +10,7 @@
     }
 %>
 
+
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -37,7 +38,7 @@
                 Map<Store, List<Merchandise>> shopMerchMap =
                     (Map<Store, List<Merchandise>>) request.getAttribute("shopMerchMap");
             %>
-	
+
             <% if (shopMerchMap != null) { %>
                 <% for (Map.Entry<Store, List<Merchandise>> entry : shopMerchMap.entrySet()) {
                     Store store = entry.getKey();
