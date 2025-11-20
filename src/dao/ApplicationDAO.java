@@ -115,3 +115,4 @@ public class ApplicationDAO extends DAO {
         return app;
     }
 }
+
