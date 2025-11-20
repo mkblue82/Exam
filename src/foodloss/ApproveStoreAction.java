@@ -168,6 +168,7 @@ public class ApproveStoreAction extends Action {
         return false;
     }
 
+
     // --- Applicationテーブル（pending）重複チェック ---
     private boolean isPhoneExistsInPending(ApplicationDAO dao, String phone, int currentAppId) throws Exception {
         for (Application app : dao.selectPendingApplications()) {
