@@ -203,12 +203,6 @@
                     <% } %>
                 </div>
 
-                <div class="button-container">
-                    <a href="${pageContext.request.contextPath}/foodloss/Menu.action" class="btn btn-secondary">
-                        ホームに戻る
-                    </a>
-                </div>
-
             </div>
         </div>
     </main>
