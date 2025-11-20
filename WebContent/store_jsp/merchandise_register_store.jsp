@@ -126,6 +126,10 @@
             font-weight: bold;
         }
 
+        .file-input-wrapper {
+            margin-top: 0.5rem;
+        }
+
         .file-input-label {
             display: block;
             padding: 0.8rem;
@@ -140,10 +144,6 @@
         .file-input-label:hover {
             background: #fef3ed;
             border-color: #a85d38;
-        }
-
-        .file-input-label input {
-            display: none;
         }
 
         .btn-submit,
@@ -205,25 +205,30 @@
         }
     </style>
     <script>
-        // 複数画像プレビュー用の配列
-        let selectedFiles = [];
+        // 画像プレビュー管理
+        let imagePreviewData = [];
 
         function handleFileSelect(input) {
             const files = Array.from(input.files);
 
-            // 既存のファイルに新しいファイルを追加
-            selectedFiles = selectedFiles.concat(files);
+            if (files.length === 0) return;
 
-            // プレビューを更新
-            updatePreview();
-
-            // input要素をリセット（同じファイルを再度選択できるように）
-            input.value = '';
+            // 新しいファイルをプレビューデータに追加
+            files.forEach(file => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    imagePreviewData.push({
+                        dataUrl: e.target.result,
+                        name: file.name
+                    });
+                    updatePreview();
+                };
+                reader.readAsDataURL(file);
+            });
         }
 
         function removeImage(index) {
-            // 指定されたインデックスの画像を削除
-            selectedFiles.splice(index, 1);
+            imagePreviewData.splice(index, 1);
             updatePreview();
         }
 
@@ -231,41 +236,32 @@
             const container = document.getElementById('imagePreviewContainer');
             container.innerHTML = '';
 
-            selectedFiles.forEach((file, index) => {
-                const reader = new FileReader();
-
-                reader.onload = function(e) {
-                    const div = document.createElement('div');
-                    div.className = 'image-preview-item';
-                    div.innerHTML = `
-                        <img src="${e.target.result}" alt="プレビュー${index + 1}">
-                        <button type="button" class="remove-btn" onclick="removeImage(${index})" title="削除">×</button>
-                        <span class="image-number">${index + 1}</span>
-                    `;
-                    container.appendChild(div);
-                };
-
-                reader.readAsDataURL(file);
+            imagePreviewData.forEach((data, index) => {
+                const div = document.createElement('div');
+                div.className = 'image-preview-item';
+                div.innerHTML = `
+                    <img src="${data.dataUrl}" alt="プレビュー${index + 1}">
+                    <button type="button" class="remove-btn" onclick="removeImage(${index})" title="削除">×</button>
+                    <span class="image-number">${index + 1}</span>
+                `;
+                container.appendChild(div);
             });
-
-            // フォーム送信時に使用するFileListを更新
-            updateFileInput();
-        }
-
-        function updateFileInput() {
-            const dataTransfer = new DataTransfer();
-            selectedFiles.forEach(file => {
-                dataTransfer.items.add(file);
-            });
-            document.getElementById('merchandiseImageHidden').files = dataTransfer.files;
         }
 
         function validateForm(event) {
-            if (selectedFiles.length === 0) {
+            const fileInput = document.getElementById('merchandiseImage');
+
+            if (!fileInput.files || fileInput.files.length === 0) {
                 alert('少なくとも1枚の画像を選択してください。');
                 event.preventDefault();
                 return false;
             }
+
+            console.log('送信するファイル数:', fileInput.files.length);
+            for (let i = 0; i < fileInput.files.length; i++) {
+                console.log(`ファイル${i+1}:`, fileInput.files[i].name, fileInput.files[i].size + ' bytes');
+            }
+
             return true;
         }
     </script>
@@ -365,22 +361,20 @@
 
                     <div class="form-group">
                         <label>商品画像 <span>*</span> (複数選択可)</label>
-                        <label class="file-input-label">
-                            📷 画像を選択（複数可）
+                        <div class="file-input-wrapper">
+                            <label class="file-input-label" for="merchandiseImage">
+                                📷 画像を選択（複数可）
+                            </label>
+                            <%-- 直接multipleで複数ファイルを受け取る --%>
                             <input type="file"
-                                   id="merchandiseImageInput"
+                                   id="merchandiseImage"
+                                   name="merchandiseImage"
                                    accept="image/*"
                                    multiple
-                                   onchange="handleFileSelect(this)">
-                        </label>
-
-                        <%-- フォーム送信用の隠しinput（JavaScriptでFilesを設定） --%>
-                        <input type="file"
-                               id="merchandiseImageHidden"
-                               name="merchandiseImage"
-                               accept="image/*"
-                               multiple
-                               style="display: none;">
+                                   required
+                                   onchange="handleFileSelect(this)"
+                                   style="display: none;">
+                        </div>
 
                         <div id="imagePreviewContainer" class="image-preview-container"></div>
                     </div>
@@ -399,7 +393,7 @@
 <!-- JS -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
-<script src="${pageContext.request.contextPath}/js/slick.js"></script>
+<parameter name="contextPath}/js/slick.js"></script>
 <script src="${pageContext.request.contextPath}/js/main.js"></script>
 </body>
 </html>
