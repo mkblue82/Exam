@@ -260,6 +260,7 @@ public class SignupStoreAction extends Action {
         return null;
     }
 
+
     private boolean isValidFileType(String fileName) {
         if (fileName == null) return false;
         String lower = fileName.toLowerCase();
