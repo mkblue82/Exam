@@ -235,7 +235,7 @@
             </div>
           <% } %>
 
-          <form action="${pageContext.request.contextPath}/foodloss/NotificationSettings.action" method="post">
+          <form action="${pageContext.request.contextPath}/foodloss/NotificationSetting.action" method="post">
             <!-- お気に入り店舗取得 -->
             <%
             List<Favorite> favoriteStores = (List<Favorite>)request.getAttribute("favoriteStores");
