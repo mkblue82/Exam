@@ -1,131 +1,80 @@
 package foodloss;
 
-import java.sql.Connection;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import bean.Merchandise;
-import bean.Store;
-import dao.MerchandiseDAO;
+import bean.Employee;
+import dao.DiscountSettingDAO;
 import tool.Action;
 
+/**
+ * 割引設定アクション
+ */
 public class DiscountSettingAction extends Action {
 
     @Override
-    public void execute(HttpServletRequest request, HttpServletResponse response) throws Exception {
-
-        HttpSession session = request.getSession();
+    public String execute(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
         // セッションから店舗情報を取得
-        Store store = (Store) session.getAttribute("store");
+        HttpSession session = request.getSession();
+        Employee employee = (Employee) session.getAttribute("employee");
 
-        // セッションチェック
-        if (store == null) {
-            request.setAttribute("error", "セッションが切れています。再度ログインしてください。");
-            request.getRequestDispatcher("error.jsp").forward(request, response);
-            return;
+        if (employee == null) {
+            return "error.jsp?error=セッションが切れています";
         }
 
-        // パラメータ取得
-        String timeStr = request.getParameter("time");
-        String discountStr = request.getParameter("discount");
-        String merchandiseIdStr = request.getParameter("merchandiseId");
-
-        // ①-1 フィールドが未入力の場合
-        if (timeStr == null || timeStr.trim().isEmpty() ||
-            discountStr == null || discountStr.trim().isEmpty()) {
-            request.setAttribute("error", "時間と割引率は必須項目です。");
-            request.getRequestDispatcher("store_jsp/discount_setting.jsp").forward(request, response);
-            return;
+        // GETリクエストの場合は画面表示のみ
+        if ("GET".equalsIgnoreCase(request.getMethod())) {
+            return "discount_setting.jsp";
         }
 
-        Connection con = null;
-
+        // POSTリクエストの場合は設定を保存
         try {
-            // DB接続
-            con = getConnection();
+            // パラメータ取得
+            String timeStr = request.getParameter("time");
+            String discountStr = request.getParameter("discount");
 
-            // 入力値を数値に変換
+            // バリデーション
+            if (timeStr == null || timeStr.isEmpty() ||
+                discountStr == null || discountStr.isEmpty()) {
+                request.setAttribute("error", "すべての項目を入力してください");
+                return "discount_setting.jsp";
+            }
+
             int time = Integer.parseInt(timeStr);
             int discount = Integer.parseInt(discountStr);
 
-            // ②-1 時間と割引率のバリデーション
+            // 範囲チェック
             if (time < 0 || time > 23) {
-                request.setAttribute("error", "時間は0〜23の範囲で入力してください。");
-                request.getRequestDispatcher("store_jsp/discount_setting.jsp").forward(request, response);
-                return;
+                request.setAttribute("error", "時間は0〜23の範囲で入力してください");
+                return "discount_setting.jsp";
             }
 
             if (discount < 1 || discount > 100) {
-                request.setAttribute("error", "割引率は1〜100の範囲で入力してください。");
-                request.getRequestDispatcher("store_jsp/discount_setting.jsp").forward(request, response);
-                return;
+                request.setAttribute("error", "割引率は1〜100の範囲で入力してください");
+                return "discount_setting.jsp";
             }
 
-            MerchandiseDAO merchandiseDAO = new MerchandiseDAO(con);
+            // データベースに保存
+            DiscountSettingDAO dao = new DiscountSettingDAO(getConnection());
+            int result = dao.saveDiscountSetting(employee.getStoreId(), time, discount);
 
-            // 商品IDが指定されている場合は商品の存在チェック
-            if (merchandiseIdStr != null && !merchandiseIdStr.trim().isEmpty()) {
-                int merchandiseId = Integer.parseInt(merchandiseIdStr);
-
-                Merchandise merchandise = merchandiseDAO.getMerchandiseById(merchandiseId);
-
-                // ③-1 商品が未登録の場合
-                if (merchandise == null) {
-                    request.setAttribute("error", "登録されている商品がありません。");
-                    request.getRequestDispatcher("store_jsp/discount_setting.jsp").forward(request, response);
-                    return;
-                }
-
-                // 商品に対する割引設定を更新
-                int result = merchandiseDAO.updateDiscount(merchandiseId, time, discount);
-
-                if (result > 0) {
-                    // 成功時は割引設定完了画面へ
-                    request.setAttribute("time", time);
-                    request.setAttribute("discount", discount);
-                    request.setAttribute("merchandise", merchandise);
-                    request.getRequestDispatcher("store_jsp/discount_setting_complete.jsp").forward(request, response);
-                } else {
-                    request.setAttribute("error", "割引設定に失敗しました。");
-                    request.getRequestDispatcher("store_jsp/discount_setting.jsp").forward(request, response);
-                }
+            if (result > 0) {
+                // 成功時はリダイレクト
+                return "discount_setting.jsp?success=true";
             } else {
-                // 商品IDが指定されていない場合（店舗全体の設定など）
-                int result = merchandiseDAO.updateDiscountByStore(store.getStoreId(), time, discount);
-
-                if (result > 0) {
-                    // 成功メッセージをセッションに保存
-                    session.setAttribute("successMessage", "割引設定が完了しました。");
-
-                    // 成功時は割引設定画面へリダイレクト
-                    response.sendRedirect(request.getContextPath() + "/store_jsp/discount_setting.jsp?success=true");
-                } else {
-                    request.setAttribute("error", "割引設定に失敗しました。");
-                    request.getRequestDispatcher("store_jsp/discount_setting.jsp").forward(request, response);
-                }
+                request.setAttribute("error", "割引設定の保存に失敗しました");
+                return "discount_setting.jsp";
             }
 
         } catch (NumberFormatException e) {
-            // ②-1 数字以外が入力された場合
-            request.setAttribute("error", "時間と割引率は数字で入力してください。");
-            request.getRequestDispatcher("store_jsp/discount_setting.jsp").forward(request, response);
+            request.setAttribute("error", "数値を正しく入力してください");
+            return "discount_setting.jsp";
         } catch (Exception e) {
-            // その他のエラー
             e.printStackTrace();
-            request.setAttribute("error", "システムエラーが発生しました: " + e.getMessage());
-            request.getRequestDispatcher("store_jsp/discount_setting.jsp").forward(request, response);
-        } finally {
-            // DB接続を閉じる
-            if (con != null) {
-                try {
-                    con.close();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
+            request.setAttribute("error", "エラーが発生しました: " + e.getMessage());
+            return "discount_setting.jsp";
         }
     }
 }

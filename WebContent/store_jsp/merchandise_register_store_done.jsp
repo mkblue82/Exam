@@ -119,8 +119,7 @@
                 <h1>商品登録完了</h1>
 
                 <p class="message">
-                    商品登録が完了しました！<br>
-                    ご登録ありがとうございます。
+                    商品登録が完了しました！
                 </p>
 
                 <div class="merchandise-info">

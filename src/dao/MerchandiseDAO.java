@@ -49,14 +49,13 @@ public class MerchandiseDAO {
         return list;
     }
 
-    // 商品IDで検索（割引情報も取得）
+    // 商品IDで検索
     public Merchandise selectById(int merchandiseId) throws Exception {
         PreparedStatement st = connection.prepareStatement(
             "select T002_PK1_merchandise, T002_FD1_merchandise, " +
             "T002_FD2_merchandise, T002_FD3_merchandise, T002_FD4_merchandise, " +
             "T002_FD5_merchandise, T002_FD6_merchandise, T002_FD7_merchandise, " +
-            "T002_FD8_merchandise, T002_FD9_merchandise, " +
-            "T002_FD10_original_price, T002_FD11_discount_percent, T002_FD12_discount_start_time " +
+            "T002_FD8_merchandise, T002_FD9_merchandise " +
             "from T002_merchandise " +
             "where T002_PK1_merchandise = ?");
         st.setInt(1, merchandiseId);
@@ -75,13 +74,6 @@ public class MerchandiseDAO {
             m.setRegistrationTime(rs.getTimestamp("T002_FD7_merchandise"));
             m.setStoreId(rs.getInt("T002_FD8_merchandise"));
             m.setBookingStatus(rs.getBoolean("T002_FD9_merchandise"));
-
-            // 割引情報の取得
-            Integer originalPrice = (Integer) rs.getObject("T002_FD10_original_price");
-            m.setOriginalPrice(originalPrice);
-            m.setDiscountPercent(rs.getInt("T002_FD11_discount_percent"));
-            Integer discountStartTime = (Integer) rs.getObject("T002_FD12_discount_start_time");
-            m.setDiscountStartTime(discountStartTime);
         }
 
         st.close();
@@ -366,7 +358,7 @@ public class MerchandiseDAO {
         return list;
     }
 
-    // 同一店舗内で同じ商品名が存在するか確認
+    // 同一店舗内で同じ商品名が存在する確認
     public boolean isDuplicateMerchandise(int storeId, String merchandiseName) throws Exception {
         PreparedStatement st = connection.prepareStatement(
             "SELECT COUNT(*) FROM T002_merchandise WHERE T002_FD8_merchandise = ? AND T002_FD5_merchandise = ?");
@@ -382,112 +374,6 @@ public class MerchandiseDAO {
         rs.close();
         st.close();
         return exists;
-    }
-
-    // ========== 割引設定関連メソッド ==========
-
-    /**
-     * 商品IDで商品を取得（Actionで使用）
-     * @param merchandiseId 商品ID
-     * @return Merchandise
-     */
-    public Merchandise getMerchandiseById(int merchandiseId) throws Exception {
-        return selectById(merchandiseId);
-    }
-
-    /**
-     * 商品の割引設定を保存（元価格も記録）
-     * @param merchandiseId 商品ID
-     * @param discountTime 割引開始時刻（0-23）
-     * @param discountRate 割引率（1-100）
-     * @return 更新行数
-     */
-    public int updateDiscount(int merchandiseId, int discountTime, int discountRate) throws Exception {
-        PreparedStatement st = connection.prepareStatement(
-            "UPDATE T002_merchandise " +
-            "SET T002_FD10_original_price = CASE " +
-            "    WHEN T002_FD10_original_price IS NULL THEN CAST(T002_FD2_merchandise AS INTEGER) " +
-            "    ELSE T002_FD10_original_price " +
-            "END, " +
-            "T002_FD11_discount_percent = ?, " +
-            "T002_FD12_discount_start_time = ? " +
-            "WHERE T002_PK1_merchandise = ?");
-        st.setInt(1, discountRate);
-        st.setInt(2, discountTime);
-        st.setInt(3, merchandiseId);
-
-        int line = st.executeUpdate();
-        st.close();
-        return line;
-    }
-
-    /**
-     * 店舗の全商品に割引設定を保存（元価格も記録）
-     * @param storeId 店舗ID
-     * @param discountTime 割引開始時刻
-     * @param discountRate 割引率
-     * @return 更新行数
-     */
-    public int updateDiscountByStore(int storeId, int discountTime, int discountRate) throws Exception {
-        PreparedStatement st = connection.prepareStatement(
-            "UPDATE T002_merchandise " +
-            "SET T002_FD10_original_price = CASE " +
-            "    WHEN T002_FD10_original_price IS NULL THEN CAST(T002_FD2_merchandise AS INTEGER) " +
-            "    ELSE T002_FD10_original_price " +
-            "END, " +
-            "T002_FD11_discount_percent = ?, " +
-            "T002_FD12_discount_start_time = ? " +
-            "WHERE T002_FD8_merchandise = ?");
-        st.setInt(1, discountRate);
-        st.setInt(2, discountTime);
-        st.setInt(3, storeId);
-
-        int line = st.executeUpdate();
-        st.close();
-        return line;
-    }
-
-    /**
-     * 現在時刻に基づいて割引を適用
-     * スケジューラーやバッチ処理から定期的に呼び出す
-     * @return 更新行数
-     */
-    public int applyScheduledDiscounts() throws Exception {
-        // 現在の時刻を取得
-        java.util.Calendar cal = java.util.Calendar.getInstance();
-        int currentHour = cal.get(java.util.Calendar.HOUR_OF_DAY);
-
-        PreparedStatement st = connection.prepareStatement(
-            "UPDATE T002_merchandise " +
-            "SET T002_FD2_merchandise = CAST(" +
-            "    (CAST(T002_FD10_original_price AS INTEGER) - " +
-            "    (CAST(T002_FD10_original_price AS INTEGER) * T002_FD11_discount_percent / 100)) " +
-            "AS CHAR(10)) " +
-            "WHERE T002_FD12_discount_start_time = ? " +
-            "AND T002_FD10_original_price IS NOT NULL " +
-            "AND T002_FD11_discount_percent > 0 " +
-            "AND CAST(T002_FD2_merchandise AS INTEGER) = CAST(T002_FD10_original_price AS INTEGER)");
-        st.setInt(1, currentHour);
-
-        int line = st.executeUpdate();
-        st.close();
-        return line;
-    }
-
-    /**
-     * 割引を元に戻す（翌日リセット用
-     * @return 更新行数
-     */
-    public int resetDiscounts() throws Exception {
-        PreparedStatement st = connection.prepareStatement(
-            "UPDATE T002_merchandise " +
-            "SET T002_FD2_merchandise = CAST(T002_FD10_original_price AS CHAR(10)) " +
-            "WHERE T002_FD10_original_price IS NOT NULL " +
-            "AND CAST(T002_FD2_merchandise AS INTEGER) != CAST(T002_FD10_original_price AS INTEGER)");
-
-        int line = st.executeUpdate();
-        st.close();
-        return line;
     }
     public List<Merchandise> selectByStoreId2(int storeId) throws Exception {         List<Merchandise> list = new ArrayList<>();          PreparedStatement st = connection.prepareStatement(             "select T002_PK1_merchandise, T002_FD1_merchandise, " +             "T002_FD2_merchandise, T002_FD3_merchandise, T002_FD4_merchandise, " +             "T002_FD5_merchandise, T002_FD6_merchandise, T002_FD7_merchandise, " +             "T002_FD8_merchandise, T002_FD9_merchandise " +             "from T002_merchandise " +             "where T002_FD8_merchandise = ? " +             "order by T002_PK1_merchandise"         );          st.setInt(1, storeId);         ResultSet rs = st.executeQuery();          while (rs.next()) {             Merchandise m = new Merchandise();             m.setMerchandiseId(rs.getInt(1));             m.setStock(rs.getInt(2));             m.setPrice(rs.getInt(3));             m.setUseByDate(rs.getDate(4));             m.setMerchandiseTag(rs.getString(5));             m.setMerchandiseName(rs.getString(6));             m.setEmployeeId(rs.getInt(7));             m.setRegistrationTime(rs.getTimestamp(8));             m.setStoreId(rs.getInt(9));             m.setBookingStatus(rs.getBoolean(10));             list.add(m);         }          st.close();         return list;     }
 }
