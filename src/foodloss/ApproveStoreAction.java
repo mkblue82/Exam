@@ -53,13 +53,24 @@ public class ApproveStoreAction extends Action {
 
             System.out.println("DEBUG: Application found - " + app.getStoreName());
 
-            // --- 念のため再度重複チェック ---
-            if (isPhoneExists(storeDAO, app.getStorePhone())) {
+            // --- 重複チェック ---
+            // Storeテーブル
+            if (isPhoneExistsInStore(storeDAO, app.getStorePhone())) {
                 showError(req, res, "この電話番号は既に登録されています。\n申請を却下してください。");
                 return;
             }
-            if (isEmailExists(storeDAO, app.getStoreEmail())) {
+            if (isEmailExistsInStore(storeDAO, app.getStoreEmail())) {
                 showError(req, res, "このメールアドレスは既に登録されています。\n申請を却下してください。");
+                return;
+            }
+
+            // Applicationテーブル（pendingの申請）
+            if (isPhoneExistsInPending(appDAO, app.getStorePhone(), app.getApplicationId())) {
+                showError(req, res, "同じ電話番号で他の未承認申請があります。\n申請を却下してください。");
+                return;
+            }
+            if (isEmailExistsInPending(appDAO, app.getStoreEmail(), app.getApplicationId())) {
+                showError(req, res, "同じメールアドレスで他の未承認申請があります。\n申請を却下してください。");
                 return;
             }
 
@@ -74,12 +85,10 @@ public class ApproveStoreAction extends Action {
 
             // --- DB登録 ---
             storeDAO.insert(store);
-
             System.out.println("DEBUG: Store registered - ID: " + store.getStoreId());
 
             // --- 申請ステータスを更新 ---
             appDAO.updateStatus(app.getApplicationId(), "approved");
-
             System.out.println("DEBUG: Application status updated to 'approved'");
 
             // --- 店舗への完了メール送信 ---
@@ -98,21 +107,18 @@ public class ApproveStoreAction extends Action {
                                        "※パスワードは申請時に設定したものをご使用ください。\n\n" +
                                        "ご利用ありがとうございます。";
 
-                MailSender.sendEmail(
-                    app.getStoreEmail(),
-                    "【登録完了】ログイン情報のお知らせ",
-                    completionBody
-                );
+                MailSender.sendEmail(app.getStoreEmail(),
+                                     "【登録完了】ログイン情報のお知らせ",
+                                     completionBody);
 
                 System.out.println("DEBUG: Completion email sent to: " + app.getStoreEmail());
 
             } catch (Exception e) {
                 e.printStackTrace();
                 System.err.println("WARNING: Failed to send completion email to: " + app.getStoreEmail());
-                // メール送信失敗してもDB登録は完了しているので処理は続行
             }
 
-            // --- 運営にも完了通知を送信（オプション） ---
+            // --- 運営への完了通知 ---
             try {
                 String adminNotification = "店舗承認が完了しました。\n\n" +
                                           "店舗名: " + app.getStoreName() + "\n" +
@@ -120,15 +126,12 @@ public class ApproveStoreAction extends Action {
                                           "メール: " + app.getStoreEmail() + "\n" +
                                           "登録日時: " + new java.util.Date();
 
-                MailSender.sendEmail(
-                    "mklblue82@gmail.com",
-                    "【完了】店舗承認処理完了通知",
-                    adminNotification
-                );
+                MailSender.sendEmail("mklblue82@gmail.com",
+                                     "【完了】店舗承認処理完了通知",
+                                     adminNotification);
 
             } catch (Exception e) {
                 e.printStackTrace();
-                // 運営への通知失敗は無視
             }
 
             // --- 成功ページ表示 ---
@@ -141,9 +144,7 @@ public class ApproveStoreAction extends Action {
             e.printStackTrace();
             showError(req, res, "承認処理中にエラーが発生しました。\n" + e.getMessage());
         } finally {
-            if (conn != null) {
-                conn.close();
-            }
+            if (conn != null) conn.close();
         }
     }
 
@@ -152,20 +153,34 @@ public class ApproveStoreAction extends Action {
         req.getRequestDispatcher("/admin_jsp/approve_error.jsp").forward(req, res);
     }
 
-    private boolean isPhoneExists(StoreDAO dao, String phone) throws Exception {
+    // --- Storeテーブル重複チェック ---
+    private boolean isPhoneExistsInStore(StoreDAO dao, String phone) throws Exception {
         for (Store s : dao.selectAll()) {
-            if (s.getPhone() != null && s.getPhone().equals(phone)) {
-                return true;
-            }
+            if (s.getPhone() != null && s.getPhone().equals(phone)) return true;
         }
         return false;
     }
 
-    private boolean isEmailExists(StoreDAO dao, String email) throws Exception {
+    private boolean isEmailExistsInStore(StoreDAO dao, String email) throws Exception {
         for (Store s : dao.selectAll()) {
-            if (s.getEmail() != null && s.getEmail().equals(email)) {
-                return true;
-            }
+            if (s.getEmail() != null && s.getEmail().equals(email)) return true;
+        }
+        return false;
+    }
+
+    // --- Applicationテーブル（pending）重複チェック ---
+    private boolean isPhoneExistsInPending(ApplicationDAO dao, String phone, int currentAppId) throws Exception {
+        for (Application app : dao.selectPendingApplications()) {
+            if (app.getApplicationId() == currentAppId) continue; // 自身の申請はスキップ
+            if (app.getStorePhone() != null && app.getStorePhone().equals(phone)) return true;
+        }
+        return false;
+    }
+
+    private boolean isEmailExistsInPending(ApplicationDAO dao, String email, int currentAppId) throws Exception {
+        for (Application app : dao.selectPendingApplications()) {
+            if (app.getApplicationId() == currentAppId) continue;
+            if (app.getStoreEmail() != null && app.getStoreEmail().equals(email)) return true;
         }
         return false;
     }
