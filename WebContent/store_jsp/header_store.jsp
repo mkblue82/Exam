@@ -17,7 +17,7 @@
   <nav>
     <ul>
       <li><a href="${pageContext.request.contextPath}/foodloss/Menu.action">ホーム<span>Home</span></a></li>
-      <li><a href="${pageContext.request.contextPath}/foodloss/StoreDetail.action">店舗詳細<span>STORE</span></a></li>
+      <li><a href="${pageContext.request.contextPath}/foodloss/StoreDetail.action">店舗詳細<span>Store</span></a></li>
     </ul>
   </nav>
 </div>

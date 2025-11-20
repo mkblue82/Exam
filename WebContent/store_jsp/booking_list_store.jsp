@@ -19,16 +19,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>予約一覧 - フードロス削減システム</title>
+    <title>予約一覧</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
 
     <style>
-        body {
-            font-family: 'Segoe UI', sans-serif;
-            background-color: #f9f9f9;
-            margin: 0;
-            padding: 0;
-        }
         .main-content {
             max-width: 1000px;
             margin: 40px auto;
@@ -37,67 +31,107 @@
             border-radius: 10px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
+
         h2 {
             font-size: 1.8rem;
             text-align: center;
-            color: #333;
-            margin-bottom: 30px;
+            color: #c07148;
+            border-bottom: 2px solid #c07148;
+            padding-bottom: 1rem;
+            margin-bottom: 2rem;
         }
+
         .store-info {
             text-align: center;
             font-weight: bold;
-            color: #a65d36;
+            color: #c07148;
             margin-bottom: 20px;
+            font-size: 1rem;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
+            margin-top: 20px;
         }
+
         th {
-            background-color: #a65d36;
+            background-color: #c07148;
             color: #fff;
             padding: 12px;
+            font-weight: bold;
+            border: 1px solid #c07148;
         }
+
         td {
             padding: 12px;
-            border-bottom: 1px solid #ddd;
+            border: 1px solid #ddd;
             text-align: center;
+            color: #333;
         }
-        tr:hover {
+
+        tbody tr:hover {
             background-color: #f5f5f5;
         }
 
         .pickup-btn {
             display: inline-block;
             padding: 8px 25px;
-            background-color: #007bff;
+            background-color: #c07148;
             color: white;
-            border-radius: 8px;
+            border-radius: 5px;
             text-decoration: none;
             transition: 0.3s;
+            font-weight: bold;
         }
+
         .pickup-btn:hover {
-            background-color: #0056c7;
+            background-color: #a85d38;
+            transform: translateY(-2px);
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 40px 20px;
+            color: #999;
+            font-size: 1rem;
         }
 
         .back-button {
-            margin-top: 40px;
+            margin-top: 30px;
             text-align: center;
         }
+
         .back-button a {
             display: inline-block;
             padding: 12px 40px;
             background-color: #ccc;
             text-decoration: none;
-            border-radius: 8px;
+            border-radius: 5px;
             font-weight: bold;
             color: #333;
-            margin: 0 10px;
+            transition: all 0.3s;
         }
+
         .back-button a:hover {
-            background-color: #a65d36;
+            background-color: #c07148;
             color: #fff;
+            transform: translateY(-3px);
+        }
+
+        @media screen and (max-width: 1000px) {
+            .main-content {
+                margin: 20px;
+                padding: 1.5rem;
+            }
+
+            table {
+                font-size: 0.9rem;
+            }
+
+            th, td {
+                padding: 8px;
+            }
         }
     </style>
 </head>
@@ -138,42 +172,38 @@
                         </thead>
 
                         <tbody>
-						    <% for (Booking b : bookingList) { %>
-						        <tr>
-						            <td><%= b.getBookingId() %></td>
-						            <td><%= b.getMerchandiseName() %></td>
-						            <td><%= b.getUserId() %></td>
-						            <td><%= b.getCount() %></td>
-						            <td><%= b.getPickupTime() %></td>
-						            <td><%= b.getBookingTime() %></td>
-
-						            <!-- ★ ここ：getPickupStatus() に変更 -->
-						            <td><%= b.getPickupStatus() ? "受取済" : "未受取" %></td>
-
-						            <td>
-						                <% if (!b.getPickupStatus()) { %>
-						                    <a class="pickup-btn"
-						                       href="${pageContext.request.contextPath}/foodloss/PickupBooking.action?bookingId=<%= b.getBookingId() %>">
-						                        受け取り
-						                    </a>
-						                <% } else { %>
-						                    ー
-						                <% } %>
-						            </td>
-						        </tr>
-						    <% } %>
-						</tbody>
-
+                            <% for (Booking b : bookingList) { %>
+                                <tr>
+                                    <td><%= b.getBookingId() %></td>
+                                    <td><%= b.getMerchandiseName() %></td>
+                                    <td><%= b.getUserId() %></td>
+                                    <td><%= b.getCount() %></td>
+                                    <td><%= b.getPickupTime() %></td>
+                                    <td><%= b.getBookingTime() %></td>
+                                    <td><%= b.getPickupStatus() ? "受取済" : "未受取" %></td>
+                                    <td>
+                                        <% if (!b.getPickupStatus()) { %>
+                                            <a class="pickup-btn"
+                                               href="${pageContext.request.contextPath}/foodloss/PickupBooking.action?bookingId=<%= b.getBookingId() %>">
+                                                受け取り
+                                            </a>
+                                        <% } else { %>
+                                            ー
+                                        <% } %>
+                                    </td>
+                                </tr>
+                            <% } %>
+                        </tbody>
                     </table>
 
                 <% } else { %>
-                    <p style="text-align:center; padding:20px; color:#999;">
+                    <p class="no-data">
                         現在、予約は登録されていません。
                     </p>
                 <% } %>
 
                 <div class="back-button">
-                    <a href="${pageContext.request.contextPath}/store_jsp/main_store.jsp">メインメニューへ戻る</a>
+                    <a href="${pageContext.request.contextPath}/foodloss/Menu.action">ホームに戻る</a>
                 </div>
 
             </div>
@@ -185,6 +215,11 @@
 
 </div>
 
+<!-- JS -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
+<script src="${pageContext.request.contextPath}/js/slick.js"></script>
+<script src="${pageContext.request.contextPath}/js/main.js"></script>
 
 </body>
 </html>

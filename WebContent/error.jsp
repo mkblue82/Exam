@@ -134,7 +134,6 @@
                 <% if (isStoreLoggedIn || isLoggedIn) { %>
                     <!-- ログイン中(店舗・一般共通) -->
                     <a href="${pageContext.request.contextPath}/foodloss/Menu.action" class="btn btn-home">ホームへ戻る</a>
-                    <button onclick="history.back()" class="btn btn-back">前のページに戻る</button>
                 <% } else { %>
                     <!-- 未ログイン TOPページへ -->
                     <a href="${pageContext.request.contextPath}/foodloss/Top.action" class="btn btn-home">TOPへ戻る</a>
