@@ -195,8 +195,21 @@ public class MerchandiseRegisterExecuteAction extends Action {
                 System.out.println("★ ファイルサイズ: " + imageFile.getSize() + " bytes");
 
                 try {
-                    // 保存先ディレクトリのパスを取得
-                    String uploadPath = request.getServletContext().getRealPath("/uploads/merchandise");
+                    // プロジェクトのWebContentディレクトリに保存
+                    // Eclipse開発環境用のパスを取得
+                    String projectPath = request.getServletContext().getRealPath("/");
+                    // tmp0/wtpwebapps から WebContent へのパスを構築
+                    String uploadPath;
+
+                    if (projectPath.contains("tmp0")) {
+                        // Eclipse開発環境の場合、実際のプロジェクトパスを取得
+                        String workspacePath = projectPath.substring(0, projectPath.indexOf("\\.metadata"));
+                        uploadPath = workspacePath + "\\foodloss\\WebContent\\uploads\\merchandise";
+                    } else {
+                        // 本番環境の場合
+                        uploadPath = request.getServletContext().getRealPath("/uploads/merchandise");
+                    }
+
                     System.out.println("★ アップロードパス: " + uploadPath);
 
                     File uploadDir = new File(uploadPath);
