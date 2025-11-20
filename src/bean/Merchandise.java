@@ -2,6 +2,7 @@ package bean;
 
 import java.sql.Date;
 import java.sql.Timestamp;
+import java.util.List;
 
 public class Merchandise implements java.io.Serializable {
 
@@ -21,6 +22,7 @@ public class Merchandise implements java.io.Serializable {
     private Integer originalPrice;      // 元の価格（割引前）
     private int discountPercent;        // 割引率（0-100）
     private Integer discountStartTime;  // 割引開始時刻（0-23、null可）
+    private List<MerchandiseImage> images;
 
 
     // ========== 既存のgetter/setter（そのまま） ==========
@@ -103,6 +105,14 @@ public class Merchandise implements java.io.Serializable {
 
     public void setBookingStatus(boolean bookingStatus) {
         this.bookingStatus = bookingStatus;
+    }
+
+    public List<MerchandiseImage> getImages() {
+        return images;
+    }
+
+    public void setImages(List<MerchandiseImage> images) {
+        this.images = images;
     }
 
 
