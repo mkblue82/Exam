@@ -10,8 +10,6 @@
     }
 %>
 
-
-
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -48,7 +46,9 @@
 
                     <div class="store-box">
                         <div class="store-title">
-                            店舗名：<%= store.getStoreName() %>（ID: <%= store.getStoreId() %>）
+                            店舗名：<a href="StoreInfo.action?storeId=<%= store.getStoreId() %>">
+									    <%= store.getStoreName() %>
+									</a>
                         </div>
 
                         <% if (merchList != null && !merchList.isEmpty()) { %>
