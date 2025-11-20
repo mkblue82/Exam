@@ -12,6 +12,7 @@
         return;
     }
 
+
     // キャッシュ制御（ブラウザバック対策）
     response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
     response.setHeader("Pragma", "no-cache");

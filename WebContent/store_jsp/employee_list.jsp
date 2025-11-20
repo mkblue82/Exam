@@ -19,15 +19,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>社員一覧 - フードロス削減システム</title>
+    <title>社員一覧</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
     <style>
-        body {
-            font-family: 'Segoe UI', sans-serif;
-            background-color: #f9f9f9;
-            margin: 0;
-            padding: 0;
-        }
         .main-content {
             max-width: 1000px;
             margin: 40px auto;
@@ -36,51 +30,77 @@
             border-radius: 10px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
+
         h2 {
             font-size: 1.8rem;
             text-align: center;
-            color: #333;
-            margin-bottom: 30px;
+            color: #c07148;
+            border-bottom: 2px solid #c07148;
+            padding-bottom: 1rem;
+            margin-bottom: 2rem;
         }
+
         .store-info {
             text-align: center;
             font-weight: bold;
-            color: #a65d36;
+            color: #c07148;
             margin-bottom: 20px;
+            font-size: 1rem;
         }
+
         table {
             width: 100%;
             border-collapse: collapse;
+            margin-top: 20px;
         }
+
         th {
-            background-color: #a65d36;
+            background-color: #c07148;
             color: #fff;
             padding: 12px;
+            font-weight: bold;
+            border: 1px solid #c07148;
         }
+
         td {
             padding: 12px;
-            border-bottom: 1px solid #ddd;
+            border: 1px solid #ddd;
             text-align: center;
+            color: #333;
         }
-        tr:hover {
+
+        tbody tr:hover {
             background-color: #f5f5f5;
         }
+
         .btn {
             display: inline-block;
             padding: 8px 25px;
             background-color: #c07148;
             color: white;
-            border-radius: 8px;
+            border-radius: 5px;
             text-decoration: none;
             transition: 0.3s;
+            font-weight: bold;
         }
+
         .btn:hover {
-            background-color: #c77c4a;
+            background-color: #a85d38;
+            transform: translateY(-2px);
         }
+
+        .no-data {
+            text-align: center;
+            padding: 40px 20px;
+            color: #999;
+            font-size: 1rem;
+        }
+
         .back-button {
             margin-top: 40px;
             text-align: center;
         }
+
         .back-button a {
             display: inline-block;
             padding: 12px 40px;
@@ -90,24 +110,35 @@
             font-weight: bold;
             color: #333;
             margin: 0 10px;
+            transition: all 0.3s;
         }
-        .back-button a:hover {
-            background-color: #a65d36;
-            color: #fff;
-        }
-        .btn {
-		    display: inline-block;
-		    padding: 8px 25px;
-		    background-color: #c07148;
-		    color: white;
-		    border-radius: 8px;
-		    text-decoration: none;
-		    transition: 0.3s;
-		}
-		.btn:hover {
-		    background-color: #c77c4a;
-		}
 
+        .back-button a:hover {
+            background-color: #c07148;
+            color: #fff;
+            transform: translateY(-3px);
+        }
+
+        @media screen and (max-width: 1000px) {
+            .main-content {
+                margin: 20px;
+                padding: 1.5rem;
+            }
+
+            table {
+                font-size: 0.9rem;
+            }
+
+            th, td {
+                padding: 8px;
+            }
+
+            .back-button a {
+                display: block;
+                margin: 10px auto;
+                max-width: 300px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -147,20 +178,20 @@
                                     <td><%= emp.getEmployeeCode() %></td>
                                     <td><%= emp.getEmployeeName() %></td>
                                     <td>
-									    <a class="btn" href="${pageContext.request.contextPath}/foodloss/EmployeeEdit.action?id=<%= emp.getId() %>">編集</a>
-									</td>
+                                        <a class="btn" href="${pageContext.request.contextPath}/foodloss/EmployeeEdit.action?id=<%= emp.getId() %>">編集</a>
+                                    </td>
                                 </tr>
                             <% } %>
                         </tbody>
                     </table>
                 <% } else { %>
-                    <p style="text-align:center; padding:20px; color:#999;">
+                    <p class="no-data">
                         社員情報が登録されていません。
                     </p>
                 <% } %>
 
                 <div class="back-button">
-                    <a href="${pageContext.request.contextPath}/store_jsp/main_store.jsp">メインメニューへ戻る</a>
+                    <a href="${pageContext.request.contextPath}/foodloss/Menu.action">ホームに戻る</a>
                     <a href="${pageContext.request.contextPath}/foodloss/EmployeeRegister.action">社員登録</a>
                 </div>
 
@@ -173,7 +204,10 @@
 
 </div>
 
+<!-- JS -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
+<script src="${pageContext.request.contextPath}/js/slick.js"></script>
 <script src="${pageContext.request.contextPath}/js/main.js"></script>
 </body>
 </html>

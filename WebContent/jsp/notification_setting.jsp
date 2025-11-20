@@ -20,7 +20,7 @@
         color: #c07148;
         text-align: center;
         font-size: 1.8rem;
-        border-bottom: 2px solid #c07148;
+        border-bottom: 1px solid #c07148;
         padding-bottom: 1rem;
         margin-bottom: 2rem;
     }

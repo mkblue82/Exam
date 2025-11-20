@@ -10,7 +10,11 @@ import bean.Application;
 
 public class ApplicationDAO extends DAO {
 
-	private Connection con;
+    private Connection con;
+
+    public ApplicationDAO(Connection con) {
+        this.con = con;
+    }
 
     /**
      * 申請データを新規登録

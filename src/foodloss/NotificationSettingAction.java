@@ -1,6 +1,5 @@
 package foodloss;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -44,57 +43,6 @@ public class NotificationSettingAction extends Action {
             // お気に入り店舗一覧を取得
             List<Favorite> favoriteStores = dao.getFavoriteStoresByUserId(user.getUserId());
 
-            // ===== ダミーデータ（画面確認用） =====
-            // 実際の運用時はこのブロックを削除してください
-            if (favoriteStores == null || favoriteStores.isEmpty()) {
-                favoriteStores = new ArrayList<>();
-
-                Favorite store1 = new Favorite();
-                store1.setFavoriteStoreId(1);
-                store1.setUserId(user.getUserId());
-                store1.setStoreId(1);
-                store1.setStoreName("ベーカリー山田");
-                store1.setStoreAddress("東京都渋谷区代々木1-2-3");
-                store1.setNotificationSetting(true);
-
-                Favorite store2 = new Favorite();
-                store2.setFavoriteStoreId(2);
-                store2.setUserId(user.getUserId());
-                store2.setStoreId(2);
-                store2.setStoreName("カフェ＆レストラン グリーン");
-                store2.setStoreAddress("東京都新宿区新宿3-10-5");
-                store2.setNotificationSetting(true);
-
-                Favorite store3 = new Favorite();
-                store3.setFavoriteStoreId(3);
-                store3.setUserId(user.getUserId());
-                store3.setStoreId(3);
-                store3.setStoreName("スーパーマーケット田中");
-                store3.setStoreAddress("東京都世田谷区三軒茶屋2-15-8");
-                store3.setNotificationSetting(false);
-
-                Favorite store4 = new Favorite();
-                store4.setFavoriteStoreId(4);
-                store4.setUserId(user.getUserId());
-                store4.setStoreId(4);
-                store4.setStoreName("デリカテッセン佐藤");
-                store4.setStoreAddress("東京都港区六本木7-18-12");
-                store4.setNotificationSetting(true);
-
-                Favorite store5 = new Favorite();
-                store5.setFavoriteStoreId(5);
-                store5.setUserId(user.getUserId());
-                store5.setStoreId(5);
-                store5.setStoreName("和食処 鈴木");
-                store5.setStoreAddress("東京都中央区銀座4-5-6");
-                store5.setNotificationSetting(false);
-
-                favoriteStores.add(store1);
-                favoriteStores.add(store2);
-                favoriteStores.add(store3);
-                favoriteStores.add(store4);
-                favoriteStores.add(store5);
-            }
             // ===== ダミーデータここまで =====
 
             request.setAttribute("favoriteStores", favoriteStores);
