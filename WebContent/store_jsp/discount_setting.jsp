@@ -136,7 +136,7 @@
                     割引設定が完了しました。
                 </div>
 
-                <form id="discountForm" method="post" action="${pageContext.request.contextPath}/foodloss/DiscountSetting.action">
+              <form id="discountForm" method="post" action="${pageContext.request.contextPath}/foodloss/DiscountSetting.action">
                     <!-- 時間入力 -->
                     <div class="form-group">
                         <div class="form-row">

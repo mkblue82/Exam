@@ -1,6 +1,6 @@
 package foodloss;
 
-import java.io.InputStream;
+import java.io.File;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -187,35 +187,58 @@ public class MerchandiseRegisterExecuteAction extends Action {
 
             System.out.println("✅ 商品登録成功！ merchandiseId = " + merchandiseId);
 
-            // 画像がアップロードされている場合、画像を保存
+            // 画像がアップロードされている場合、ファイルシステムに保存
             if (imageFile != null && imageFile.getSize() > 0) {
                 System.out.println("★ 画像アップロード開始");
                 System.out.println("★ ファイル名: " + imageFile.getName());
                 System.out.println("★ ファイルサイズ: " + imageFile.getSize() + " bytes");
-//sｋd
-                InputStream inputStream = imageFile.getInputStream();
-                byte[] imageData = new byte[(int) imageFile.getSize()];
-                int bytesRead = inputStream.read(imageData);
-                inputStream.close();
 
-                System.out.println("★ 読み込んだバイト数: " + bytesRead);
+                // 保存先ディレクトリのパスを取得
+                String uploadPath = request.getServletContext().getRealPath("/uploads/merchandise");
+                File uploadDir = new File(uploadPath);
 
+                // ディレクトリが存在しない場合は作成
+                if (!uploadDir.exists()) {
+                    boolean created = uploadDir.mkdirs();
+                    System.out.println("★ ディレクトリ作成: " + uploadPath + " -> " + (created ? "成功" : "失敗"));
+                }
+
+                // 元のファイル名を取得
+                String originalFileName = imageFile.getName();
+                if (originalFileName == null || originalFileName.isEmpty()) {
+                    originalFileName = "image.jpg";
+                }
+
+                // 拡張子を取得
+                String extension = "";
+                int lastDot = originalFileName.lastIndexOf('.');
+                if (lastDot > 0) {
+                    extension = originalFileName.substring(lastDot);
+                }
+
+                // 一意なファイル名を生成（merchandiseId + タイムスタンプ）
+                String fileName = merchandiseId + "_" + System.currentTimeMillis() + extension;
+                String filePath = uploadPath + File.separator + fileName;
+
+                System.out.println("★ 保存先: " + filePath);
+
+                // ファイルに書き込み
+                File savedFile = new File(filePath);
+                imageFile.write(savedFile);
+
+                System.out.println("✅ ファイル保存成功: " + fileName);
+
+                // DBには相対パスを保存
                 MerchandiseImage img = new MerchandiseImage();
                 img.setMerchandiseId(merchandiseId);
-                img.setImageData(imageData);
-
-                // ファイル名を取得
-                String fileName = imageFile.getName();
-                if (fileName == null || fileName.isEmpty()) {
-                    fileName = "image_" + merchandiseId + ".jpg";
-                }
-                img.setFileName(fileName);
+                img.setFileName("/uploads/merchandise/" + fileName);  // 相対パス
                 img.setDisplayOrder(1);
 
                 MerchandiseImageDAO imgDao = new MerchandiseImageDAO(connection);
                 int imgResult = imgDao.insert(img);
 
-                System.out.println("✅ 画像登録結果: " + imgResult + " 件");
+                System.out.println("✅ DB画像パス登録結果: " + imgResult + " 件");
+
             } else {
                 System.out.println("⚠️ 画像ファイルが選択されていないか、サイズが0です");
                 if (imageFile != null) {
