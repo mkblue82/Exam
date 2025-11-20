@@ -1,25 +1,18 @@
 package foodloss;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.nio.file.Files;
 import java.sql.Connection;
-import java.sql.SQLException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import bean.Application;
 import bean.Store;
+import dao.ApplicationDAO;
 import dao.StoreDAO;
 import tool.Action;
-import tool.DBManager;
 import tool.MailSender;
 
 public class ApproveStoreAction extends Action {
-
-    // 一時保存ディレクトリ（SignupStoreActionと同じ）
-    private static final String TEMP_DIR = System.getProperty("java.io.tmpdir") + File.separator + "store_applications";
 
     @Override
     public void execute(HttpServletRequest req, HttpServletResponse res) throws Exception {
@@ -35,135 +28,122 @@ public class ApproveStoreAction extends Action {
             return;
         }
 
-        // --- 一時ファイルの存在確認 ---
-        File dataFile = new File(TEMP_DIR + File.separator + token + ".txt");
-        File permitFile = new File(TEMP_DIR + File.separator + token + "_permit");
+        System.out.println("DEBUG: Approval token = " + token);
 
-        if (!dataFile.exists() || !permitFile.exists()) {
-            showError(req, res, "申請データが見つかりません。\n既に承認済みか、有効期限が切れている可能性があります。");
-            return;
-        }
+        Connection conn = null;
 
-        // --- ファイルからデータ読み込み ---
-        String storeName = null;
-        String address = null;
-        String phone = null;
-        String email = null;
-        String password = null;
-        String permitFileName = null;
-
-        try (BufferedReader reader = new BufferedReader(new FileReader(dataFile))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                if (line.startsWith("storeName=")) {
-                    storeName = line.substring("storeName=".length());
-                } else if (line.startsWith("address=")) {
-                    address = line.substring("address=".length());
-                } else if (line.startsWith("phone=")) {
-                    phone = line.substring("phone=".length());
-                } else if (line.startsWith("email=")) {
-                    email = line.substring("email=".length());
-                } else if (line.startsWith("password=")) {
-                    password = line.substring("password=".length());
-                } else if (line.startsWith("permitFileName=")) {
-                    permitFileName = line.substring("permitFileName=".length());
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            showError(req, res, "申請データの読み込みに失敗しました。");
-            return;
-        }
-
-        // --- 営業許可書ファイル読み込み ---
-        byte[] permitFileData;
         try {
-            permitFileData = Files.readAllBytes(permitFile.toPath());
-        } catch (Exception e) {
-            e.printStackTrace();
-            showError(req, res, "営業許可書ファイルの読み込みに失敗しました。");
-            return;
-        }
+            conn = getConnection();
+            ApplicationDAO appDAO = new ApplicationDAO(conn);
+            StoreDAO storeDAO = new StoreDAO(conn);
 
-        // --- データ検証 ---
-        if (storeName == null || address == null || phone == null ||
-            email == null || password == null || permitFileData == null) {
-            showError(req, res, "申請データが不完全です。");
-            return;
-        }
+            // --- トークンで申請データを取得 ---
+            Application app = appDAO.selectByToken(token);
 
-        // --- DB登録 ---
-        DBManager db = new DBManager();
-        try (Connection conn = db.getConnection()) {
-            StoreDAO dao = new StoreDAO(conn);
+            if (app == null) {
+                showError(req, res, "申請データが見つかりません。\n既に承認済みか、無効なトークンです。");
+                return;
+            }
 
-            // 念のため再度重複チェック
-            if (isPhoneExists(dao, phone)) {
+            // --- 既に承認済みかチェック ---
+            if ("approved".equals(app.getStatus())) {
+                showError(req, res, "この申請は既に承認済みです。");
+                return;
+            }
+
+            System.out.println("DEBUG: Application found - " + app.getStoreName());
+
+            // --- 念のため再度重複チェック ---
+            if (isPhoneExists(storeDAO, app.getStorePhone())) {
                 showError(req, res, "この電話番号は既に登録されています。\n申請を却下してください。");
                 return;
             }
-            if (isEmailExists(dao, email)) {
+            if (isEmailExists(storeDAO, app.getStoreEmail())) {
                 showError(req, res, "このメールアドレスは既に登録されています。\n申請を却下してください。");
                 return;
             }
 
-            // Storeオブジェクト作成
+            // --- Storeオブジェクト作成 ---
             Store store = new Store();
-            store.setStoreName(storeName);
-            store.setAddress(address);
-            store.setPhone(phone);
-            store.setEmail(email);
-            store.setLicense(permitFileData);
-            store.setPassword(password);
+            store.setStoreName(app.getStoreName());
+            store.setAddress(app.getStoreAddress());
+            store.setPhone(app.getStorePhone());
+            store.setEmail(app.getStoreEmail());
+            store.setPassword(app.getPasswordHash());
+            store.setLicense(app.getBusinessLicense());
 
-            // DB登録
-            dao.insert(store);
+            // --- DB登録 ---
+            storeDAO.insert(store);
 
-            System.out.println("DEBUG: Store registered - " + storeName);
+            System.out.println("DEBUG: Store registered - ID: " + store.getStoreId());
 
-            // --- 一時ファイル削除 ---
-            try {
-                dataFile.delete();
-                permitFile.delete();
-                System.out.println("DEBUG: Temporary files deleted for token: " + token);
-            } catch (Exception e) {
-                e.printStackTrace();
-                // ファイル削除失敗してもエラーにはしない
-            }
+            // --- 申請ステータスを更新 ---
+            appDAO.updateStatus(app.getApplicationId(), "approved");
+
+            System.out.println("DEBUG: Application status updated to 'approved'");
 
             // --- 店舗への完了メール送信 ---
             try {
-                String completionBody = storeName + " 様\n\n" +
-                                       "店舗の登録が完了しました。\n\n" +
-                                       "以下のログインページからログインして、商品登録などを行ってください。\n\n" +
-                                       "ログインURL: " + req.getScheme() + "://" + req.getServerName() +
-                                       ":" + req.getServerPort() + req.getContextPath() + "/StoreLogin\n\n" +
-                                       "メールアドレス: " + email + "\n" +
-                                       "※パスワードは登録時に設定したものをご使用ください。\n\n" +
-                                       "ご不明な点がございましたら、お気軽にお問い合わせください。";
+                String loginUrl = req.getScheme() + "://" + req.getServerName() +
+                                ":" + req.getServerPort() + req.getContextPath() +
+                                "/foodloss/LoginStore.action";
+
+                String completionBody = app.getStoreName() + " 様\n\n" +
+                                       "店舗登録の審査が完了しました。\n" +
+                                       "以下の情報でログインできます。\n\n" +
+                                       "━━━━━━━━━━━━━━━━━━\n" +
+                                       "店舗ID: " + store.getStoreId() + "\n" +
+                                       "ログインURL: " + loginUrl + "\n" +
+                                       "━━━━━━━━━━━━━━━━━━\n\n" +
+                                       "※パスワードは申請時に設定したものをご使用ください。\n\n" +
+                                       "ご利用ありがとうございます。";
 
                 MailSender.sendEmail(
-                    email,
-                    "【完了】店舗登録完了のお知らせ",
+                    app.getStoreEmail(),
+                    "【登録完了】ログイン情報のお知らせ",
                     completionBody
                 );
 
-                System.out.println("DEBUG: Completion email sent to: " + email);
+                System.out.println("DEBUG: Completion email sent to: " + app.getStoreEmail());
 
             } catch (Exception e) {
                 e.printStackTrace();
-                // メール送信失敗してもDB登録は完了しているのでエラーページは表示しない
-                System.err.println("WARNING: Failed to send completion email to: " + email);
+                System.err.println("WARNING: Failed to send completion email to: " + app.getStoreEmail());
+                // メール送信失敗してもDB登録は完了しているので処理は続行
+            }
+
+            // --- 運営にも完了通知を送信（オプション） ---
+            try {
+                String adminNotification = "店舗承認が完了しました。\n\n" +
+                                          "店舗名: " + app.getStoreName() + "\n" +
+                                          "店舗ID: " + store.getStoreId() + "\n" +
+                                          "メール: " + app.getStoreEmail() + "\n" +
+                                          "登録日時: " + new java.util.Date();
+
+                MailSender.sendEmail(
+                    "mklblue82@gmail.com",
+                    "【完了】店舗承認処理完了通知",
+                    adminNotification
+                );
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                // 運営への通知失敗は無視
             }
 
             // --- 成功ページ表示 ---
-            req.setAttribute("storeName", storeName);
-            req.setAttribute("email", email);
+            req.setAttribute("storeName", app.getStoreName());
+            req.setAttribute("storeId", store.getStoreId());
+            req.setAttribute("email", app.getStoreEmail());
             req.getRequestDispatcher("/admin_jsp/approve_success.jsp").forward(req, res);
 
-        } catch (SQLException e) {
+        } catch (Exception e) {
             e.printStackTrace();
-            showError(req, res, "データベースへの登録に失敗しました。\n" + e.getMessage());
+            showError(req, res, "承認処理中にエラーが発生しました。\n" + e.getMessage());
+        } finally {
+            if (conn != null) {
+                conn.close();
+            }
         }
     }
 

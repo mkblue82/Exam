@@ -18,7 +18,6 @@ import dao.ApplicationDAO;
 import dao.StoreDAO;
 import tool.Action;
 import tool.MailSender;
-import tool.DBUtil;
 
 public class SignupStoreAction extends Action {
 
@@ -106,7 +105,7 @@ public class SignupStoreAction extends Action {
             return;
         }
 
-        // ファイルを byte[] に変換
+        // ファイルデータをbyte配列に変換
         byte[] permitFileData;
         try (InputStream is = permitFilePart.getInputStream();
              java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream()) {
@@ -121,13 +120,12 @@ public class SignupStoreAction extends Action {
         // --- パスワードハッシュ化 ---
         String passwordHash = hashPassword(passwordRaw);
 
+        // --- 重複チェック（既存店舗テーブルのみ） ---
         Connection conn = null;
 
         try {
-            // ⭐ コネクションは DBUtil で取得する
-            conn = DBUtil.getConnection();
-
-            StoreDAO storeDAO = new StoreDAO(conn);
+        	conn = getConnection();
+        	StoreDAO storeDAO = new StoreDAO(conn);
 
             if (isPhoneExists(storeDAO, phone)) {
                 forwardWithError(req, res, "この電話番号は既に登録されています。");
@@ -155,10 +153,10 @@ public class SignupStoreAction extends Action {
             ApplicationDAO appDAO = new ApplicationDAO(conn);
             appDAO.insert(app);
 
-            // CSRFトークン削除
+            // --- CSRFトークンをクリア ---
             session.removeAttribute("csrfToken");
 
-            // --- 運営に承認メール送信 ---
+            // --- 運営へのメール送信（承認リンク付き） ---
             String approvalLink = req.getScheme() + "://" + req.getServerName() +
                                   ":" + req.getServerPort() + req.getContextPath() +
                                   "/foodloss/ApproveStore.action?token=" + approvalToken;
@@ -171,18 +169,22 @@ public class SignupStoreAction extends Action {
                           "━━━━━━━━━━━━━━━━━━━━━━\n" +
                           "承認してDBに登録する場合は、以下のリンクをクリックしてください:\n" +
                           approvalLink + "\n" +
-                          "━━━━━━━━━━━━━━━━━━━━━━";
+                          "━━━━━━━━━━━━━━━━━━━━━━\n\n" +
+                          "※営業許可書は添付ファイルをご確認ください。";
 
-            MailSender.sendEmail(
-                "mklblue82@gmail.com",
+            MailSender.sendEmailWithAttachment(
+                "mklblue82@gmail.com", // 運営メールアドレス
                 "【要承認】新規店舗申請通知",
-                body
+                body,
+                permitFileData,
+                storeName + "_permit.pdf"
             );
 
-            // --- 店舗側に受付メール送信 ---
+            // --- 店舗側に申請受付メール送信 ---
             String storeBody = storeName + " 様\n\n" +
                               "店舗申請を受け付けました。\n" +
-                              "審査完了後、登録完了メールを送信します。";
+                              "運営による審査が完了次第、登録完了メールをお送りします。\n\n" +
+                              "今しばらくお待ちください。";
 
             MailSender.sendEmail(
                 email,
@@ -190,16 +192,20 @@ public class SignupStoreAction extends Action {
                 storeBody
             );
 
+            System.out.println("DEBUG: 申請データをDBに保存しました。Application ID = " + app.getApplicationId());
+
         } catch (SQLException e) {
             e.printStackTrace();
             forwardWithError(req, res, "データベースエラーが発生しました。");
             return;
         } catch (Exception e) {
             e.printStackTrace();
-            forwardWithError(req, res, "メール送信に失敗しました。");
+            forwardWithError(req, res, "メール送信に失敗しました。もう一度お試しください。");
             return;
         } finally {
-            if (conn != null) conn.close();
+            if (conn != null) {
+                conn.close();
+            }
         }
 
         req.getRequestDispatcher("/store_jsp/signup_done_store.jsp").forward(req, res);
@@ -212,14 +218,18 @@ public class SignupStoreAction extends Action {
 
     private boolean isPhoneExists(StoreDAO dao, String phone) throws Exception {
         for (Store s : dao.selectAll()) {
-            if (s.getPhone() != null && s.getPhone().equals(phone)) return true;
+            if (s.getPhone() != null && s.getPhone().equals(phone)) {
+                return true;
+            }
         }
         return false;
     }
 
     private boolean isEmailExists(StoreDAO dao, String email) throws Exception {
         for (Store s : dao.selectAll()) {
-            if (s.getEmail() != null && s.getEmail().equals(email)) return true;
+            if (s.getEmail() != null && s.getEmail().equals(email)) {
+                return true;
+            }
         }
         return false;
     }
@@ -253,7 +263,7 @@ public class SignupStoreAction extends Action {
     private boolean isValidFileType(String fileName) {
         if (fileName == null) return false;
         String lower = fileName.toLowerCase();
-        return lower.endsWith(".jpg") || lower.endsWith(".jpeg")
-            || lower.endsWith(".png") || lower.endsWith(".pdf");
+        return lower.endsWith(".jpg") || lower.endsWith(".jpeg") ||
+               lower.endsWith(".png") || lower.endsWith(".pdf");
     }
 }
