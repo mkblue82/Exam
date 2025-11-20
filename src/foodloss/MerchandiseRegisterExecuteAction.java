@@ -1,6 +1,7 @@
 package foodloss;
 
 import java.io.File;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -193,51 +194,88 @@ public class MerchandiseRegisterExecuteAction extends Action {
                 System.out.println("★ ファイル名: " + imageFile.getName());
                 System.out.println("★ ファイルサイズ: " + imageFile.getSize() + " bytes");
 
-                // 保存先ディレクトリのパスを取得
-                String uploadPath = request.getServletContext().getRealPath("/uploads/merchandise");
-                File uploadDir = new File(uploadPath);
+                try {
+                    // プロジェクトのWebContentディレクトリに保存
+                    // Eclipse開発環境用のパスを取得
+                    String projectPath = request.getServletContext().getRealPath("/");
+                    // tmp0/wtpwebapps から WebContent へのパスを構築
+                    String uploadPath;
 
-                // ディレクトリが存在しない場合は作成
-                if (!uploadDir.exists()) {
-                    boolean created = uploadDir.mkdirs();
-                    System.out.println("★ ディレクトリ作成: " + uploadPath + " -> " + (created ? "成功" : "失敗"));
+                    if (projectPath.contains("tmp0")) {
+                        // Eclipse開発環境の場合、実際のプロジェクトパスを取得
+                        String workspacePath = projectPath.substring(0, projectPath.indexOf("\\.metadata"));
+                        uploadPath = workspacePath + "\\foodloss\\WebContent\\uploads\\merchandise";
+                    } else {
+                        // 本番環境の場合
+                        uploadPath = request.getServletContext().getRealPath("/uploads/merchandise");
+                    }
+
+                    System.out.println("★ アップロードパス: " + uploadPath);
+
+                    File uploadDir = new File(uploadPath);
+
+                    // ディレクトリが存在しない場合は作成
+                    if (!uploadDir.exists()) {
+                        boolean created = uploadDir.mkdirs();
+                        System.out.println("★ ディレクトリ作成: " + uploadPath + " -> " + (created ? "成功" : "失敗"));
+                    } else {
+                        System.out.println("★ ディレクトリ存在確認: " + uploadPath);
+                    }
+
+                    // 元のファイル名を取得
+                    String originalFileName = imageFile.getName();
+                    if (originalFileName == null || originalFileName.isEmpty()) {
+                        originalFileName = "image.jpg";
+                    }
+
+                    // 拡張子を取得
+                    String extension = "";
+                    int lastDot = originalFileName.lastIndexOf('.');
+                    if (lastDot > 0) {
+                        extension = originalFileName.substring(lastDot);
+                    }
+
+                    // 一意なファイル名を生成（merchandiseId + タイムスタンプ）
+                    String fileName = merchandiseId + "_" + System.currentTimeMillis() + extension;
+                    String filePath = uploadPath + File.separator + fileName;
+
+                    System.out.println("★ 保存先フルパス: " + filePath);
+
+                    // ファイルに書き込み（InputStreamを使用）
+                    File savedFile = new File(filePath);
+                    InputStream inputStream = imageFile.getInputStream();
+                    java.io.FileOutputStream outputStream = new java.io.FileOutputStream(savedFile);
+
+                    byte[] buffer = new byte[4096];
+                    int bytesRead;
+                    long totalBytes = 0;
+
+                    while ((bytesRead = inputStream.read(buffer)) != -1) {
+                        outputStream.write(buffer, 0, bytesRead);
+                        totalBytes += bytesRead;
+                    }
+
+                    outputStream.close();
+                    inputStream.close();
+
+                    System.out.println("✅ ファイル保存成功: " + fileName + " (" + totalBytes + " bytes)");
+
+                    // DBには相対パスを保存
+                    MerchandiseImage img = new MerchandiseImage();
+                    img.setMerchandiseId(merchandiseId);
+                    img.setFileName("/uploads/merchandise/" + fileName);  // 相対パス
+                    img.setDisplayOrder(1);
+
+                    MerchandiseImageDAO imgDao = new MerchandiseImageDAO(connection);
+                    int imgResult = imgDao.insert(img);
+
+                    System.out.println("✅ DB画像パス登録結果: " + imgResult + " 件");
+
+                } catch (Exception imgEx) {
+                    System.err.println("❌ 画像保存エラー: " + imgEx.getMessage());
+                    imgEx.printStackTrace();
+                    // 画像保存失敗でも商品登録は継続
                 }
-
-                // 元のファイル名を取得
-                String originalFileName = imageFile.getName();
-                if (originalFileName == null || originalFileName.isEmpty()) {
-                    originalFileName = "image.jpg";
-                }
-
-                // 拡張子を取得
-                String extension = "";
-                int lastDot = originalFileName.lastIndexOf('.');
-                if (lastDot > 0) {
-                    extension = originalFileName.substring(lastDot);
-                }
-
-                // 一意なファイル名を生成（merchandiseId + タイムスタンプ）
-                String fileName = merchandiseId + "_" + System.currentTimeMillis() + extension;
-                String filePath = uploadPath + File.separator + fileName;
-
-                System.out.println("★ 保存先: " + filePath);
-
-                // ファイルに書き込み
-                File savedFile = new File(filePath);
-                imageFile.write(savedFile);
-
-                System.out.println("✅ ファイル保存成功: " + fileName);
-
-                // DBには相対パスを保存
-                MerchandiseImage img = new MerchandiseImage();
-                img.setMerchandiseId(merchandiseId);
-                img.setFileName("/uploads/merchandise/" + fileName);  // 相対パス
-                img.setDisplayOrder(1);
-
-                MerchandiseImageDAO imgDao = new MerchandiseImageDAO(connection);
-                int imgResult = imgDao.insert(img);
-
-                System.out.println("✅ DB画像パス登録結果: " + imgResult + " 件");
 
             } else {
                 System.out.println("⚠️ 画像ファイルが選択されていないか、サイズが0です");
