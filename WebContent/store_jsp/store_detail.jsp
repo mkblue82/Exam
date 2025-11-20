@@ -1,4 +1,12 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page import="bean.Store" %>
+<%
+    Store store = (Store) request.getAttribute("store");
+    if (store == null) {
+        response.sendRedirect(request.getContextPath() + "/foodloss/Menu.action");
+        return;
+    }
+%>
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -20,8 +28,6 @@
         color: #c07148;
         text-align: center;
         font-size: 1.8rem;
-        border-bottom: 1px solid #c07148;
-        padding-bottom: 1rem;
         margin-bottom: 2rem;
     }
 
@@ -145,27 +151,27 @@
 
                     <div class="detail-row">
                         <div class="detail-label">店舗ID</div>
-                        <div class="detail-value">1</div>
+                        <div class="detail-value"><%= store.getStoreId() %></div>
                     </div>
 
                     <div class="detail-row">
                         <div class="detail-label">店舗名</div>
-                        <div class="detail-value">サンプルベーカリー</div>
+                        <div class="detail-value"><%= store.getStoreName() %></div>
                     </div>
 
                     <div class="detail-row">
                         <div class="detail-label">住所</div>
-                        <div class="detail-value">東京都渋谷区渋谷1-2-3</div>
+                        <div class="detail-value"><%= store.getAddress() != null ? store.getAddress() : "未設定" %></div>
                     </div>
 
                     <div class="detail-row">
                         <div class="detail-label">電話番号</div>
-                        <div class="detail-value">03-1234-5678</div>
+                        <div class="detail-value"><%= store.getPhone() != null ? store.getPhone() : "未設定" %></div>
                     </div>
 
                     <div class="detail-row">
                         <div class="detail-label">メールアドレス</div>
-                        <div class="detail-value">sample@example.com</div>
+                        <div class="detail-value"><%= store.getEmail() != null ? store.getEmail() : "未設定" %></div>
                     </div>
                 </div>
 
@@ -174,18 +180,33 @@
                     <h3>営業許可証</h3>
 
                     <div class="detail-row">
-                        <div class="detail-label">ファイル名</div>
-                        <div class="detail-value">license_sample.pdf</div>
+                        <div class="detail-label">ステータス</div>
+                        <div class="detail-value">
+                            <% if (store.getLicense() != null) { %>
+                                登録済み
+                            <% } else { %>
+                                <span class="no-data">未登録</span>
+                            <% } %>
+                        </div>
                     </div>
 
+                    <% if (store.getLicense() != null) { %>
                     <div class="detail-row">
                         <div class="detail-label">ダウンロード</div>
                         <div class="detail-value">
-                            <a href="#" class="btn btn-secondary" style="padding: 8px 20px; font-size: 14px;">
+                            <a href="${pageContext.request.contextPath}/foodloss/DownloadLicense.action?storeId=<%= store.getStoreId() %>"
+                               class="btn btn-secondary" style="padding: 8px 20px; font-size: 14px;">
                                 営業許可証をダウンロード
                             </a>
                         </div>
                     </div>
+                    <% } %>
+                </div>
+
+                <div class="button-container">
+                    <a href="${pageContext.request.contextPath}/foodloss/Menu.action" class="btn btn-secondary">
+                        ホームに戻る
+                    </a>
                 </div>
 
             </div>
@@ -198,6 +219,8 @@
 
 <!-- JS -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
+<script src="${pageContext.request.contextPath}/js/slick.js"></script>
 <script src="${pageContext.request.contextPath}/js/main.js"></script>
 </body>
 </html>
