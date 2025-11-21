@@ -22,7 +22,7 @@ public class MerchandiseImageDAO extends DAO {
 
     /**
      * 画像を登録（bytea保存対応）
-     * カラム: t002_1_fd6_uploaded_at が bytea
+     * カラム: t002_1_fd6_uploaded_atが bytea
      */
     public int insert(MerchandiseImage image) throws Exception {
         Connection con = (connection != null) ? connection : getConnection();
