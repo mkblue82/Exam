@@ -195,7 +195,7 @@
 				                img.style.maxWidth = '120px';
 				                img.style.maxHeight = '120px';
 				                img.style.marginRight = '10px';
-				                img.style.marginBottom = '10px'; // ← ここで下に余白を追加
+				                img.style.marginBottom = '10px';
 				                preview.appendChild(img);
 				            };
 
