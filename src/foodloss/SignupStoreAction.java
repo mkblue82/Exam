@@ -51,46 +51,31 @@ public class SignupStoreAction extends Action {
         String passwordConfirm = req.getParameter("passwordConfirm");
 
         // バリデーション
-        if (storeName == null || storeName.trim().isEmpty()) {
-            forwardWithError(req, res, "店舗名を入力してください。"); return;
+        if (storeName == null || storeName.trim().isEmpty()) { forwardWithError(req, res, "店舗名を入力してください。"); return;
         }
-        if (address == null || address.trim().isEmpty()) {
-            forwardWithError(req, res, "店舗住所を入力してください。"); return;
+        if (address == null || address.trim().isEmpty()) { forwardWithError(req, res, "店舗住所を入力してください。"); return;
         }
-        if (phone == null || phone.trim().isEmpty()) {
-            forwardWithError(req, res, "電話番号を入力してください。"); return;
+        if (phone == null || phone.trim().isEmpty()) { forwardWithError(req, res, "電話番号を入力してください。"); return;
         }
-        if (email == null || email.trim().isEmpty()) {
-            forwardWithError(req, res, "メールアドレスを入力してください。"); return;
+        if (email == null || email.trim().isEmpty()) { forwardWithError(req, res, "メールアドレスを入力してください。"); return;
         }
-        if (passwordRaw == null || passwordRaw.trim().isEmpty()) {
-            forwardWithError(req, res, "パスワードを入力してください。"); return;
+        if (passwordRaw == null || passwordRaw.trim().isEmpty()) { forwardWithError(req, res, "パスワードを入力してください。"); return;
         }
-        if (passwordConfirm == null || passwordConfirm.trim().isEmpty()) {
-            forwardWithError(req, res, "確認用パスワードを入力してください。"); return;
+        if (passwordConfirm == null || passwordConfirm.trim().isEmpty()) { forwardWithError(req, res, "確認用パスワードを入力してください。"); return;
         }
-        if (!passwordRaw.equals(passwordConfirm)) {
-            forwardWithError(req, res, "パスワードが一致しません。"); return;
+        if (!passwordRaw.equals(passwordConfirm)) { forwardWithError(req, res, "パスワードが一致しません。"); return;
         }
-        if (passwordRaw.length() < 8) {
-            forwardWithError(req, res, "パスワードは8文字以上で入力してください。"); return;
+        if (passwordRaw.length() < 8) { forwardWithError(req, res, "パスワードは8文字以上で入力してください。"); return;
         }
-        if (!phone.matches("[0-9]{10,11}")) {
-            forwardWithError(req, res, "電話番号は10桁または11桁の数字で入力してください。"); return;
+        if (!phone.matches("[0-9]{10,11}")) { forwardWithError(req, res, "電話番号は10桁または11桁の数字で入力してください。"); return;
         }
 
         // ファイルアップロード
         Part permitFilePart = req.getPart("permitFile");
-        if (permitFilePart == null || permitFilePart.getSize() == 0) {
-            forwardWithError(req, res, "営業許可書をアップロードしてください。"); return;
-        }
+        if (permitFilePart == null || permitFilePart.getSize() == 0) { forwardWithError(req, res, "営業許可書をアップロードしてください。"); return; }
         String permitFileName = getFileName(permitFilePart);
-        if (!isValidFileType(permitFileName)) {
-            forwardWithError(req, res, "営業許可書はJPG、PNG、PDF形式でアップロードしてください。"); return;
-        }
-        if (permitFilePart.getSize() > 5 * 1024 * 1024) {
-            forwardWithError(req, res, "ファイルサイズは5MB以下にしてください。"); return;
-        }
+        if (!isValidFileType(permitFileName)) { forwardWithError(req, res, "営業許可書はJPG、PNG、PDF形式でアップロードしてください。"); return; }
+        if (permitFilePart.getSize() > 5 * 1024 * 1024) { forwardWithError(req, res, "ファイルサイズは5MB以下にしてください。"); return; }
 
         // byte配列に変換
         byte[] permitFileData;
@@ -110,15 +95,12 @@ public class SignupStoreAction extends Action {
             StoreDAO storeDAO = new StoreDAO(conn);
             ApplicationDAO appDAO = new ApplicationDAO();
 
-            // 重複チェック
+            // Storeテーブルだけ重複チェック（仮登録はApplicationテーブルは無視）
             if (isPhoneExists(storeDAO, phone)) {
-                forwardWithError(req, res, "この電話番号は既に登録されています。"); return;
+                forwardWithError(req, res, "この電話番号は既に使用されています。"); return;
             }
             if (isEmailExists(storeDAO, email)) {
-                forwardWithError(req, res, "このメールアドレスは既に登録されています。"); return;
-            }
-            if (appDAO.existsByEmail(email)) {
-                forwardWithError(req, res, "このメールアドレスは既に申請されています。"); return;
+                forwardWithError(req, res, "このメールアドレスは既に使用されています。"); return;
             }
 
             // 承認用トークン
@@ -157,7 +139,7 @@ public class SignupStoreAction extends Action {
                     "営業許可証を添付ファイルでご確認ください。";
 
             MailSender.sendEmailWithAttachment(
-                    "admin@example.com",  // 運営メールアドレス
+                    "mklblue82@gmail.com",  // 運営メールアドレス
                     "【要承認】新規店舗申請通知 - " + storeName,
                     adminBody,
                     permitFileData,
