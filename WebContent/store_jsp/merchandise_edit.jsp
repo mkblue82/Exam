@@ -1,22 +1,14 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="bean.Merchandise" %>
 <%@ page import="bean.MerchandiseImage" %>
-<%@ page import="dao.MerchandiseImageDAO" %>
-<%@ page import="tool.DBManager" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.Base64" %>
 
 <%
     Merchandise m = (Merchandise) request.getAttribute("merchandise");
-    String useByDateStr = (m.getUseByDate() != null) ? m.getUseByDate().toString() : "";
+    List<MerchandiseImage> images = (List<MerchandiseImage>) request.getAttribute("images");
 
-    List<MerchandiseImage> images = null;
-    try {
-        MerchandiseImageDAO imageDao = new MerchandiseImageDAO(new DBManager().getConnection());
-        images = imageDao.selectByMerchandiseId(m.getMerchandiseId());
-    } catch (Exception e) {
-        e.printStackTrace();
-    }
+    String useByDateStr = (m.getUseByDate() != null) ? m.getUseByDate().toString() : "";
 %>
 
 <!DOCTYPE html>
@@ -131,8 +123,7 @@
 
                 <div class="form-group">
                     <label for="merchandiseName">商品名</label>
-                    <input type="text" id="merchandiseName" name="merchandiseName"
-                           value="<%= m.getMerchandiseName() %>" required>
+                    <input type="text" id="merchandiseName" name="merchandiseName" value="<%= m.getMerchandiseName() %>" required>
                 </div>
 
                 <div class="form-group">
@@ -152,26 +143,23 @@
 
                 <div class="form-group">
                     <label for="employeeId">担当社員番号</label>
-                    <input type="number" id="employeeId" name="employeeId"
-                           value="<%= m.getEmployeeId() %>" required>
+                    <input type="number" id="employeeId" name="employeeId" value="<%= m.getEmployeeId() %>" required>
                 </div>
 
                 <div class="form-group">
                     <label for="merchandiseTag">タグ</label>
-                    <input type="text" id="merchandiseTag" name="merchandiseTag"
-                           value="<%= m.getMerchandiseTag() %>">
+                    <input type="text" id="merchandiseTag" name="merchandiseTag" value="<%= m.getMerchandiseTag() %>">
                 </div>
 
                 <div class="form-group">
                     <label>現在の画像</label><br>
                     <% if (images != null && !images.isEmpty() && images.get(0).getImageData() != null) {
-					    String base64 = Base64.getEncoder().encodeToString(images.get(0).getImageData());
-					%>
-					    <img src="data:image/jpeg;base64,<%= base64 %>"
-					         alt="商品画像" style="max-width:120px; max-height:120px;">
-					<% } else { %>
-					    <p>画像なし</p>
-					<% } %>
+                        String base64 = Base64.getEncoder().encodeToString(images.get(0).getImageData());
+                    %>
+                        <img src="data:image/jpeg;base64,<%= base64 %>" alt="商品画像" style="max-width:120px; max-height:120px;">
+                    <% } else { %>
+                        <p>画像なし</p>
+                    <% } %>
                 </div>
 
                 <div class="form-group">

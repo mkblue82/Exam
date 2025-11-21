@@ -19,11 +19,12 @@ public class MerchandiseEditAction extends Action {
 
     @Override
     public void execute(HttpServletRequest request, HttpServletResponse response) throws IOException {
-
         try {
+            // セッションから店舗ID取得
             HttpSession session = request.getSession();
             Integer storeId = (Integer) session.getAttribute("storeId");
 
+            // 商品ID取得
             String idParam = request.getParameter("id");
             if (idParam == null || idParam.isEmpty()) {
                 response.sendRedirect("error.jsp");
@@ -32,8 +33,8 @@ public class MerchandiseEditAction extends Action {
 
             int merchandiseId = Integer.parseInt(idParam);
 
-            DBManager dbManager = new DBManager();
-            try (Connection conn = dbManager.getConnection()) {
+            // DB接続とデータ取得
+            try (Connection conn = DBManager.getInstance().getConnection()) {
                 MerchandiseDAO dao = new MerchandiseDAO(conn);
                 Merchandise merchandise = dao.selectById(merchandiseId);
 
@@ -42,13 +43,13 @@ public class MerchandiseEditAction extends Action {
                     return;
                 }
 
-                // ★ 商品画像も取得してJSPへ渡す
-                MerchandiseImageDAO imageDao = new MerchandiseImageDAO(conn);
-                List<MerchandiseImage> images = imageDao.selectByMerchandiseId(merchandiseId);
-                request.setAttribute("images", images);
+                // 画像取得
+                MerchandiseImageDAO imageDAO = new MerchandiseImageDAO(conn);
+                List<MerchandiseImage> images = imageDAO.selectByMerchandiseId(merchandiseId);
 
-                // 商品情報をJSPへ渡す
+                // JSPへデータ渡す
                 request.setAttribute("merchandise", merchandise);
+                request.setAttribute("images", images);
                 request.getRequestDispatcher("/store_jsp/merchandise_edit.jsp").forward(request, response);
             }
 
