@@ -4,184 +4,144 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
 import bean.Store;
 
-public class StoreDAO extends DAO {
+public class StoreDAO {
+
+    private Connection con;
+
+    public StoreDAO(Connection con) {
+        this.con = con;
+    }
 
     // 全店舗を取得
-    public List<Store> selectAll() throws Exception {
+    public List<Store> selectAll() throws SQLException {
         List<Store> list = new ArrayList<>();
-        Connection con = getConnection();
 
-        PreparedStatement st = con.prepareStatement(
-            "SELECT * FROM T001_store ORDER BY T001_PK1_store");
-        ResultSet rs = st.executeQuery();
+        String sql = "SELECT * FROM T001_store ORDER BY T001_PK1_store";
 
-        while (rs.next()) {
-            Store s = mapResultSetToStore(rs);
-            list.add(s);
+        try (PreparedStatement st = con.prepareStatement(sql);
+             ResultSet rs = st.executeQuery()) {
+
+            while (rs.next()) {
+                Store s = mapResultSetToStore(rs);
+                list.add(s);
+            }
         }
-
-        rs.close();
-        st.close();
-        con.close();
         return list;
     }
 
     // 店舗IDで検索
-    public Store selectById(int id) throws Exception {
-        Connection con = getConnection();
+    public Store selectById(int id) throws SQLException {
+        String sql = "SELECT * FROM T001_store WHERE T001_PK1_store = ?";
 
-        PreparedStatement st = con.prepareStatement(
-            "SELECT * FROM T001_store WHERE T001_PK1_store = ?");
-        st.setInt(1, id);
-        ResultSet rs = st.executeQuery();
+        try (PreparedStatement st = con.prepareStatement(sql)) {
+            st.setInt(1, id);
 
-        Store s = null;
-        if (rs.next()) {
-            s = mapResultSetToStore(rs);
-        }
-
-        rs.close();
-        st.close();
-        con.close();
-        return s;
-    }
-
-    /**
-     * 店舗を登録（承認後の正式登録用）
-     * @return 生成されたstoreId
-     */
-    public int insert(Store store) throws Exception {
-        Connection con = getConnection();
-
-        String sql = "INSERT INTO T001_store " +
-                     "(T001_FD1_store, T001_FD2_store, T001_FD3_store, T001_FD4_store, T001_FD7_store, T001_FD8_store) " +
-                     "VALUES (?, ?, ?, ?, ?, ?)";
-
-        PreparedStatement pstmt = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-
-        pstmt.setString(1, store.getStoreName());   // 店舗名
-        pstmt.setString(2, store.getAddress());     // 住所
-        pstmt.setString(3, store.getPhone());       // 電話番号
-        pstmt.setString(4, store.getPassword());    // パスワード（ハッシュ済み）
-        pstmt.setString(5, store.getEmail());       // メールアドレス
-        pstmt.setBytes(6, store.getLicense());      // 営業許可証 (bytea)
-
-        int line = pstmt.executeUpdate();
-
-        int generatedId = 0;
-        if (line > 0) {
-            ResultSet rs = pstmt.getGeneratedKeys();
-            if (rs.next()) {
-                generatedId = rs.getInt(1);
-                store.setStoreId(generatedId);
+            try (ResultSet rs = st.executeQuery()) {
+                if (rs.next()) {
+                    return mapResultSetToStore(rs);
+                }
             }
-            rs.close();
         }
-
-        pstmt.close();
-        con.close();
-        return generatedId;
+        return null;
     }
 
-    /**
-     * メールアドレスで店舗が存在するか確認
-     */
-    public boolean existsByEmail(String email) throws Exception {
-        Connection con = getConnection();
+	 // 店舗を登録
+	 public void insert(Store store) throws SQLException {
+	     String sql = "INSERT INTO T001_store " +
+	                  "(T001_FD1_store, T001_FD2_store, T001_FD3_store, T001_FD4_store, T001_FD7_store, T001_FD8_store) " +
+	                  "VALUES (?, ?, ?, ?, ?, ?) RETURNING T001_PK1_store";
 
-        PreparedStatement pstmt = con.prepareStatement(
-            "SELECT COUNT(*) FROM T001_store WHERE T001_FD7_store = ?");
-        pstmt.setString(1, email);
+	     try (PreparedStatement pstmt = con.prepareStatement(sql)) {
+	         pstmt.setString(1, store.getStoreName());   // 店舗名
+	         pstmt.setString(2, store.getAddress());     // 住所
+	         pstmt.setString(3, store.getPhone());       // 電話番号
+	         pstmt.setString(4, store.getPassword());    // パスワード
+	         pstmt.setString(5, store.getEmail());       // メールアドレス
+	         pstmt.setBytes(6, store.getLicense());      // 営業許可証 (bytea)
 
-        ResultSet rs = pstmt.executeQuery();
-
-        boolean exists = false;
-        if (rs.next()) {
-            exists = rs.getInt(1) > 0;
-        }
-
-        rs.close();
-        pstmt.close();
-        con.close();
-        return exists;
-    }
+	         try (ResultSet rs = pstmt.executeQuery()) {
+	             if (rs.next()) {
+	                 store.setStoreId(rs.getInt(1));    // 生成されたPKをセット
+	             }
+	         }
+	     }
+	 }
 
     // 店舗を更新
-    public int update(Store store) throws Exception {
-        Connection con = getConnection();
+    public void update(Store store) throws SQLException {
+        // T001_FD9_store = ? を削除
+        String sql = "UPDATE T001_store SET " +
+                      "T001_FD1_store = ?, T001_FD2_store = ?, T001_FD3_store = ?, T001_FD4_store = ?, " +
+                      "T001_FD5_store = ?, T001_FD6_store = ?, T001_FD7_store = ?, T001_FD8_store = ? " +
+                      "WHERE T001_PK1_store = ?";
 
-        PreparedStatement st = con.prepareStatement(
-            "UPDATE T001_store SET " +
-            "T001_FD1_store = ?, T001_FD2_store = ?, T001_FD3_store = ?, T001_FD4_store = ?, " +
-            "T001_FD5_store = ?, T001_FD6_store = ?, T001_FD7_store = ?, T001_FD8_store = ? " +
-            "WHERE T001_PK1_store = ?");
+        try (PreparedStatement st = con.prepareStatement(sql)) {
+            st.setString(1, store.getStoreName());
+            st.setString(2, store.getAddress());
+            st.setString(3, store.getPhone());
+            st.setString(4, store.getPassword());
+            st.setTime(5, store.getDiscountTime());
+            st.setInt(6, store.getDiscountRate());
+            st.setString(7, store.getEmail());
+            st.setBytes(8, store.getLicense());
+            st.setInt(9, store.getStoreId()); // WHERE句の引数
 
-        st.setString(1, store.getStoreName());
-        st.setString(2, store.getAddress());
-        st.setString(3, store.getPhone());
-        st.setString(4, store.getPassword());
-        st.setTime(5, store.getDiscountTime());
-        st.setInt(6, store.getDiscountRate());
-        st.setString(7, store.getEmail());
-        st.setBytes(8, store.getLicense());
-        st.setInt(9, store.getStoreId());
-
-        int line = st.executeUpdate();
-
-        st.close();
-        con.close();
-        return line;
+            st.executeUpdate();
+        }
     }
 
     // 店舗を削除
-    public int delete(int storeId) throws Exception {
-        Connection con = getConnection();
+    public void delete(int storeId) throws SQLException {
+        String sql = "DELETE FROM T001_store WHERE T001_PK1_store = ?";
 
-        PreparedStatement st = con.prepareStatement(
-            "DELETE FROM T001_store WHERE T001_PK1_store = ?");
-        st.setInt(1, storeId);
-
-        int line = st.executeUpdate();
-
-        st.close();
-        con.close();
-        return line;
+        try (PreparedStatement st = con.prepareStatement(sql)) {
+            st.setInt(1, storeId);
+            st.executeUpdate();
+        }
     }
 
-    /**
-     * ログイン処理
-     */
-    public Store login(int storeId, String hashedPassword) throws Exception {
-        Connection con = getConnection();
+    public Store login(int storeId, String hashedPassword) throws SQLException {
 
-        PreparedStatement pstmt = con.prepareStatement(
-            "SELECT * FROM t001_store WHERE t001_pk1_store = ? AND t001_fd4_store = ?");
-        pstmt.setInt(1, storeId);
-        pstmt.setString(2, hashedPassword);
+        String sql = "SELECT * FROM t001_store WHERE t001_pk1_store = ? AND t001_fd4_store = ?";
 
-        ResultSet rs = pstmt.executeQuery();
+        try (PreparedStatement pstmt = con.prepareStatement(sql)) {
+            pstmt.setInt(1, storeId);
+            pstmt.setString(2, hashedPassword);
 
-        Store store = null;
-        if (rs.next()) {
-            store = mapResultSetToStore(rs);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    Store store = new Store();
+
+
+                    store.setStoreId(rs.getInt("t001_pk1_store"));
+                    store.setStoreName(rs.getString("t001_fd1_store"));
+                    store.setAddress(rs.getString("t001_fd2_store"));
+                    store.setPhone(rs.getString("t001_fd3_store"));
+                    store.setPassword(rs.getString("t001_fd4_store"));
+                    store.setDiscountTime(rs.getTime("t001_fd5_store"));
+                    store.setDiscountRate(rs.getInt("t001_fd6_store"));
+                    store.setEmail(rs.getString("t001_fd7_store"));
+                    store.setLicense(rs.getBytes("t001_fd8_store"));
+
+
+
+                    return store;
+                }
+            }
         }
 
-        rs.close();
-        pstmt.close();
-        con.close();
-        return store;
+        return null; // 該当なし（ログイン失敗）
     }
 
-
-    // ResultSetからStoreオブジェクトへのマッピング
+    // ResultSetからStoreオブジェクトへのマッピング（重複コード削減）
     private Store mapResultSetToStore(ResultSet rs) throws SQLException {
         Store s = new Store();
+        // 列名すべてを小文字に修正
         s.setStoreId(rs.getInt("t001_pk1_store"));
         s.setStoreName(rs.getString("t001_fd1_store"));
         s.setAddress(rs.getString("t001_fd2_store"));
@@ -191,6 +151,7 @@ public class StoreDAO extends DAO {
         s.setDiscountRate(rs.getInt("t001_fd6_store"));
         s.setEmail(rs.getString("t001_fd7_store"));
         s.setLicense(rs.getBytes("t001_fd8_store"));
+
         return s;
     }
 }
