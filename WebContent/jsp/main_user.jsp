@@ -15,81 +15,85 @@
 <head>
 <meta charset="UTF-8">
 <title>出店店舗と商品一覧</title>
+
 <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
 
 <style>
-/* 店舗ボックス */
+/* 店舗枠 */
 .store-box {
     background:#fff;
     padding:20px;
     border-radius:10px;
-    margin-bottom:30px;
+    margin-bottom:40px;
     box-shadow:0 2px 8px rgba(0,0,0,0.1);
 }
 
-/* 店舗タイトル */
+/* 店舗名 */
 .store-title {
     font-size:1.6rem;
     font-weight:bold;
     color:#c07148;
     border-bottom:2px solid #c07148;
-    padding-bottom:10px;
+    padding-bottom:8px;
     margin-bottom:15px;
 }
 
-/* ☆ 横スクロール商品一覧 */
-.merch-row {
+/* 商品横並び全体 */
+.merch-list {
     display:flex;
     gap:20px;
-    overflow-x:auto;
-    padding:10px 0;
+    flex-wrap:wrap;
 }
 
-/* 商品カード */
-.merch-card {
-    min-width:150px;
-    background:#fff;
+/* 商品1つの箱 */
+.merch-item {
+    width:200px;
+    padding:15px;
     border-radius:10px;
-    box-shadow:0 2px 5px rgba(0,0,0,0.1);
-    padding:10px;
+    background:#fafafa;
+    box-shadow:0 1px 5px rgba(0,0,0,0.1);
     text-align:center;
 }
 
-/* 商品画像枠 */
-.merch-image {
-    width:100%;
-    height:120px;
-    background:#fafafa;
-    border-radius:5px;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    overflow:hidden;
-}
-
+/* 商品画像 */
 .merch-image img {
-    width:100%;
-    height:100%;
+    width:180px;
+    height:130px;
     object-fit:cover;
+    border-radius:8px;
 }
 
-/* 値段 */
+/* 金額表示 */
 .merch-price {
     margin-top:8px;
+    font-size:1.1rem;
     font-weight:bold;
     color:#c07148;
-    font-size:1.1rem;
+}
+
+/* 画像がない場合 */
+.no-image {
+    width:180px;
+    height:130px;
+    background:#ddd;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:#666;
+    border-radius:8px;
 }
 </style>
 </head>
 
 <body>
-
 <div id="container">
+
+    <!-- ヘッダー -->
     <jsp:include page="header_user.jsp" />
 
     <main class="column">
         <div class="main-contents">
+
             <h2 style="text-align:center; margin:30px 0; color:#c07148;">出店店舗と商品一覧</h2>
 
             <%
@@ -106,64 +110,78 @@
 
                 <div class="store-box">
 
-                    <!-- 店舗名リンク -->
+                    <!-- 店舗名（クリックで店舗詳細へ） -->
                     <div class="store-title">
-                        店舗名：
                         <a href="StoreInfo.action?storeId=<%= store.getStoreId() %>"
-                           style="text-decoration:none; color:#c07148;">
-                            <%= store.getStoreName() %>
+                           style="text-decoration:none;color:#c07148;">
+                           <%= store.getStoreName() %>
                         </a>
                     </div>
 
-                    <!-- 商品横スクロール -->
-                    <div class="merch-row">
+                    <% if (merchList != null && !merchList.isEmpty()) { %>
 
-                        <% if (merchList != null && !merchList.isEmpty()) { %>
+                        <div class="merch-list">
 
-                            <% for (Merchandise m : merchList) { %>
+                        <% for (Merchandise merch : merchList) { %>
 
-                                <div class="merch-card">
+                            <div class="merch-item">
 
-                                    <!-- 商品画像 -->
+                                <!-- 画像クリック → 商品詳細へ -->
+                                <a href="MerchandiseDetail.action?merchandiseId=<%= merch.getMerchandiseId() %>">
+
                                     <div class="merch-image">
-                                        <% if (m.getImages() != null && !m.getImages().isEmpty()) { %>
-                                            <a href="MerchDetail.action?merchId=<%= m.getMerchandiseId() %>">
-											    <img src="<%= request.getContextPath() + "/ImageDisplay.action?imageId=" + m.getImages().get(0).getImageId() %>"
-											         alt="<%= m.getMerchandiseName() %>">
-											</a>
 
-                                        <% } else { %>
-                                            <span style="color:#999;">画像なし</span>
-                                        <% } %>
+                                        <%
+                                        List<MerchandiseImage> images = merch.getImages();
+                                        if (images != null && !images.isEmpty()) {
+                                            MerchandiseImage img = images.get(0);
+                                        %>
+                                            <img src="<%= request.getContextPath() %>/ImageDisplay.action?imageId=<%= img.getImageId() %>"
+                                                 alt="<%= merch.getMerchandiseName() %>">
+                                        <%
+                                        } else {
+                                        %>
+                                            <div class="no-image">画像なし</div>
+                                        <%
+                                        }
+                                        %>
+
                                     </div>
+                                </a>
 
-                                    <!-- 値段のみ表示 -->
-                                    <div class="merch-price">
-                                        <%= m.getPrice() %>円
-                                    </div>
-
+                                <!-- 値段のみ表示 -->
+                                <div class="merch-price">
+                                    ¥ <%= merch.getPrice() %>
                                 </div>
 
-                            <% } %>
+                            </div>
 
-                        <% } else { %>
-                            <p>この店舗の商品はありません</p>
                         <% } %>
 
-                    </div><!-- /.merch-row -->
+                        </div>
 
-                </div><!-- /.store-box -->
+                    <% } else { %>
+
+                        <p>この店舗の商品はありません。</p>
+
+                    <% } %>
+
+                </div>
 
                 <% } %>
 
             <% } else { %>
+
                 <p style="text-align:center;">商品情報が取得できませんでした。</p>
+
             <% } %>
 
         </div>
     </main>
 
+    <!-- フッター -->
     <jsp:include page="footer.jsp" />
+
 </div>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>

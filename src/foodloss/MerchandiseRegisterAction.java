@@ -1,36 +1,39 @@
 package foodloss;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import bean.Employee;
 import bean.Store;
+import dao.EmployeeDAO;
 import tool.Action;
 
 public class MerchandiseRegisterAction extends Action {
-
     @Override
-    public void execute(HttpServletRequest req, HttpServletResponse res)
+    public void execute(HttpServletRequest request, HttpServletResponse response)
             throws Exception {
-
-        HttpSession session = req.getSession();
-
-        // セッションから店舗情報を取得
+        HttpSession session = request.getSession();
         Store store = (Store) session.getAttribute("store");
 
-        // ログインチェック（店舗として）
         if (store == null) {
-            // 店舗としてログインしていない場合、ログイン画面へリダイレクト
-            System.out.println("⚠️ 店舗ログインが必要です。ログイン画面へリダイレクト");
-            res.sendRedirect(req.getContextPath() + "/foodloss/Login_Store.action");
+            response.sendRedirect(request.getContextPath() + "/foodloss/Login_Store.action");
             return;
         }
 
-        System.out.println("✅ 店舗ログイン確認: storeId=" + store.getStoreId()
-                         + ", storeName=" + store.getStoreName());
+        // 店舗に所属する社員リストを取得
+        EmployeeDAO employeeDAO = new EmployeeDAO();
+        List<Employee> employeeList = employeeDAO.selectByStoreCode(String.valueOf(store.getStoreId()));
 
-        // 商品登録画面へフォワード
-        req.getRequestDispatcher("/store_jsp/merchandise_register_store.jsp")
-           .forward(req, res);
+        // 社員が存在すれば最初の社員を自動セット
+        if (!employeeList.isEmpty()) {
+            request.setAttribute("defaultEmployee", employeeList.get(0));
+        }
+
+        request.setAttribute("employeeList", employeeList);
+        request.getRequestDispatcher("/store_jsp/merchandise_register_store.jsp")
+               .forward(request, response);
     }
 }
