@@ -140,7 +140,7 @@
                     <!-- 時間入力 -->
                     <div class="form-group">
                         <div class="form-row">
-                            <label for="time">時間</label>
+                            <label for="time">開始時間</label>
                             <div class="input-wrapper">
                                 <input type="number"
                                        id="time"
@@ -149,7 +149,6 @@
                                        max="23"
                                        placeholder="例: 18"
                                        required>
-                                <span class="unit">時</span>
                             </div>
                         </div>
                         <div class="error-message" id="timeError">時間は0〜23の範囲で入力してください</div>
@@ -167,7 +166,6 @@
                                        max="100"
                                        placeholder="例: 30"
                                        required>
-                                <span class="unit">%</span>
                             </div>
                         </div>
                         <div class="error-message" id="discountError">割引率は1〜100の範囲で入力してください</div>

@@ -127,7 +127,11 @@
                                     <!-- 商品画像 -->
                                     <div class="merch-image">
                                         <% if (m.getImages() != null && !m.getImages().isEmpty()) { %>
-                                            <img src="<%= request.getContextPath() + "/ImageDisplay.action?imageId=" + m.getImages().get(0).getImageId() %>">
+                                            <a href="MerchDetail.action?merchId=<%= m.getMerchandiseId() %>">
+											    <img src="<%= request.getContextPath() + "/ImageDisplay.action?imageId=" + m.getImages().get(0).getImageId() %>"
+											         alt="<%= m.getMerchandiseName() %>">
+											</a>
+
                                         <% } else { %>
                                             <span style="color:#999;">画像なし</span>
                                         <% } %>

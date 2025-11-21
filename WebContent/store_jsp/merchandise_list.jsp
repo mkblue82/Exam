@@ -212,7 +212,7 @@
                 <div class="back-button">
                     <a href="${pageContext.request.contextPath}/foodloss/Menu.action">ホームに戻る</a>
                     <a href="${pageContext.request.contextPath}/foodloss/MerchandiseRegister.action">商品登録</a>
-                    <a href="${pageContext.request.contextPath}/store_jsp/discount_setting.jsp">割引設定</a>
+                    <a href="${pageContext.request.contextPath}/foodloss/DiscountSetting.action">割引設定</a>
                 </div>
 
             </div>
