@@ -172,6 +172,7 @@ public class ApplicationDAO extends DAO {
         return list;
     }
 
+
     /**
      * ResultSetからApplicationオブジェクトへのマッピング
      */
