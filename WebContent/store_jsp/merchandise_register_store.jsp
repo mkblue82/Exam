@@ -15,7 +15,6 @@
             border-radius: 10px;
             box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
         }
-
         .register-container h1 {
             color: #c07148;
             text-align: center;
@@ -24,7 +23,6 @@
             border-bottom: 2px solid #c07148;
             padding-bottom: 1rem;
         }
-
         .error-message {
             background: #ffebee;
             color: #c62828;
@@ -34,26 +32,21 @@
             border-left: 4px solid #c62828;
             font-size: 0.9rem;
         }
-
         .form-group {
             margin-bottom: 1.5rem;
         }
-
         .form-group label {
             display: block;
             margin-bottom: 0.5rem;
             font-weight: bold;
             color: #555;
         }
-
         .form-group label span {
             color: red;
         }
-
         .form-group input[type="text"],
         .form-group input[type="number"],
-        .form-group input[type="date"],
-        .form-group input[type="file"] {
+        .form-group input[type="date"] {
             width: 100%;
             padding: 0.8rem;
             border: 1px solid #ccc;
@@ -61,21 +54,17 @@
             font-size: 1rem;
             transition: 0.3s;
         }
-
         .form-group input:focus {
             outline: none;
             border-color: #c07148;
             box-shadow: 0 0 0 3px rgba(192, 113, 72, 0.1);
         }
-
-        /* 複数画像プレビューのスタイル */
         .image-preview-container {
             margin-top: 1rem;
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 1rem;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 0.8rem;
         }
-
         .image-preview-item {
             position: relative;
             border: 2px solid #ddd;
@@ -83,37 +72,11 @@
             overflow: hidden;
             aspect-ratio: 1;
         }
-
         .image-preview-item img {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
-
-        .image-preview-item .remove-btn {
-            position: absolute;
-            top: 5px;
-            right: 5px;
-            background: rgba(255, 0, 0, 0.8);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 25px;
-            height: 25px;
-            cursor: pointer;
-            font-size: 16px;
-            line-height: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: 0.3s;
-        }
-
-        .image-preview-item .remove-btn:hover {
-            background: rgba(255, 0, 0, 1);
-            transform: scale(1.1);
-        }
-
         .image-preview-item .image-number {
             position: absolute;
             bottom: 5px;
@@ -125,29 +88,12 @@
             font-size: 0.8rem;
             font-weight: bold;
         }
-
-        .file-input-wrapper {
+        .file-count {
             margin-top: 0.5rem;
+            color: #c07148;
+            font-weight: bold;
         }
-
-        .file-input-label {
-            display: block;
-            padding: 0.8rem;
-            background: #f5f5f5;
-            border: 2px dashed #c07148;
-            border-radius: 5px;
-            text-align: center;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-
-        .file-input-label:hover {
-            background: #fef3ed;
-            border-color: #a85d38;
-        }
-
-        .btn-submit,
-        .btn-cancel {
+        .btn-submit, .btn-cancel {
             width: 100%;
             border: none;
             border-radius: 5px;
@@ -157,7 +103,6 @@
             display: block;
             text-align: center;
         }
-
         .btn-submit {
             padding: 1.2rem;
             font-size: 1.1rem;
@@ -167,108 +112,25 @@
             box-shadow: 0 3px 10px rgba(192, 113, 72, 0.3);
             margin-bottom: 0.8rem;
         }
-
         .btn-submit:hover {
             background: #a85d38;
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(192, 113, 72, 0.4);
         }
-
         .btn-cancel {
             padding: 0.6rem;
             font-size: 0.9rem;
-            font-weight: normal;
             background: #fff;
             color: #c07148;
             border: 1px solid #c07148;
         }
-
         .btn-cancel:hover {
             background: #c07148;
             color: #fff;
         }
-
-        @media screen and (max-width: 600px) {
-            .register-container {
-                margin: 40px 10px;
-                padding: 1.5rem;
-            }
-
-            .register-container h1 {
-                font-size: 1.5rem;
-            }
-
-            .image-preview-container {
-                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-                gap: 0.5rem;
-            }
-        }
     </style>
-    <script>
-        // 画像プレビュー管理
-        let imagePreviewData = [];
-
-        function handleFileSelect(input) {
-            const files = Array.from(input.files);
-
-            if (files.length === 0) return;
-
-            // 新しいファイルをプレビューデータに追加
-            files.forEach(file => {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    imagePreviewData.push({
-                        dataUrl: e.target.result,
-                        name: file.name
-                    });
-                    updatePreview();
-                };
-                reader.readAsDataURL(file);
-            });
-        }
-
-        function removeImage(index) {
-            imagePreviewData.splice(index, 1);
-            updatePreview();
-        }
-
-        function updatePreview() {
-            const container = document.getElementById('imagePreviewContainer');
-            container.innerHTML = '';
-
-            imagePreviewData.forEach((data, index) => {
-                const div = document.createElement('div');
-                div.className = 'image-preview-item';
-                div.innerHTML = `
-                    <img src="${data.dataUrl}" alt="プレビュー${index + 1}">
-                    <button type="button" class="remove-btn" onclick="removeImage(${index})" title="削除">×</button>
-                    <span class="image-number">${index + 1}</span>
-                `;
-                container.appendChild(div);
-            });
-        }
-
-        function validateForm(event) {
-            const fileInput = document.getElementById('merchandiseImage');
-
-            if (!fileInput.files || fileInput.files.length === 0) {
-                alert('少なくとも1枚の画像を選択してください。');
-                event.preventDefault();
-                return false;
-            }
-
-            console.log('送信するファイル数:', fileInput.files.length);
-            for (let i = 0; i < fileInput.files.length; i++) {
-                console.log(`ファイル${i+1}:`, fileInput.files[i].name, fileInput.files[i].size + ' bytes');
-            }
-
-            return true;
-        }
-    </script>
 </head>
 <body>
 <div id="container">
-    <%-- ヘッダー読み込み --%>
     <jsp:include page="/store_jsp/header_store.jsp" />
 
     <main class="column">
@@ -276,106 +138,69 @@
             <div class="register-container">
                 <h1>商品登録</h1>
 
-                <%-- エラーメッセージ表示 --%>
                 <% if (request.getAttribute("errorMessage") != null) { %>
                     <div class="error-message">
                         <%= request.getAttribute("errorMessage") %>
                     </div>
                 <% } %>
 
-                <%-- 商品登録フォーム --%>
                 <form action="${pageContext.request.contextPath}/foodloss/MerchandiseRegisterExecute.action"
                       method="post"
                       enctype="multipart/form-data"
-                      id="merchandiseRegisterForm"
-                      onsubmit="return validateForm(event)">
+                      id="merchandiseRegisterForm">
 
-                    <%-- 店舗ID（セッションから取得） --%>
                     <input type="hidden" name="storeId" value="${sessionScope.store.storeId}">
 
                     <div class="form-group">
                         <label for="merchandiseName">商品名 <span>*</span></label>
-                        <input type="text"
-                               id="merchandiseName"
-                               name="merchandiseName"
-                               required
-                               maxlength="100"
-                               placeholder="例: トマトジュース"
-                               value="${param.merchandiseName != null ? param.merchandiseName : ''}">
+                        <input type="text" id="merchandiseName" name="merchandiseName"
+                               required maxlength="100" placeholder="例: トマトジュース">
                     </div>
 
                     <div class="form-group">
                         <label for="price">価格（円） <span>*</span></label>
-                        <input type="number"
-                               id="price"
-                               name="price"
-                               required
-                               min="0"
-                               max="999999"
-                               step="1"
-                               placeholder="例: 500"
-                               value="${param.price != null ? param.price : ''}">
+                        <input type="number" id="price" name="price"
+                               required min="0" max="999999" placeholder="例: 500">
                     </div>
 
                     <div class="form-group">
                         <label for="quantity">個数 <span>*</span></label>
-                        <input type="number"
-                               id="quantity"
-                               name="quantity"
-                               required
-                               min="1"
-                               max="9999"
-                               placeholder="例: 10"
-                               value="${param.quantity != null ? param.quantity : ''}">
+                        <input type="number" id="quantity" name="quantity"
+                               required min="1" max="9999" placeholder="例: 10">
                     </div>
 
                     <div class="form-group">
                         <label for="expirationDate">消費期限 <span>*</span></label>
-                        <input type="date"
-                               id="expirationDate"
-                               name="expirationDate"
-                               required
-                               value="${param.expirationDate != null ? param.expirationDate : ''}">
+                        <input type="date" id="expirationDate" name="expirationDate" required>
                     </div>
 
                     <div class="form-group">
                         <label for="employeeNumber">社員番号 <span>*</span></label>
-                        <input type="text"
-                               id="employeeNumber"
-                               name="employeeNumber"
-                               required
-                               maxlength="20"
-                               placeholder="例: 12345"
-                               value="${param.employeeNumber != null ? param.employeeNumber : ''}">
+                        <input type="text" id="employeeNumber" name="employeeNumber"
+                               required maxlength="20" placeholder="例: 12345">
                     </div>
 
                     <div class="form-group">
                         <label for="tags">タグ</label>
-                        <input type="text"
-                               id="tags"
-                               name="tags"
-                               maxlength="200"
-                               placeholder="例: 野菜, 新鮮, セール"
-                               value="${param.tags != null ? param.tags : ''}">
+                        <input type="text" id="tags" name="tags"
+                               maxlength="200" placeholder="例: 野菜, 新鮮, セール">
                     </div>
 
                     <div class="form-group">
-                        <label>商品画像 <span>*</span> (複数選択可)</label>
-                        <div class="file-input-wrapper">
-                            <label class="file-input-label" for="merchandiseImage">
-                                📷 画像を選択（複数可）
-                            </label>
-                            <%-- 直接multipleで複数ファイルを受け取る --%>
-                            <input type="file"
-                                   id="merchandiseImage"
-                                   name="merchandiseImage"
-                                   accept="image/*"
-                                   multiple
-                                   required
-                                   onchange="handleFileSelect(this)"
-                                   style="display: none;">
-                        </div>
+                        <label>商品画像 <span>*</span></label>
+                        <p style="font-size: 0.85rem; color: #666; margin-bottom: 0.5rem;">
+                            ※ 複数選択: Ctrlキー(Mac: Cmd)を押しながらクリック
+                        </p>
+                        <input type="file"
+                               id="merchandiseImage"
+                               name="merchandiseImage"
+                               accept="image/*"
+                               multiple
+                               required
+                               onchange="previewImages(this)"
+                               style="width: 100%; padding: 0.8rem; border: 2px dashed #c07148; border-radius: 5px; background: #fef3ed;">
 
+                        <div id="fileCount" class="file-count"></div>
                         <div id="imagePreviewContainer" class="image-preview-container"></div>
                     </div>
 
@@ -386,14 +211,52 @@
         </div>
     </main>
 
-    <%-- フッター読み込み --%>
     <jsp:include page="/jsp/footer.jsp" />
 </div>
 
-<!-- JS -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
-<parameter name="contextPath}/js/slick.js"></script>
 <script src="${pageContext.request.contextPath}/js/main.js"></script>
+
+<script>
+function previewImages(input) {
+    var container = document.getElementById('imagePreviewContainer');
+    var fileCount = document.getElementById('fileCount');
+    container.innerHTML = '';
+
+    if (input.files && input.files.length > 0) {
+        fileCount.textContent = input.files.length + '枚の画像を選択中';
+
+        console.log('選択されたファイル数: ' + input.files.length);
+
+        for (var i = 0; i < input.files.length; i++) {
+            var file = input.files[i];
+            console.log('ファイル' + (i+1) + ': ' + file.name + ' (' + file.size + ' bytes)');
+
+            (function(index) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    var div = document.createElement('div');
+                    div.className = 'image-preview-item';
+
+                    var img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.alt = 'プレビュー' + (index + 1);
+
+                    var num = document.createElement('span');
+                    num.className = 'image-number';
+                    num.textContent = (index + 1);
+
+                    div.appendChild(img);
+                    div.appendChild(num);
+                    container.appendChild(div);
+                };
+                reader.readAsDataURL(file);
+            })(i);
+        }
+    } else {
+        fileCount.textContent = '';
+    }
+}
+</script>
 </body>
 </html>
