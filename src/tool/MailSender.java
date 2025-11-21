@@ -16,14 +16,14 @@ import javax.mail.internet.MimeMultipart;
 
 public class MailSender {
 
-    // Gmail SMTP 設定
     private static final String SMTP_HOST = "smtp.gmail.com";
-    private static final int SMTP_PORT = 587; // TLS
-    private static final String SMTP_USER = "あなたのGmail@gmail.com"; // 後で設定
-    private static final String SMTP_PASSWORD = "アプリパスワード";     // 後で設定
+    private static final int SMTP_PORT = 587;
 
-    // メール本文のみ送信
+    private static final String SMTP_USER = "あなたのGmail@gmail.com";
+    private static final String SMTP_PASSWORD = "アプリパスワード";
+
     public static void sendEmail(String to, String subject, String body) throws MessagingException {
+
         Properties props = new Properties();
         props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.starttls.enable", "true");
@@ -39,11 +39,13 @@ public class MailSender {
         Message message = new MimeMessage(session);
         message.setFrom(new InternetAddress(SMTP_USER));
         message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to));
-        message.setSubject(subject);
 
-        // 日本語対応の本文
+
+        message.setSubject(subject);
+        message.setHeader("Content-Transfer-Encoding", "8bit");
+
         MimeBodyPart textPart = new MimeBodyPart();
-        textPart.setContent(body, "text/plain; charset=UTF-8");
+        textPart.setText(body, "UTF-8");
 
         Multipart multipart = new MimeMultipart();
         multipart.addBodyPart(textPart);
@@ -54,9 +56,10 @@ public class MailSender {
         System.out.println("DEBUG: メール送信完了 → " + to);
     }
 
-    // 添付ファイル付きメール送信
-    public static void sendEmailWithAttachment(String to, String subject, String body,
-                                               byte[] attachmentData, String fileName) throws MessagingException {
+    public static void sendEmailWithAttachment(
+            String to, String subject, String body,
+            byte[] attachmentData, String fileName) throws MessagingException {
+
         Properties props = new Properties();
         props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.starttls.enable", "true");
@@ -72,13 +75,14 @@ public class MailSender {
         Message message = new MimeMessage(session);
         message.setFrom(new InternetAddress(SMTP_USER));
         message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to));
+
+
         message.setSubject(subject);
+        message.setHeader("Content-Transfer-Encoding", "8bit");
 
-        // 本文（日本語対応）
         MimeBodyPart textPart = new MimeBodyPart();
-        textPart.setContent(body, "text/plain; charset=UTF-8");
+        textPart.setText(body, "UTF-8");
 
-        // 添付ファイル
         MimeBodyPart attachmentPart = new MimeBodyPart();
         attachmentPart.setFileName(fileName);
         attachmentPart.setContent(attachmentData, "application/octet-stream");

@@ -4,7 +4,6 @@ import java.io.InputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
@@ -35,7 +34,7 @@ public class SignupStoreAction extends Action {
         req.setCharacterEncoding("UTF-8");
         HttpSession session = req.getSession();
 
-        // --- CSRFチェック ---
+        // CSRFチェック
         String token = req.getParameter("csrfToken");
         String sessionToken = (String) session.getAttribute("csrfToken");
         if (sessionToken == null || !sessionToken.equals(token)) {
@@ -43,7 +42,7 @@ public class SignupStoreAction extends Action {
             return;
         }
 
-        // --- 入力値 ---
+        // 入力値
         String storeName = req.getParameter("storeName");
         String address = req.getParameter("address");
         String phone = req.getParameter("phone");
@@ -53,93 +52,79 @@ public class SignupStoreAction extends Action {
 
         // バリデーション
         if (storeName == null || storeName.trim().isEmpty()) {
-            forwardWithError(req, res, "店舗名を入力してください。");
-            return;
+            forwardWithError(req, res, "店舗名を入力してください。"); return;
         }
         if (address == null || address.trim().isEmpty()) {
-            forwardWithError(req, res, "店舗住所を入力してください。");
-            return;
+            forwardWithError(req, res, "店舗住所を入力してください。"); return;
         }
         if (phone == null || phone.trim().isEmpty()) {
-            forwardWithError(req, res, "電話番号を入力してください。");
-            return;
+            forwardWithError(req, res, "電話番号を入力してください。"); return;
         }
         if (email == null || email.trim().isEmpty()) {
-            forwardWithError(req, res, "メールアドレスを入力してください。");
-            return;
+            forwardWithError(req, res, "メールアドレスを入力してください。"); return;
         }
         if (passwordRaw == null || passwordRaw.trim().isEmpty()) {
-            forwardWithError(req, res, "パスワードを入力してください。");
-            return;
+            forwardWithError(req, res, "パスワードを入力してください。"); return;
         }
         if (passwordConfirm == null || passwordConfirm.trim().isEmpty()) {
-            forwardWithError(req, res, "確認用パスワードを入力してください。");
-            return;
+            forwardWithError(req, res, "確認用パスワードを入力してください。"); return;
         }
         if (!passwordRaw.equals(passwordConfirm)) {
-            forwardWithError(req, res, "パスワードが一致しません。");
-            return;
+            forwardWithError(req, res, "パスワードが一致しません。"); return;
         }
         if (passwordRaw.length() < 8) {
-            forwardWithError(req, res, "パスワードは8文字以上で入力してください。");
-            return;
+            forwardWithError(req, res, "パスワードは8文字以上で入力してください。"); return;
         }
         if (!phone.matches("[0-9]{10,11}")) {
-            forwardWithError(req, res, "電話番号は10桁または11桁の数字で入力してください。");
-            return;
+            forwardWithError(req, res, "電話番号は10桁または11桁の数字で入力してください。"); return;
         }
 
-        // --- ファイルアップロード ---
+        // ファイルアップロード
         Part permitFilePart = req.getPart("permitFile");
         if (permitFilePart == null || permitFilePart.getSize() == 0) {
-            forwardWithError(req, res, "営業許可書をアップロードしてください。");
-            return;
+            forwardWithError(req, res, "営業許可書をアップロードしてください。"); return;
         }
         String permitFileName = getFileName(permitFilePart);
         if (!isValidFileType(permitFileName)) {
-            forwardWithError(req, res, "営業許可書はJPG、PNG、またはPDF形式でアップロードしてください。");
-            return;
+            forwardWithError(req, res, "営業許可書はJPG、PNG、PDF形式でアップロードしてください。"); return;
         }
         if (permitFilePart.getSize() > 5 * 1024 * 1024) {
-            forwardWithError(req, res, "ファイルサイズは5MB以下にしてください。");
-            return;
+            forwardWithError(req, res, "ファイルサイズは5MB以下にしてください。"); return;
         }
 
-        // ファイルデータをbyte配列に変換
+        // byte配列に変換
         byte[] permitFileData;
         try (InputStream is = permitFilePart.getInputStream();
              java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream()) {
-            byte[] buffer = new byte[1024];
-            int len;
-            while ((len = is.read(buffer)) != -1) {
-                baos.write(buffer, 0, len);
-            }
+            byte[] buffer = new byte[1024]; int len;
+            while ((len = is.read(buffer)) != -1) { baos.write(buffer, 0, len); }
             permitFileData = baos.toByteArray();
         }
 
-        // --- パスワードハッシュ化 ---
+        // パスワードハッシュ
         String passwordHash = hashPassword(passwordRaw);
 
-        // --- 重複チェック（既存店舗テーブルのみ） ---
         Connection conn = null;
-
         try {
-        	conn = getConnection();
-        	StoreDAO storeDAO = new StoreDAO(conn);
+            conn = getConnection();
+            StoreDAO storeDAO = new StoreDAO(conn);
+            ApplicationDAO appDAO = new ApplicationDAO();
 
+            // 重複チェック
             if (isPhoneExists(storeDAO, phone)) {
-                forwardWithError(req, res, "この電話番号は既に登録されています。");
-                return;
+                forwardWithError(req, res, "この電話番号は既に登録されています。"); return;
             }
             if (isEmailExists(storeDAO, email)) {
-                forwardWithError(req, res, "このメールアドレスは既に登録されています。");
-                return;
+                forwardWithError(req, res, "このメールアドレスは既に登録されています。"); return;
+            }
+            if (appDAO.existsByEmail(email)) {
+                forwardWithError(req, res, "このメールアドレスは既に申請されています。"); return;
             }
 
-            // --- 承認トークン生成 ---
+            // 承認用トークン
             String approvalToken = UUID.randomUUID().toString();
 
-            // --- Applicationオブジェクト作成 ---
+            // Application作成
             Application app = new Application();
             app.setStoreName(storeName);
             app.setStoreAddress(address);
@@ -148,89 +133,66 @@ public class SignupStoreAction extends Action {
             app.setPasswordHash(passwordHash);
             app.setBusinessLicense(permitFileData);
             app.setApprovalToken(approvalToken);
+            app.setStatus("pending");
 
-            // --- DBに申請データを保存 ---
-            ApplicationDAO appDAO = new ApplicationDAO(conn);
-            appDAO.insert(app);
+            // DB登録
+            int applicationId = appDAO.insert(app);
+            if (applicationId == 0) {
+                forwardWithError(req, res, "申請登録に失敗しました。"); return;
+            }
 
-            // --- CSRFトークンをクリア ---
             session.removeAttribute("csrfToken");
 
-            // --- 運営へのメール送信（承認リンク付き） ---
-            String approvalLink = req.getScheme() + "://" + req.getServerName() +
-                                  ":" + req.getServerPort() + req.getContextPath() +
-                                  "/foodloss/ApproveStore.action?token=" + approvalToken;
+            // 運営メール
+            String approvalUrl = req.getScheme() + "://" +
+                    req.getServerName() + ":" + req.getServerPort() +
+                    req.getContextPath() + "/foodloss/ApproveStore.action?token=" + approvalToken;
 
-            String body = "新しい店舗申請がありました。\n\n" +
-                          "店舗名: " + storeName + "\n" +
-                          "住所: " + address + "\n" +
-                          "電話番号: " + phone + "\n" +
-                          "メール: " + email + "\n\n" +
-                          "━━━━━━━━━━━━━━━━━━━━━━\n" +
-                          "承認してDBに登録する場合は、以下のリンクをクリックしてください:\n" +
-                          approvalLink + "\n" +
-                          "━━━━━━━━━━━━━━━━━━━━━━\n\n" +
-                          "※営業許可書は添付ファイルをご確認ください。";
+            String adminBody = "新規店舗申請がありました。\n\n" +
+                    "店舗名: " + storeName + "\n" +
+                    "住所: " + address + "\n" +
+                    "電話: " + phone + "\n" +
+                    "メール: " + email + "\n\n" +
+                    "承認するには下記URLをクリックしてください:\n" + approvalUrl + "\n\n" +
+                    "営業許可証を添付ファイルでご確認ください。";
 
             MailSender.sendEmailWithAttachment(
-                "mklblue82@gmail.com", // 運営メールアドレス
-                "【要承認】新規店舗申請通知",
-                body,
-                permitFileData,
-                storeName + "_permit.pdf"
+                    "admin@example.com",  // 運営メールアドレス
+                    "【要承認】新規店舗申請通知 - " + storeName,
+                    adminBody,
+                    permitFileData,
+                    storeName + "_permit.pdf"
             );
 
-            // --- 店舗側に申請受付メール送信 ---
-            String storeBody = storeName + " 様\n\n" +
-                              "店舗申請を受け付けました。\n" +
-                              "運営による審査が完了次第、登録完了メールをお送りします。\n\n" +
-                              "今しばらくお待ちください。";
+            // 店舗に受付メール
+            String storeBody = storeName + " 様\n\n申請を受け付けました。\n";
+            MailSender.sendEmail(email, "【店舗申請受付】" + storeName, storeBody);
 
-            MailSender.sendEmail(
-                email,
-                "店舗申請受付のお知らせ",
-                storeBody
-            );
+            session.setAttribute("pendingApplication", app);
 
-            System.out.println("DEBUG: 申請データをDBに保存しました。Application ID = " + app.getApplicationId());
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-            forwardWithError(req, res, "データベースエラーが発生しました。");
-            return;
         } catch (Exception e) {
             e.printStackTrace();
-            forwardWithError(req, res, "メール送信に失敗しました。もう一度お試しください。");
+            forwardWithError(req, res, "申請処理中にエラーが発生しました: " + e.getMessage());
             return;
         } finally {
-            if (conn != null) {
-                conn.close();
-            }
+            if (conn != null) conn.close();
         }
 
         req.getRequestDispatcher("/store_jsp/signup_done_store.jsp").forward(req, res);
     }
 
-    private void forwardWithError(HttpServletRequest req, HttpServletResponse res, String message) throws Exception {
-        req.setAttribute("errorMessage", message);
+    private void forwardWithError(HttpServletRequest req, HttpServletResponse res, String msg) throws Exception {
+        req.setAttribute("errorMessage", msg);
         req.getRequestDispatcher("/store_jsp/signup_store.jsp").forward(req, res);
     }
 
     private boolean isPhoneExists(StoreDAO dao, String phone) throws Exception {
-        for (Store s : dao.selectAll()) {
-            if (s.getPhone() != null && s.getPhone().equals(phone)) {
-                return true;
-            }
-        }
+        for (Store s : dao.selectAll()) { if (s.getPhone() != null && s.getPhone().equals(phone)) return true; }
         return false;
     }
 
     private boolean isEmailExists(StoreDAO dao, String email) throws Exception {
-        for (Store s : dao.selectAll()) {
-            if (s.getEmail() != null && s.getEmail().equals(email)) {
-                return true;
-            }
-        }
+        for (Store s : dao.selectAll()) { if (s.getEmail() != null && s.getEmail().equals(email)) return true; }
         return false;
     }
 
@@ -238,33 +200,21 @@ public class SignupStoreAction extends Action {
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-256");
             byte[] hash = md.digest(password.getBytes());
-            StringBuilder hex = new StringBuilder();
-            for (byte b : hash) {
-                String h = Integer.toHexString(0xff & b);
-                if (h.length() == 1) hex.append('0');
-                hex.append(h);
-            }
-            return hex.toString();
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException("パスワードのハッシュ化に失敗しました", e);
-        }
+            StringBuilder sb = new StringBuilder();
+            for (byte b : hash) { String h = Integer.toHexString(0xff & b); if (h.length() == 1) sb.append('0'); sb.append(h); }
+            return sb.toString();
+        } catch (NoSuchAlgorithmException e) { throw new RuntimeException(e); }
     }
 
     private String getFileName(Part part) {
         String cd = part.getHeader("content-disposition");
-        for (String elem : cd.split(";")) {
-            if (elem.trim().startsWith("filename")) {
-                return elem.substring(elem.indexOf('=') + 1).trim().replace("\"", "");
-            }
-        }
+        for (String elem : cd.split(";")) { if (elem.trim().startsWith("filename")) { return elem.substring(elem.indexOf('=')+1).trim().replace("\"",""); } }
         return null;
     }
-
 
     private boolean isValidFileType(String fileName) {
         if (fileName == null) return false;
         String lower = fileName.toLowerCase();
-        return lower.endsWith(".jpg") || lower.endsWith(".jpeg") ||
-               lower.endsWith(".png") || lower.endsWith(".pdf");
+        return lower.endsWith(".jpg") || lower.endsWith(".jpeg") || lower.endsWith(".png") || lower.endsWith(".pdf");
     }
 }
