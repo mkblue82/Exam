@@ -95,7 +95,7 @@
         </div>
       </c:when>
 
-      <!-- 検索結果ゼロ件 -->
+      <!-- 検索結果ロ件 -->
       <c:otherwise>
         <div class="no-results">
           <i class="fa fa-frown"></i>
