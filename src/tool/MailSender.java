@@ -93,3 +93,4 @@ public class MailSender {
         System.out.println("DEBUG: 添付メール送信完了 → " + to);
     }
 }
+
