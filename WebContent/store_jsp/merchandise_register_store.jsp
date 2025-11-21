@@ -328,7 +328,7 @@ function updateFileCount() {
     var elem = document.getElementById('fileCount');
     elem.textContent = count > 0 ? count + '枚の画像を選択中' : '';
 }
-
+//hh
 function validateForm() {
     if (imageDataList.length === 0) {
         alert('少なくとも1枚の画像を選択してください');
