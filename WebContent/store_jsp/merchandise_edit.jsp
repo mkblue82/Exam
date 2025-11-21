@@ -2,7 +2,6 @@
 <%@ page import="bean.Merchandise" %>
 <%@ page import="bean.MerchandiseImage" %>
 <%@ page import="java.util.List" %>
-<%@ page import="java.util.Base64" %>
 
 <%
     Merchandise m = (Merchandise) request.getAttribute("merchandise");
@@ -15,93 +14,105 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>商品編集 ‑ フードロス削減システム</title>
+    <title>商品編集 - フードロス削減システム</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
+
     <style>
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+            font-family: sans-serif;
             background: #f5f5f5;
-            min-height: 100vh;
             padding: 20px;
         }
+
         .edit-wrapper {
             width: 100%;
-            max-width: 440px;
+            max-width: 450px;   /* ★前の細めデザイン */
             margin: 3rem auto;
         }
+
         .edit-container {
             background: #fff;
             border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            padding: 3rem 2.5rem;
+            padding: 2rem 2rem;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
         }
+
         .edit-header {
             text-align: center;
             margin-bottom: 2rem;
         }
+
         .edit-header h1 {
             color: #c77c4a;
-            font-size: 2rem;
-            font-weight: 700;
-            margin: 0 0 1rem 0;
+            font-size: 1.8rem;
         }
-        .edit-header::after {
-            content: '';
-            display: block;
-            width: 70%;
-            height: 3px;
-            background: #c77c4a;
-            margin: 0 auto;
-        }
+
         .form-group {
-            margin-bottom: 1.5rem;
+            margin-bottom: 1.3rem;
         }
+
         .form-group label {
             display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 600;
-            color: #333;
-            font-size: 1rem;
+            margin-bottom: 0.4rem;
+            font-weight: bold;
+            color: #444;
         }
+
         .form-group input[type="text"],
         .form-group input[type="number"],
-        .form-group input[type="date"],
-        .form-group input[type="file"] {
+        .form-group input[type="date"] {
             width: 100%;
-            padding: 0.8rem;
-            border: 2px solid #ddd;
+            padding: 0.75rem;
+            border: 1px solid #ccc;
             border-radius: 4px;
-            font-size: 1rem;
-            background: #fff;
         }
-        .form-group input:focus {
-            outline: none;
-            border-color: #c77c4a;
+
+        /* 画像ボックス（前の小さめレイアウト） */
+        .image-box {
+            text-align: center;
+            margin-right: 10px;
+            margin-bottom: 10px;
         }
+
+        /* 削除ボタン */
+        .btn-delete {
+            background: red;
+            color: #fff;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 4px;
+        }
+
+        /* 更新ボタン */
         .btn-update {
             width: 100%;
-            padding: 1rem;
-            border: none;
-            border-radius: 4px;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-weight: 600;
             background: #c77c4a;
             color: #fff;
+            padding: 0.9rem;
+            font-size: 1rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 1rem;
         }
+
         .btn-update:hover {
-            background: #b56c3a;
+            background: #b66c3a;
         }
+
+        /* 戻るリンク（中央寄せ） */
         .back-link {
             text-align: center;
             margin-top: 1.5rem;
         }
+
         .back-link a {
             color: #666;
             text-decoration: none;
-            font-size: 0.9rem;
         }
+
         .back-link a:hover {
             color: #c77c4a;
         }
@@ -114,6 +125,7 @@
 <main class="column">
     <div class="edit-wrapper">
         <div class="edit-container">
+
             <div class="edit-header">
                 <h1>商品情報編集</h1>
             </div>
@@ -121,91 +133,134 @@
             <form action="${pageContext.request.contextPath}/foodloss/MerchandiseEdit.action" method="post" enctype="multipart/form-data">
                 <input type="hidden" name="merchandiseId" value="<%= m.getMerchandiseId() %>">
 
+                <!-- 商品名 -->
                 <div class="form-group">
-                    <label for="merchandiseName">商品名</label>
-                    <input type="text" id="merchandiseName" name="merchandiseName" value="<%= m.getMerchandiseName() %>" required>
+                    <label>商品名</label>
+                    <input type="text" name="merchandiseName" value="<%= m.getMerchandiseName() %>" required>
                 </div>
 
+                <!-- 価格 -->
                 <div class="form-group">
-                    <label for="price">価格</label>
-                    <input type="number" id="price" name="price" value="<%= m.getPrice() %>" required>
+                    <label>価格</label>
+                    <input type="number" name="price" value="<%= m.getPrice() %>" required>
                 </div>
 
+                <!-- 在庫 -->
                 <div class="form-group">
-                    <label for="stock">在庫数</label>
-                    <input type="number" id="stock" name="stock" value="<%= m.getStock() %>" required>
+                    <label>在庫数</label>
+                    <input type="number" name="stock" value="<%= m.getStock() %>" required>
                 </div>
 
+                <!-- 消費期限 -->
                 <div class="form-group">
-                    <label for="useByDate">消費期限</label>
-                    <input type="date" id="useByDate" name="useByDate" value="<%= useByDateStr %>" required>
+                    <label>消費期限</label>
+                    <input type="date" name="useByDate" value="<%= useByDateStr %>" required>
                 </div>
 
+                <!-- 社員番号 -->
                 <div class="form-group">
-                    <label for="employeeId">担当社員番号</label>
-                    <input type="number" id="employeeId" name="employeeId" value="<%= m.getEmployeeId() %>" required>
+                    <label>担当社員番号</label>
+                    <input type="number" name="employeeId" value="<%= m.getEmployeeId() %>" required>
                 </div>
 
+                <!-- タグ -->
                 <div class="form-group">
-                    <label for="merchandiseTag">タグ</label>
-                    <input type="text" id="merchandiseTag" name="merchandiseTag" value="<%= m.getMerchandiseTag() %>">
+                    <label>タグ</label>
+                    <input type="text" name="merchandiseTag" value="<%= m.getMerchandiseTag() %>">
                 </div>
 
+                <!-- ★ 既存画像表示 -->
                 <div class="form-group">
-				    <label>現在の画像</label><br>
-				    <%
-				        if (images != null && !images.isEmpty()) {
-				            for (MerchandiseImage img : images) {
-				                byte[] data = img.getImageData();
-				                if (data != null) {
-				                    String base64 = Base64.getEncoder().encodeToString(data);
-				    %>
-				                    <img src="data:image/jpeg;base64,<%= base64 %>" alt="商品画像" style="max-width:120px; max-height:120px; margin-right:10px;">
-				    <%
-				                }
-				            }
-				        } else {
-				    %>
-				        <p>画像なし</p>
-				    <% } %>
-				</div>
+                    <label>登録済み画像</label>
 
+                    <div style="display:flex; flex-wrap:wrap;">
+                    <%
+                        if (images != null && !images.isEmpty()) {
+                            int index = 0;
+                            for (MerchandiseImage img : images) {
+                                boolean isMain = (index == 0);
+                    %>
 
-                <div class="form-group">
-				    <label for="imageFile">画像を変更（複数可）</label>
-				    <input type="file" id="imageFile" name="imageFile" multiple>
-				</div>
+                        <div class="image-box">
+                            <img src="<%= request.getContextPath() %>/foodloss/ImageDisplay.action?id=<%= img.getImageId() %>"
+                                 style="width:120px; height:120px; object-fit:cover; border:<%= isMain ? "3px solid red" : "1px solid #ccc" %>;">
+                            <% if (isMain) { %>
+                                <div style="color:red; font-weight:bold; margin-top:4px;">メイン</div>
+                            <% } %>
 
-				<div id="preview" style="margin-top: 1rem;"></div>
+                            <form action="${pageContext.request.contextPath}/foodloss/DeleteImage.action" method="post">
+                                <input type="hidden" name="imageId" value="<%= img.getImageId() %>">
+                                <input type="hidden" name="merchandiseId" value="<%= m.getMerchandiseId() %>">
+                                <button class="btn-delete">削除</button>
+                            </form>
+                        </div>
 
+                    <%
+                                index++;
+                            }
+                        } else {
+                    %>
+                        <p>画像なし</p>
+                    <% } %>
+                    </div>
+                </div>
+
+                <!-- ★ 削除用フォームを JS で作成して送信 -->
 				<script>
-				    document.getElementById('imageFile').addEventListener('change', function (event) {
-				        const preview = document.getElementById('preview');
-				        preview.innerHTML = ''; // 既存のプレビューをクリア
+				function deleteImage(imageId, merchandiseId) {
+				    if (!confirm("画像を削除しますか？")) return;
 
-				        const files = event.target.files;
+				    const form = document.createElement("form");
+				    form.method = "post";
+				    form.action = "<%= request.getContextPath() %>/foodloss/DeleteImage.action";
 
-				        for (let i = 0; i < files.length; i++) {
-				            const file = files[i];
-				            const reader = new FileReader();
+				    const i1 = document.createElement("input");
+				    i1.type = "hidden";
+				    i1.name = "imageId";
+				    i1.value = imageId;
+				    form.appendChild(i1);
 
-				            reader.onload = function (e) {
-				                const img = document.createElement('img');
-				                img.src = e.target.result;
-				                img.style.maxWidth = '120px';
-				                img.style.maxHeight = '120px';
-				                img.style.marginRight = '10px';
-				                img.style.marginBottom = '10px';
-				                preview.appendChild(img);
-				            };
+				    const i2 = document.createElement("input");
+				    i2.type = "hidden";
+				    i2.name = "merchandiseId";
+				    i2.value = merchandiseId;
+				    form.appendChild(i2);
 
-				            reader.readAsDataURL(file);
-				        }
-				    });
+				    document.body.appendChild(form);
+				    form.submit();
+				}
 				</script>
 
+                <!-- 新しい画像アップロード -->
+                <div class="form-group">
+                    <label>画像を追加（複数可）</label>
+                    <input type="file" name="imageFile" id="imageFile" multiple>
+                </div>
 
+                <!-- プレビュー -->
+                <div id="preview" style="margin-top:10px;"></div>
 
+                <script>
+                    document.getElementById('imageFile').addEventListener('change', function (event) {
+                        const preview = document.getElementById('preview');
+                        preview.innerHTML = "";
+
+                        for (const file of event.target.files) {
+                            const reader = new FileReader();
+                            reader.onload = e => {
+                                const img = document.createElement("img");
+                                img.src = e.target.result;
+                                img.style.width = "120px";
+                                img.style.height = "120px";
+                                img.style.objectFit = "cover";
+                                img.style.marginRight = "10px";
+                                img.style.marginBottom = "10px";
+                                preview.appendChild(img);
+                            };
+                            reader.readAsDataURL(file);
+                        }
+                    });
+                </script>
 
                 <button type="submit" class="btn-update">更新する</button>
             </form>
@@ -213,6 +268,7 @@
             <div class="back-link">
                 <a href="${pageContext.request.contextPath}/foodloss/MerchandiseList.action">← 戻る</a>
             </div>
+
         </div>
     </div>
 </main>
