@@ -178,6 +178,7 @@ public class StoreDAO extends DAO {
         return store;
     }
 
+
     // ResultSetからStoreオブジェクトへのマッピング
     private Store mapResultSetToStore(ResultSet rs) throws SQLException {
         Store s = new Store();
