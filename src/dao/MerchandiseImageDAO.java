@@ -20,19 +20,32 @@ public class MerchandiseImageDAO extends DAO {
         this.connection = con;
     }
 
-    // 画像を登録（画像データなし - ファイル名のみ）
+    /**
+     * 画像を登録（bytea保存対応）
+     * カラム: t002_1_fd6_uploaded_at が bytea
+     */
     public int insert(MerchandiseImage image) throws Exception {
         Connection con = (connection != null) ? connection : getConnection();
         boolean shouldClose = (connection == null);
 
         PreparedStatement st = con.prepareStatement(
-            "INSERT INTO t002_1_merchandise_image " +
-            "(t002_1_fd1_merchandise_id, t002_1_fd3_file_name, t002_1_fd4_display_order) " +
-            "VALUES (?, ?, ?)");
+            "INSERT INTO t002_1_merchandise_image (" +
+            " t002_1_fd1_merchandise_id," +
+            " t002_1_fd3_file_name," +
+            " t002_1_fd4_display_order," +
+            " t002_1_fd6_uploaded_at" +
+            ") VALUES (?, ?, ?, ?)");
 
         st.setInt(1, image.getMerchandiseId());
         st.setString(2, image.getFileName());
         st.setInt(3, image.getDisplayOrder());
+
+        // 画像データ（bytea）
+        if (image.getImageData() != null) {
+            st.setBytes(4, image.getImageData());
+        } else {
+            st.setNull(4, java.sql.Types.BINARY);
+        }
 
         int line = st.executeUpdate();
         st.close();
@@ -44,8 +57,49 @@ public class MerchandiseImageDAO extends DAO {
         return line;
     }
 
-    // 商品IDに紐づく画像を全て取得
+    /**
+     * 商品IDに紐づく画像を全て取得
+     */
     public List<MerchandiseImage> selectByMerchandiseId(int merchandiseId) throws Exception {
+        List<MerchandiseImage> list = new ArrayList<>();
+        Connection con = (connection != null) ? connection : getConnection();
+        boolean shouldClose = (connection == null);
+
+        PreparedStatement st = con.prepareStatement(
+            "SELECT t002_1_pk1_image, t002_1_fd1_merchandise_id, " +
+            "t002_1_fd3_file_name, t002_1_fd4_display_order, " +
+            "t002_1_fd5_uploaded_at, t002_1_fd6_uploaded_at " +
+            "FROM t002_1_merchandise_image " +
+            "WHERE t002_1_fd1_merchandise_id = ? " +
+            "ORDER BY t002_1_fd4_display_order, t002_1_pk1_image");
+        st.setInt(1, merchandiseId);
+        ResultSet rs = st.executeQuery();
+
+        while (rs.next()) {
+            MerchandiseImage img = new MerchandiseImage();
+            img.setImageId(rs.getInt("t002_1_pk1_image"));
+            img.setMerchandiseId(rs.getInt("t002_1_fd1_merchandise_id"));
+            img.setFileName(rs.getString("t002_1_fd3_file_name"));
+            img.setDisplayOrder(rs.getInt("t002_1_fd4_display_order"));
+            img.setUploadedAt(rs.getTimestamp("t002_1_fd5_uploaded_at"));
+            img.setImageData(rs.getBytes("t002_1_fd6_uploaded_at"));
+            list.add(img);
+        }
+
+        rs.close();
+        st.close();
+
+        if (shouldClose) {
+            con.close();
+        }
+
+        return list;
+    }
+
+    /**
+     * 商品IDに紐づく画像を取得（画像データなし - 軽量版）
+     */
+    public List<MerchandiseImage> selectByMerchandiseIdWithoutData(int merchandiseId) throws Exception {
         List<MerchandiseImage> list = new ArrayList<>();
         Connection con = (connection != null) ? connection : getConnection();
         boolean shouldClose = (connection == null);
@@ -79,14 +133,17 @@ public class MerchandiseImageDAO extends DAO {
         return list;
     }
 
-    // 画像IDで取得
+    /**
+     * 画像IDで取得（画像データ含む）
+     */
     public MerchandiseImage selectById(int imageId) throws Exception {
         Connection con = (connection != null) ? connection : getConnection();
         boolean shouldClose = (connection == null);
 
         PreparedStatement st = con.prepareStatement(
             "SELECT t002_1_pk1_image, t002_1_fd1_merchandise_id, " +
-            "t002_1_fd3_file_name, t002_1_fd4_display_order, t002_1_fd5_uploaded_at " +
+            "t002_1_fd3_file_name, t002_1_fd4_display_order, " +
+            "t002_1_fd5_uploaded_at, t002_1_fd6_uploaded_at " +
             "FROM t002_1_merchandise_image " +
             "WHERE t002_1_pk1_image = ?");
         st.setInt(1, imageId);
@@ -100,6 +157,7 @@ public class MerchandiseImageDAO extends DAO {
             img.setFileName(rs.getString("t002_1_fd3_file_name"));
             img.setDisplayOrder(rs.getInt("t002_1_fd4_display_order"));
             img.setUploadedAt(rs.getTimestamp("t002_1_fd5_uploaded_at"));
+            img.setImageData(rs.getBytes("t002_1_fd6_uploaded_at"));
         }
 
         rs.close();
@@ -112,20 +170,59 @@ public class MerchandiseImageDAO extends DAO {
         return img;
     }
 
-    // 複数画像を一括登録
+    /**
+     * 画像データのみ取得（表示用）
+     */
+    public byte[] selectImageDataById(int imageId) throws Exception {
+        Connection con = (connection != null) ? connection : getConnection();
+        boolean shouldClose = (connection == null);
+
+        PreparedStatement st = con.prepareStatement(
+            "SELECT t002_1_fd6_uploaded_at FROM t002_1_merchandise_image " +
+            "WHERE t002_1_pk1_image = ?");
+        st.setInt(1, imageId);
+        ResultSet rs = st.executeQuery();
+
+        byte[] data = null;
+        if (rs.next()) {
+            data = rs.getBytes("t002_1_fd6_uploaded_at");
+        }
+
+        rs.close();
+        st.close();
+
+        if (shouldClose) {
+            con.close();
+        }
+
+        return data;
+    }
+
+    /**
+     * 複数画像を一括登録
+     */
     public int[] insertBatch(List<MerchandiseImage> images) throws Exception {
         Connection con = (connection != null) ? connection : getConnection();
         boolean shouldClose = (connection == null);
 
         PreparedStatement st = con.prepareStatement(
-            "INSERT INTO t002_1_merchandise_image " +
-            "(t002_1_fd1_merchandise_id, t002_1_fd3_file_name, t002_1_fd4_display_order) " +
-            "VALUES (?, ?, ?)");
+            "INSERT INTO t002_1_merchandise_image (" +
+            " t002_1_fd1_merchandise_id," +
+            " t002_1_fd3_file_name," +
+            " t002_1_fd4_display_order," +
+            " t002_1_fd6_uploaded_at" +
+            ") VALUES (?, ?, ?, ?)");
 
         for (MerchandiseImage image : images) {
             st.setInt(1, image.getMerchandiseId());
             st.setString(2, image.getFileName());
             st.setInt(3, image.getDisplayOrder());
+
+            if (image.getImageData() != null) {
+                st.setBytes(4, image.getImageData());
+            } else {
+                st.setNull(4, java.sql.Types.BINARY);
+            }
             st.addBatch();
         }
 
@@ -139,19 +236,28 @@ public class MerchandiseImageDAO extends DAO {
         return lines;
     }
 
-    // 画像を更新
+    /**
+     * 画像を更新
+     */
     public int update(MerchandiseImage image) throws Exception {
         Connection con = (connection != null) ? connection : getConnection();
         boolean shouldClose = (connection == null);
 
         PreparedStatement st = con.prepareStatement(
             "UPDATE t002_1_merchandise_image SET " +
-            "t002_1_fd3_file_name = ?, t002_1_fd4_display_order = ? " +
+            "t002_1_fd3_file_name = ?, " +
+            "t002_1_fd4_display_order = ?, " +
+            "t002_1_fd6_uploaded_at = ? " +
             "WHERE t002_1_pk1_image = ?");
 
         st.setString(1, image.getFileName());
         st.setInt(2, image.getDisplayOrder());
-        st.setInt(3, image.getImageId());
+        if (image.getImageData() != null) {
+            st.setBytes(3, image.getImageData());
+        } else {
+            st.setNull(3, java.sql.Types.BINARY);
+        }
+        st.setInt(4, image.getImageId());
 
         int line = st.executeUpdate();
         st.close();
@@ -163,7 +269,9 @@ public class MerchandiseImageDAO extends DAO {
         return line;
     }
 
-    // 表示順のみ更新
+    /**
+     * 表示順のみ更新
+     */
     public int updateDisplayOrder(int imageId, int displayOrder) throws Exception {
         Connection con = (connection != null) ? connection : getConnection();
         boolean shouldClose = (connection == null);
@@ -185,7 +293,9 @@ public class MerchandiseImageDAO extends DAO {
         return line;
     }
 
-    // 画像を削除
+    /**
+     * 画像を削除
+     */
     public int delete(int imageId) throws Exception {
         Connection con = (connection != null) ? connection : getConnection();
         boolean shouldClose = (connection == null);
@@ -204,7 +314,9 @@ public class MerchandiseImageDAO extends DAO {
         return line;
     }
 
-    // 商品IDに紐づく全画像を削除
+    /**
+     * 商品IDに紐づく全画像を削除
+     */
     public int deleteByMerchandiseId(int merchandiseId) throws Exception {
         Connection con = (connection != null) ? connection : getConnection();
         boolean shouldClose = (connection == null);
@@ -223,7 +335,9 @@ public class MerchandiseImageDAO extends DAO {
         return line;
     }
 
-    // 商品の画像数を取得
+    /**
+     * 商品の画像数を取得
+     */
     public int countByMerchandiseId(int merchandiseId) throws Exception {
         Connection con = (connection != null) ? connection : getConnection();
         boolean shouldClose = (connection == null);
