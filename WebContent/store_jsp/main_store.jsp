@@ -58,7 +58,7 @@
                 <h2>店舗メインメニュー</h2>
                 <div class="button-group">
                     <a href="${pageContext.request.contextPath}/foodloss/MerchandiseRegister.action">商品登録</a>
-					<a href="${pageContext.request.contextPath}/foodloss/MerchandiseList.action">登録商品一覧</a>
+					<a href="${pageContext.request.contextPath}/foodloss/MerchandiseList.action">商品一覧</a>
 					<a href="${pageContext.request.contextPath}/foodloss/StoreBookingList.action">予約リスト</a>
 					<a href="${pageContext.request.contextPath}/foodloss/EmployeeList.action">社員管理</a>
                 </div>
