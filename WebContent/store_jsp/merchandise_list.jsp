@@ -6,7 +6,7 @@
     // サーブレットから受け取った商品一覧
     List<Merchandise> products = (List<Merchandise>) request.getAttribute("merchandiseList");
 
-    // セッション情報
+    // セッショ情報
     Integer storeId = (session.getAttribute("storeId") != null)
                         ? (Integer) session.getAttribute("storeId")
                         : null;
@@ -21,7 +21,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>商品一覧 - フードロス削減システム</title>
+    <title>登録商品一覧</title>
 
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
 
@@ -34,51 +34,77 @@
             border-radius: 10px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
+
         h2 {
             font-size: 1.8rem;
             text-align: center;
-            color: #333;
-            margin-bottom: 30px;
+            color: #c07148;
+            border-bottom: 2px solid #c07148;
+            padding-bottom: 1rem;
+            margin-bottom: 2rem;
         }
+
         .store-info {
             text-align: center;
             font-weight: bold;
-            color: #a65d36;
+            color: #c07148;
             margin-bottom: 20px;
+            font-size: 1rem;
         }
+
         table {
             width: 100%;
             border-collapse: collapse;
+            margin-top: 20px;
         }
+
         th {
-            background-color: #a65d36;
+            background-color: #c07148;
             color: #fff;
             padding: 12px;
+            font-weight: bold;
+            border: 1px solid #c07148;
         }
+
         td {
             padding: 12px;
-            border-bottom: 1px solid #ddd;
+            border: 1px solid #ddd;
             text-align: center;
+            color: #333;
         }
-        tr:hover {
+
+        tbody tr:hover {
             background-color: #f5f5f5;
         }
+
         .btn {
             display: inline-block;
             padding: 8px 25px;
             background-color: #c07148;
             color: white;
-            border-radius: 8px;
+            border-radius: 5px;
             text-decoration: none;
             transition: 0.3s;
+            font-weight: bold;
         }
+
         .btn:hover {
-            background-color: #c77c4a;
+            background-color: #a85d38;
+            transform: translateY(-2px);
         }
+
+        .no-data {
+            text-align: center;
+            padding: 40px 20px;
+            color: #999;
+            font-size: 1rem;
+        }
+
         .back-button {
             margin-top: 40px;
             text-align: center;
         }
+
         .back-button a {
             display: inline-block;
             padding: 12px 40px;
@@ -88,10 +114,34 @@
             font-weight: bold;
             color: #333;
             margin: 0 10px;
+            transition: all 0.3s;
         }
+
         .back-button a:hover {
-            background-color: #a65d36;
+            background-color: #c07148;
             color: #fff;
+            transform: translateY(-3px);
+        }
+
+        @media screen and (max-width: 1000px) {
+            .main-content {
+                margin: 20px;
+                padding: 1.5rem;
+            }
+
+            table {
+                font-size: 0.9rem;
+            }
+
+            th, td {
+                padding: 8px;
+            }
+
+            .back-button a {
+                display: block;
+                margin: 10px auto;
+                max-width: 300px;
+            }
         }
     </style>
 </head>
@@ -100,7 +150,7 @@
 
 <div id="container">
 
-    <!-- ▼ 共通ヘッダー -->
+    <!-- 共通ヘッダー -->
     <jsp:include page="/store_jsp/header_store.jsp" />
 
     <main class="column">
@@ -109,7 +159,7 @@
 
                 <h2>登録商品一覧</h2>
 
-                <!-- ▼ ログイン店舗の表示 -->
+                <!-- ログイン店舗の表示 -->
                 <div class="store-info">
                     <% if (storeName != null) { %>
                         表示中の店舗：<%= storeName %>（ID：<%= storeId %>）
@@ -118,7 +168,7 @@
                     <% } %>
                 </div>
 
-                <!-- ▼ 商品一覧 -->
+                <!-- 商品一覧 -->
                 <% if (products != null && !products.isEmpty()) { %>
                     <table>
                         <thead>
@@ -143,9 +193,9 @@
                                     <td><%= m.getRegistrationTime() %></td>
                                     <td>
                                         <a class="btn"
-										   href="${pageContext.request.contextPath}/foodloss/MerchandiseEdit.action?id=<%= m.getMerchandiseId() %>">
-										   編集
-										</a>
+                                           href="${pageContext.request.contextPath}/foodloss/MerchandiseEdit.action?id=<%= m.getMerchandiseId() %>">
+                                           編集
+                                        </a>
                                     </td>
                                 </tr>
                             <% } %>
@@ -153,29 +203,31 @@
                     </table>
 
                 <% } else { %>
-                    <p style="text-align:center; padding:20px; color:#999;">
+                    <p class="no-data">
                         登録された商品はありません。
                     </p>
                 <% } %>
-<!-- ん」 -->
-               <!-- ▼ 戻る・商品登録・割引設定ボタン -->
-					<div class="back-button">
-					    <a href="${pageContext.request.contextPath}/store_jsp/main_store.jsp">メインメニューへ戻る</a>
-					    <a href="${pageContext.request.contextPath}/store_jsp/merchandise_register_store.jsp">商品登録</a>
-					    <a href="${pageContext.request.contextPath}/store_jsp/discount_setting.jsp">割引設定</a>
-					</div>
+
+                <!-- 戻る・商品登録・割引設定ボタン -->
+                <div class="back-button">
+                    <a href="${pageContext.request.contextPath}/foodloss/Menu.action">ホームに戻る</a>
+                    <a href="${pageContext.request.contextPath}/foodloss/MerchandiseRegister.action">商品登録</a>
+                    <a href="${pageContext.request.contextPath}/foodloss/DiscountSetting.action">割引設定</a>
+                </div>
 
             </div>
         </div>
     </main>
 
-    <!-- ▼ 共通フッター -->
+    <!-- 共通フッター -->
     <jsp:include page="/jsp/footer.jsp" />
 
 </div>
 
 <!-- 共通JS -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
+<script src="${pageContext.request.contextPath}/js/slick.js"></script>
 <script src="${pageContext.request.contextPath}/js/main.js"></script>
 
 </body>

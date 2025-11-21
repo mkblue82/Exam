@@ -1,13 +1,17 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page import="bean.User" %>
 <%
     // セッションチェック
     HttpSession userSession = request.getSession(false);
-    if (userSession == null || userSession.getAttribute("user") == null) {
+    User user = (User) (userSession != null ? userSession.getAttribute("user") : null);
+
+    if (userSession == null || user == null) {
         // セッションがない場合は共通エラーページへリダイレクト
         request.setAttribute("errorMessage", "セッションが切れています。ログアウトされたか、長時間操作がありませんでした。");
         request.getRequestDispatcher("/error.jsp").forward(request, response);
         return;
     }
+
 
     // キャッシュ制御（ブラウザバック対策）
     response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
@@ -79,9 +83,8 @@
         <div class="main-contents">
             <div class="main-content">
                 <div class="point-section">
-                <!-- ポイント機能追加したらここら辺都度直してください -->
                     <h2>所有ポイント</h2>
-                    <p>0 P</p>
+                    <p><%= user.getPoint() %> P</p>
                 </div>
                 <div class="button-group">
                     <a href="${pageContext.request.contextPath}/jsp/edit_info_user.jsp">情報変更</a>

@@ -50,8 +50,6 @@
         }
 
         .favorite-btn:hover {
-            background-color: #c07148;
-            color: #fff;
             transform: translateY(-2px);
         }
 
@@ -285,16 +283,8 @@ $(document).ready(function() {
                     // ボタンの表示を切り替え
                     btn.toggleClass('active');
 
-                    // メッセージ表示（オプション）
-                    const message = isActive ? 'お気に入りから削除しました' : 'お気に入りに追加しました';
-                    alert(message);
-                } else {
-                    alert('エラーが発生しました。もう一度お試しください。');
                 }
             },
-            error: function() {
-                alert('通信エラーが発生しました。');
-            }
         });
     });
 });

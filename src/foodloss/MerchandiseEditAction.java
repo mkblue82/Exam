@@ -1,5 +1,4 @@
 package foodloss;
-
 import java.io.IOException;
 import java.sql.Connection;
 import java.util.List;
@@ -14,48 +13,44 @@ import dao.MerchandiseDAO;
 import dao.MerchandiseImageDAO;
 import tool.Action;
 import tool.DBManager;
-
 public class MerchandiseEditAction extends Action {
-
     @Override
     public void execute(HttpServletRequest request, HttpServletResponse response) throws IOException {
         try {
-            // セッションから店舗ID取得
             HttpSession session = request.getSession();
             Integer storeId = (Integer) session.getAttribute("storeId");
-
-            // 商品ID取得
             String idParam = request.getParameter("id");
             if (idParam == null || idParam.isEmpty()) {
-                response.sendRedirect("error.jsp");
+                request.setAttribute("errorMessage", "商品IDが指定されていません。");
+                request.getRequestDispatcher("/error.jsp").forward(request, response);
                 return;
             }
-
             int merchandiseId = Integer.parseInt(idParam);
-
-            // DB接続とデータ取得
-            try (Connection conn = DBManager.getInstance().getConnection()) {
+            DBManager dbManager = new DBManager();
+            try (Connection conn = dbManager.getConnection()) {
                 MerchandiseDAO dao = new MerchandiseDAO(conn);
                 Merchandise merchandise = dao.selectById(merchandiseId);
-
                 if (merchandise == null || (storeId != null && merchandise.getStoreId() != storeId)) {
-                    response.sendRedirect("error.jsp");
+                    request.setAttribute("errorMessage", "商品が見つからないか、アクセス権限がありません。");
+                    request.getRequestDispatcher("/error.jsp").forward(request, response);
                     return;
                 }
-
-                // 画像取得
-                MerchandiseImageDAO imageDAO = new MerchandiseImageDAO(conn);
-                List<MerchandiseImage> images = imageDAO.selectByMerchandiseId(merchandiseId);
-
-                // JSPへデータ渡す
-                request.setAttribute("merchandise", merchandise);
+                // ★ 商品画像も取得してJSPへ渡す
+                MerchandiseImageDAO imageDao = new MerchandiseImageDAO(conn);
+                List<MerchandiseImage> images = imageDao.selectByMerchandiseId(merchandiseId);
                 request.setAttribute("images", images);
+                // 商品情報をJSPへ渡す
+                request.setAttribute("merchandise", merchandise);
                 request.getRequestDispatcher("/store_jsp/merchandise_edit.jsp").forward(request, response);
             }
-
         } catch (Exception e) {
             e.printStackTrace();
-            response.sendRedirect("error.jsp");
+            request.setAttribute("errorMessage", "システムエラーが発生しました。");
+            try {
+                request.getRequestDispatcher("/error.jsp").forward(request, response);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
         }
     }
 }

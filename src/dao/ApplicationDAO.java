@@ -5,12 +5,18 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 
 import bean.Application;
 
 public class ApplicationDAO extends DAO {
 
-	private Connection con;
+    private Connection con;
+
+    public ApplicationDAO(Connection con) {
+        this.con = con;
+    }
 
     /**
      * 申請データを新規登録
@@ -76,6 +82,21 @@ public class ApplicationDAO extends DAO {
     }
 
     /**
+     * 未承認(pending)の申請一覧を取得
+     */
+    public List<Application> selectPendingApplications() throws SQLException {
+        List<Application> list = new ArrayList<>();
+        String sql = "SELECT * FROM T001_1_applications WHERE T001_1_FD8_applications = 'pending'";
+        try (PreparedStatement pstmt = con.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+            while (rs.next()) {
+                list.add(mapResultSetToApplication(rs));
+            }
+        }
+        return list;
+    }
+
+    /**
      * ResultSetからApplicationオブジェクトへのマッピング
      */
     private Application mapResultSetToApplication(ResultSet rs) throws SQLException {
@@ -94,3 +115,4 @@ public class ApplicationDAO extends DAO {
         return app;
     }
 }
+

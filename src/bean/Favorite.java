@@ -6,7 +6,7 @@ public class Favorite {
     private int storeId;
     private boolean notificationSetting;
 
-    // 追加：店舗情報（表示用）
+    // 店舗情報（表示用）
     private String storeName;
     private String storeAddress;
 
@@ -42,7 +42,7 @@ public class Favorite {
         this.notificationSetting = notificationSetting;
     }
 
-    // 店舗名のゲッター・セッター（追加）
+    // 店舗名のゲッター・セッター
     public String getStoreName() {
         return storeName;
     }
@@ -50,7 +50,7 @@ public class Favorite {
         this.storeName = storeName;
     }
 
-    // 店舗住所のゲッター・セッター（追加）
+    // 店舗住所のゲッター・セッター
     public String getStoreAddress() {
         return storeAddress;
     }
