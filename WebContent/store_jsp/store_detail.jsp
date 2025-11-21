@@ -112,6 +112,28 @@
         transform: translateY(-3px);
     }
 
+    .back-button {
+        margin-top: 30px;
+        text-align: center;
+    }
+
+    .back-button a {
+        display: inline-block;
+        padding: 12px 40px;
+        background-color: #ccc;
+        text-decoration: none;
+        border-radius: 5px;
+        font-weight: bold;
+        color: #333;
+        transition: all 0.3s;
+    }
+
+    .back-button a:hover {
+        background-color: #c07148;
+        color: #fff;
+        transform: translateY(-3px);
+    }
+
     .no-data {
         color: #999;
         font-style: italic;
@@ -201,6 +223,11 @@
                         </div>
                     </div>
                     <% } %>
+                </div>
+
+                <!-- ホームに戻るボタン -->
+                <div class="back-button">
+                    <a href="${pageContext.request.contextPath}/foodloss/Menu.action">ホームに戻る</a>
                 </div>
 
             </div>
