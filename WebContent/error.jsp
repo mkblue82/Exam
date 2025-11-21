@@ -19,7 +19,7 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
     <style>
         body {
-            background: #f5f5f5;
+            background: #fff;
         }
         .error-container {
             max-width: 500px;

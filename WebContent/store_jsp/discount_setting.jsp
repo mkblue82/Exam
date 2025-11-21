@@ -1,13 +1,4 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%
-    // セッションチェック（店舗側）
-
-
-    // キャッシュ制御
-    response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
-    response.setHeader("Pragma", "no-cache");
-    response.setDateHeader("Expires", 0);
-%>
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -252,18 +243,6 @@
     }
 </script>
 
-<!-- ブラウザバック対策 -->
-<script>
-    // ページ読み込み時に履歴を操作
-    history.pushState(null, null, location.href);
 
-    // ブラウザの戻るボタンが押された時の処理
-    window.addEventListener('popstate', function(event) {
-        // 履歴を再び追加
-        history.pushState(null, null, location.href);
-        // 共通エラーページへ遷移
-        location.href = '${pageContext.request.contextPath}/error.jsp?error=セッションが切れています';
-    });
-</script>
 </body>
 </html>

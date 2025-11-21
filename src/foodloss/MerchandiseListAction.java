@@ -1,6 +1,10 @@
 package foodloss;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.Time;
+import java.time.LocalTime;
 import java.util.List;
 
 import javax.naming.InitialContext;
@@ -29,6 +33,8 @@ public class MerchandiseListAction extends Action {
         }
 
         Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
 
         try {
             // JNDIでDB接続
@@ -40,10 +46,52 @@ public class MerchandiseListAction extends Action {
             MerchandiseDAO dao = new MerchandiseDAO(con);
             List<Merchandise> list = dao.selectByStoreId(storeId);
 
+            // 店舗の割引設定を取得
+            String sql = "SELECT t001_fd5_store, t001_fd6_store FROM t001_store WHERE t001_pk1_store = ?";
+            ps = con.prepareStatement(sql);
+            ps.setInt(1, storeId);
+            rs = ps.executeQuery();
+
+            Time discountStartTime = null;
+            Integer discountRate = null;
+
+            if (rs.next()) {
+                discountStartTime = rs.getTime("t001_fd5_store");
+                String discountRateStr = rs.getString("t001_fd6_store");
+                if (discountRateStr != null && !discountRateStr.trim().isEmpty()) {
+                    try {
+                        discountRate = Integer.parseInt(discountRateStr.trim());
+                    } catch (NumberFormatException e) {
+                        // 割引率が数値でない場合は無視
+                    }
+                }
+            }
+
+            // 現在時刻を取得
+            LocalTime now = LocalTime.now();
+
+            // 割引が適用されるかチェック
+            boolean isDiscountApplied = false;
+            if (discountStartTime != null && discountRate != null && discountRate > 0) {
+                LocalTime discountTime = discountStartTime.toLocalTime();
+                // 現在時刻が割引開始時刻以降なら割引適用
+                if (now.isAfter(discountTime) || now.equals(discountTime)) {
+                    isDiscountApplied = true;
+                }
+            }
+
+            // 割引情報をリクエストに設定
+            request.setAttribute("isDiscountApplied", isDiscountApplied);
+            if (isDiscountApplied) {
+                request.setAttribute("discountRate", discountRate);
+            }
+
             // JSPに渡す
             request.setAttribute("merchandiseList", list);
 
         } finally {
+            if (rs != null) rs.close();
+            if (ps != null) ps.close();
             if (con != null) con.close();
         }
 

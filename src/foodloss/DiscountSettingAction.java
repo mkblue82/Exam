@@ -20,10 +20,6 @@ public class DiscountSettingAction extends Action {
 
         // セッションから店舗情報を取得
         HttpSession session = request.getSession(false);
-        if (session == null) {
-            response.sendRedirect(request.getContextPath() + "/error.jsp?error=セッションが切れています");
-            return;
-        }
 
         Store store = (Store) session.getAttribute("store");
         if (store == null) {
@@ -38,7 +34,8 @@ public class DiscountSettingAction extends Action {
         // バリデーション
         if (timeStr == null || discountStr == null ||
             timeStr.isEmpty() || discountStr.isEmpty()) {
-            response.sendRedirect(request.getContextPath() + "/store_jsp/discount_setting.jsp?error=入力項目が不足しています");
+            session.setAttribute("errorMessage", "入力項目が不足しています");
+            response.sendRedirect(request.getContextPath() + "/store_jsp/discount_setting.jsp");
             return;
         }
 
@@ -51,16 +48,19 @@ public class DiscountSettingAction extends Action {
 
             // 範囲チェック
             if (startTime < 0 || startTime > 23) {
-                response.sendRedirect(request.getContextPath() + "/store_jsp/discount_setting.jsp?error=時間は0〜23の範囲で入力してください");
+                session.setAttribute("errorMessage", "時間は0〜23の範囲で入力してください");
+                response.sendRedirect(request.getContextPath() + "/store_jsp/discount_setting.jsp");
                 return;
             }
             if (discountRate < 1 || discountRate > 100) {
-                response.sendRedirect(request.getContextPath() + "/store_jsp/discount_setting.jsp?error=割引率は1〜100の範囲で入力してください");
+                session.setAttribute("errorMessage", "割引率は1〜100の範囲で入力してください");
+                response.sendRedirect(request.getContextPath() + "/store_jsp/discount_setting.jsp");
                 return;
             }
 
         } catch (NumberFormatException e) {
-            response.sendRedirect(request.getContextPath() + "/store_jsp/discount_setting.jsp?error=数値を正しく入力してください");
+            session.setAttribute("errorMessage", "数値を正しく入力してください");
+            response.sendRedirect(request.getContextPath() + "/store_jsp/discount_setting.jsp");
             return;
         }
 
@@ -96,10 +96,12 @@ public class DiscountSettingAction extends Action {
                 store.setDiscountRate(discountRate);
                 session.setAttribute("store", store);
 
-                response.sendRedirect(request.getContextPath() + "/store_jsp/discount_setting.jsp?success=true");
+                // 完了画面にリダイレクト
+                response.sendRedirect(request.getContextPath() + "/store_jsp/discount_setting_done.jsp");
             } else {
                 // 更新失敗
-                response.sendRedirect(request.getContextPath() + "/store_jsp/discount_setting.jsp?error=割引設定の更新に失敗しました");
+                session.setAttribute("errorMessage", "割引設定の更新に失敗しました");
+                response.sendRedirect(request.getContextPath() + "/store_jsp/discount_setting.jsp");
             }
 
         } catch (SQLException e) {

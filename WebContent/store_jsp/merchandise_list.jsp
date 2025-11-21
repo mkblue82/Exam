@@ -6,7 +6,11 @@
     // サーブレットから受け取った商品一覧
     List<Merchandise> products = (List<Merchandise>) request.getAttribute("merchandiseList");
 
-    // セッショ情報
+    // 割引情報
+    Boolean isDiscountApplied = (Boolean) request.getAttribute("isDiscountApplied");
+    Integer discountRate = (Integer) request.getAttribute("discountRate");
+
+    // セッション情報
     Integer storeId = (session.getAttribute("storeId") != null)
                         ? (Integer) session.getAttribute("storeId")
                         : null;
@@ -52,6 +56,16 @@
             font-size: 1rem;
         }
 
+        .discount-notice {
+            text-align: center;
+            background-color: #fff3cd;
+            color: #856404;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
@@ -75,6 +89,25 @@
 
         tbody tr:hover {
             background-color: #f5f5f5;
+        }
+
+        .price-display {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+        }
+
+        .discounted-price {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #d9534f;
+        }
+
+        .original-price {
+            font-size: 0.85rem;
+            color: #999;
+            text-decoration: line-through;
         }
 
         .btn {
@@ -168,6 +201,13 @@
                     <% } %>
                 </div>
 
+                <!-- 割引適用中の通知 -->
+                <% if (isDiscountApplied != null && isDiscountApplied && discountRate != null) { %>
+                    <div class="discount-notice">
+                        現在、全商品に<%= discountRate %>%OFFの割引が適用されています
+                    </div>
+                <% } %>
+
                 <!-- 商品一覧 -->
                 <% if (products != null && !products.isEmpty()) { %>
                     <table>
@@ -187,7 +227,21 @@
                                 <tr>
                                     <td><%= m.getMerchandiseId() %></td>
                                     <td><%= m.getMerchandiseName() %></td>
-                                    <td>￥<%= m.getPrice() %></td>
+                                    <td>
+                                        <%
+                                        int originalPrice = m.getPrice();
+                                        if (isDiscountApplied != null && isDiscountApplied && discountRate != null) {
+                                            // 割引後の価格を計算
+                                            int discountedPrice = (int)(originalPrice * (100 - discountRate) / 100.0);
+                                        %>
+                                            <div class="price-display">
+                                                <span class="discounted-price">￥<%= discountedPrice %></span>
+                                                <span class="original-price">(元価格: ￥<%= originalPrice %>)</span>
+                                            </div>
+                                        <% } else { %>
+                                            ￥<%= originalPrice %>
+                                        <% } %>
+                                    </td>
                                     <td><%= m.getStock() %></td>
                                     <td><%= m.getUseByDate() %></td>
                                     <td><%= m.getRegistrationTime() %></td>
