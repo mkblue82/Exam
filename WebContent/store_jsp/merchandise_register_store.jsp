@@ -1,5 +1,4 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -188,10 +187,21 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="employeeNumber">社員番号</label>
-                        <input type="text" id="employeeNumber" name="employeeNumber"
-                               value="${defaultEmployee.id}" readonly
-                               style="background-color: #f0f0f0; cursor: not-allowed;">
+                        <label for="employeeNumber">社員番号 <span>*</span></label>
+                        <select id="employeeNumber" name="employeeNumber" required>
+                            <option value="">-- 社員番号を選択 --</option>
+                            <%
+                                java.util.List<bean.Employee> empList =
+                                    (java.util.List<bean.Employee>) request.getAttribute("employeeList");
+                                if (empList != null) {
+                                    for (bean.Employee emp : empList) {
+                            %>
+                                        <option value="<%= emp.getId() %>"><%= emp.getId() %></option>
+                            <%
+                                    }
+                                }
+                            %>
+                        </select>
                     </div>
 
                     <div class="form-group">
