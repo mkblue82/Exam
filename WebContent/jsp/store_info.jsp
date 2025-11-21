@@ -28,7 +28,7 @@
 
         .store-header h2 {
             font-size: 1.8rem;
-            color: #333;
+            color: #c07148;
             margin: 0;
             text-decoration: none;
             border: none;

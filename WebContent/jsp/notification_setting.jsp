@@ -73,10 +73,27 @@
         margin-bottom: 10px;
     }
 
+    .store-name-link {
+        text-decoration: none;
+        color: inherit;
+        display: inline-block;
+        transition: color 0.2s;
+    }
+
+    .store-name-link:hover {
+        color: #c07148;
+    }
+
     .store-name {
         font-size: 18px;
         font-weight: bold;
         color: #333;
+        cursor: pointer;
+        transition: color 0.2s;
+    }
+
+    .store-name-link:hover .store-name {
+        text-decoration: underline;
     }
 
     .store-info {
@@ -255,7 +272,9 @@
                   <div class="store-item">
                     <div class="store-content">
                       <div class="store-header">
-                        <div class="store-name"><%= favorite.getStoreName() %></div>
+                        <a href="${pageContext.request.contextPath}/foodloss/StoreInfo.action?storeId=<%= favorite.getStoreId() %>" class="store-name-link">
+                          <div class="store-name"><%= favorite.getStoreName() %></div>
+                        </a>
                       </div>
                       <% if (favorite.getStoreAddress() != null && !favorite.getStoreAddress().isEmpty()) { %>
                       <div class="store-info">
