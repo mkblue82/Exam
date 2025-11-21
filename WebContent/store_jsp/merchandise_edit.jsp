@@ -152,20 +152,60 @@
                 </div>
 
                 <div class="form-group">
-                    <label>現在の画像</label><br>
-                    <% if (images != null && !images.isEmpty() && images.get(0).getImageData() != null) {
-                        String base64 = Base64.getEncoder().encodeToString(images.get(0).getImageData());
-                    %>
-                        <img src="data:image/jpeg;base64,<%= base64 %>" alt="商品画像" style="max-width:120px; max-height:120px;">
-                    <% } else { %>
-                        <p>画像なし</p>
-                    <% } %>
-                </div>
+				    <label>現在の画像</label><br>
+				    <%
+				        if (images != null && !images.isEmpty()) {
+				            for (MerchandiseImage img : images) {
+				                byte[] data = img.getImageData();
+				                if (data != null) {
+				                    String base64 = Base64.getEncoder().encodeToString(data);
+				    %>
+				                    <img src="data:image/jpeg;base64,<%= base64 %>" alt="商品画像" style="max-width:120px; max-height:120px; margin-right:10px;">
+				    <%
+				                }
+				            }
+				        } else {
+				    %>
+				        <p>画像なし</p>
+				    <% } %>
+				</div>
+
 
                 <div class="form-group">
-                    <label for="imageFile">画像を変更</label>
-                    <input type="file" id="imageFile" name="imageFile">
-                </div>
+				    <label for="imageFile">画像を変更（複数可）</label>
+				    <input type="file" id="imageFile" name="imageFile" multiple>
+				</div>
+
+				<div id="preview" style="margin-top: 1rem;"></div>
+
+				<script>
+				    document.getElementById('imageFile').addEventListener('change', function (event) {
+				        const preview = document.getElementById('preview');
+				        preview.innerHTML = ''; // 既存のプレビューをクリア
+
+				        const files = event.target.files;
+
+				        for (let i = 0; i < files.length; i++) {
+				            const file = files[i];
+				            const reader = new FileReader();
+
+				            reader.onload = function (e) {
+				                const img = document.createElement('img');
+				                img.src = e.target.result;
+				                img.style.maxWidth = '120px';
+				                img.style.maxHeight = '120px';
+				                img.style.marginRight = '10px';
+				                img.style.marginBottom = '10px';
+				                preview.appendChild(img);
+				            };
+
+				            reader.readAsDataURL(file);
+				        }
+				    });
+				</script>
+
+
+
 
                 <button type="submit" class="btn-update">更新する</button>
             </form>

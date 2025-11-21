@@ -3,13 +3,6 @@
 <header>
   <h1 id="logo"><span>タイトル募集</span></h1>
 
-  <!-- 検索フォーム -->
-  <form action="${pageContext.request.contextPath}/search_management.jsp" method="get" id="search-form">
-	  <input type="text" name="keyword" placeholder="社員名または商品名を入力" required>
-	  <button type="submit"><i class="fa fa-search"></i></button>
-  </form>
-
-
 </header>
 
 <!-- メニューバー -->
