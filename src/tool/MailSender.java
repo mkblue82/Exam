@@ -31,7 +31,14 @@ public class MailSender {
     }
 
     private static Session createSession() {
-        return Session.getInstance(mailConfig, new Authenticator() {
+        Properties props = new Properties();
+        props.put("mail.smtp.host", mailConfig.getProperty("smtp.host"));
+        props.put("mail.smtp.port", mailConfig.getProperty("smtp.port"));
+        props.put("mail.smtp.auth", mailConfig.getProperty("mail.smtp.auth", "true"));
+        props.put("mail.smtp.starttls.enable", mailConfig.getProperty("mail.smtp.starttls.enable", "true"));
+        props.put("mail.smtp.ssl.trust", mailConfig.getProperty("smtp.host")); // Gmail TLS対策
+
+        Session session = Session.getInstance(props, new Authenticator() {
             protected PasswordAuthentication getPasswordAuthentication() {
                 return new PasswordAuthentication(
                         mailConfig.getProperty("smtp.user"),
@@ -39,6 +46,9 @@ public class MailSender {
                 );
             }
         });
+
+        session.setDebug(true); // デバッグログを有効化
+        return session;
     }
 
     // 本文のみ送信
@@ -93,4 +103,3 @@ public class MailSender {
         System.out.println("DEBUG: 添付メール送信完了 → " + to);
     }
 }
-
