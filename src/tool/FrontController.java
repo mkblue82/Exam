@@ -28,6 +28,9 @@ public class FrontController extends HttpServlet {
 			// ファイル名を取得しクラス名に変換
 			String name = path.replace(".action", "Action").replace('/', '.');
 			// アクションクラスのインスタンスを返却
+
+			String fullClassName = "foodloss." + name;
+
 			Action action = (Action) Class.forName(name).getDeclaredConstructor().newInstance();
 
 			// 遷移先URLを取得
