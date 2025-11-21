@@ -73,6 +73,7 @@ public class MailSender {
         System.out.println("DEBUG: メール送信完了 → " + to);
     }
 
+
     // 添付付きメール送信
     public static void sendEmailWithAttachment(
             String to, String subject, String body,
@@ -103,3 +104,4 @@ public class MailSender {
         System.out.println("DEBUG: 添付メール送信完了 → " + to);
     }
 }
+

@@ -127,7 +127,7 @@
                             <div class="merch-item">
 
                                 <!-- 画像クリック → 商品詳細へ -->
-                                <a href="MerchandiseDetail.action?merchandiseId=<%= merch.getMerchandiseId() %>">
+                                <a href="MerchDetail.action?merchandiseId=<%= merch.getMerchandiseId() %>">
 
                                     <div class="merch-image">
 
@@ -135,9 +135,12 @@
                                         List<MerchandiseImage> images = merch.getImages();
                                         if (images != null && !images.isEmpty()) {
                                             MerchandiseImage img = images.get(0);
+
+                                            System.out.println("Image ID: " + img.getImageId());
+                                            System.out.println("Image URL: " + request.getContextPath() + "/ImageDisplay.action?imageId=" + img.getImageId());
                                         %>
                                             <img src="<%= request.getContextPath() %>/ImageDisplay.action?imageId=<%= img.getImageId() %>"
-                                                 alt="<%= merch.getMerchandiseName() %>">
+     											alt="<%= merch.getMerchandiseName() %>">
                                         <%
                                         } else {
                                         %>

@@ -29,7 +29,7 @@ public class FrontController extends HttpServlet {
 			String name = path.replace(".action", "Action").replace('/', '.');
 			// アクションクラスのインスタンスを返却
 
-			String fullClassName = "foodloss." + name;
+
 
 			Action action = (Action) Class.forName(name).getDeclaredConstructor().newInstance();
 
