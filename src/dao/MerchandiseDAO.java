@@ -175,7 +175,7 @@ public class MerchandiseDAO {
             if (images != null && !images.isEmpty()) {
                 st = connection.prepareStatement(
                     "INSERT INTO t002_1_merchandise_image " +
-                    "(t002_1_fd1_merchandise_id, t002_1_fd2_image_data, " +
+                    "(t002_1_fd1_merchandise_id, t002_1_fd6_uploaded_at, " +
                     "t002_1_fd3_file_name, t002_1_fd4_display_order) " +
                     "VALUES (?, ?, ?, ?)");
 
@@ -244,7 +244,7 @@ public class MerchandiseDAO {
             if (images != null && !images.isEmpty()) {
                 st = connection.prepareStatement(
                     "INSERT INTO t002_1_merchandise_image " +
-                    "(t002_1_fd1_merchandise_id, t002_1_fd2_image_data, " +
+                    "(t002_1_fd1_merchandise_id, t002_1_fd6_uploaded_at, " +
                     "t002_1_fd3_file_name, t002_1_fd4_display_order) " +
                     "VALUES (?, ?, ?, ?)");
 
