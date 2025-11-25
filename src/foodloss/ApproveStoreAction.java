@@ -124,12 +124,12 @@ public class ApproveStoreAction extends Action {
             if (conn != null) conn.close();
         }
 
-        req.getRequestDispatcher("/admin_jsp/approve_success.jsp").forward(req, res);
+        req.getRequestDispatcher("/store_jsp/approve_success.jsp").forward(req, res);
     }
 
     private void showError(HttpServletRequest req, HttpServletResponse res, String msg) throws Exception {
         req.setAttribute("errorMessage", msg);
-        req.getRequestDispatcher("/admin_jsp/approve_error.jsp").forward(req, res);
+        req.getRequestDispatcher("/store_jsp/approve_error.jsp").forward(req, res);
     }
 
     private boolean isPhoneExistsInStore(StoreDAO dao, String phone) throws Exception {
