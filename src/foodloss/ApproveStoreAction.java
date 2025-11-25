@@ -34,21 +34,21 @@ public class ApproveStoreAction extends Action {
             // トークンで申請取得
             Application app = appDAO.selectByToken(token);
             if (app == null) {
-                showError(req, res, "申請データが見つかりません。");
+                showError(req, res, "申請データが見つかりません。トークンが無効か、既に削除されています。");
                 return;
             }
             if ("approved".equals(app.getStatus())) {
-                showError(req, res, "既に承認済みです。");
+                showError(req, res, "この申請は既に承認済みです。");
                 return;
             }
 
-            // 重複チェック
+            // 重複チェック（念のため）
             if (isPhoneExistsInStore(storeDAO, app.getStorePhone())) {
-                showError(req, res, "電話番号が既に登録されています。");
+                showError(req, res, "この電話番号は既に登録されています。");
                 return;
             }
             if (isEmailExistsInStore(storeDAO, app.getStoreEmail())) {
-                showError(req, res, "メールアドレスが既に登録されています。");
+                showError(req, res, "このメールアドレスは既に登録されています。");
                 return;
             }
 
@@ -59,25 +59,62 @@ public class ApproveStoreAction extends Action {
             store.setPhone(app.getStorePhone());
             store.setEmail(app.getStoreEmail());
             store.setPassword(app.getPasswordHash());
-            store.setLicense(app.getBusinessLicense()); // byte[] を直接セット
+            store.setLicense(app.getBusinessLicense());
             store.setDiscountTime(null);
             store.setDiscountRate(0);
 
             // DB登録
             int storeId = storeDAO.insert(store);
+            if (storeId == 0) {
+                showError(req, res, "店舗の登録に失敗しました。");
+                return;
+            }
 
             // Application更新
             app.setStatus("approved");
             app.setApprovedAt(new Timestamp(System.currentTimeMillis()));
             appDAO.updateStatus(app);
 
-            // 店舗へ完了メール
+            // ログインURL生成
+            String loginUrl = req.getScheme() + "://" +
+                    req.getServerName() + ":" + req.getServerPort() +
+                    req.getContextPath() + "/store_jsp/login_store.jsp";
+
+
+            // 店舗へ完了メール送信（店舗IDを含む）
             String storeBody = app.getStoreName() + " 様\n\n" +
-                    "店舗登録が承認されました。\n" +
-                    "ログイン情報:\n" +
-                    "メール: " + app.getStoreEmail() + "\n" +
-                    "パスワード: 申請時に設定したパスワード\n";
-            MailSender.sendEmail(app.getStoreEmail(), "【登録完了】店舗承認のお知らせ", storeBody);
+                    "店舗登録の審査が完了し、承認されました。\n" +
+                    "おめでとうございます！\n\n" +
+                    "以下のログイン情報で、すぐにご利用いただけます。\n\n" +
+                    "━━━━━━━━━━━━━━━━━━━━\n" +
+                    "【ログイン情報】\n" +
+                    "━━━━━━━━━━━━━━━━━━━━\n" +
+                    "ログインURL: " + loginUrl + "\n" +
+                    "店舗ID: " + storeId + "\n" +
+                    "メールアドレス: " + app.getStoreEmail() + "\n" +
+                    "パスワード: 申請時に設定されたパスワード\n" +
+                    "━━━━━━━━━━━━━━━━━━━━\n\n" +
+                    "※店舗IDはログイン時に必要となりますので、大切に保管してください。\n" +
+                    "※パスワードを忘れた場合は、パスワード再設定機能をご利用ください。\n\n" +
+                    "ご不明な点がございましたら、お気軽にお問い合わせください。\n" +
+                    "今後ともよろしくお願いいたします。";
+
+            try {
+                MailSender.sendEmail(app.getStoreEmail(), "【登録完了】店舗承認のお知らせ - " + app.getStoreName(), storeBody);
+                System.out.println("✓ 承認完了メール送信成功: " + app.getStoreEmail());
+            } catch (Exception mailError) {
+                // メール送信失敗してもログだけ出して処理を続行
+                mailError.printStackTrace();
+                System.err.println("✗ 承認メール送信エラー（承認処理は完了）: " + mailError.getMessage());
+            }
+
+            // セッションに承認情報をセット
+            req.setAttribute("approvedStore", app);
+
+            System.out.println("=== 店舗承認完了 ===");
+            System.out.println("Store ID: " + storeId);
+            System.out.println("Store Name: " + app.getStoreName());
+            System.out.println("Email: " + app.getStoreEmail());
 
         } catch (Exception e) {
             e.printStackTrace();

@@ -1,279 +1,181 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ page import="bean.Merchandise" %>
-<%@ page import="bean.MerchandiseImage" %>
-<%@ page import="java.util.List" %>
-
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page import="bean.Employee" %>
 <%
-    Merchandise m = (Merchandise) request.getAttribute("merchandise");
-    List<MerchandiseImage> images = (List<MerchandiseImage>) request.getAttribute("images");
-
-    String useByDateStr = (m.getUseByDate() != null) ? m.getUseByDate().toString() : "";
+    Employee employee = (Employee) request.getAttribute("employee");
 %>
-
 <!DOCTYPE html>
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>商品編集 - フードロス削減システム</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>社員情報編集</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
-
     <style>
         body {
-            font-family: sans-serif;
-            background: #f5f5f5;
+            background: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+        }
+
+        .column {
+            flex: 1;
+            width: 100%;
+        }
+
+        .main-contents {
+            width: 100%;
             padding: 20px;
         }
 
-        .edit-wrapper {
-            width: 100%;
-            max-width: 450px;   /* ★前の細めデザイン */
-            margin: 3rem auto;
-        }
-
         .edit-container {
+            max-width: 450px;
+            width: 100%;
+            margin: 40px auto;
+            padding: 2rem;
             background: #fff;
-            border-radius: 8px;
-            padding: 2rem 2rem;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
         }
 
-        .edit-header {
+        .edit-container h1 {
+            color: #c07148;
             text-align: center;
             margin-bottom: 2rem;
-        }
-
-        .edit-header h1 {
-            color: #c77c4a;
-            font-size: 1.8rem;
+            font-size: 2rem;
+            border-bottom: 2px solid #c07148;
+            padding-bottom: 1rem;
         }
 
         .form-group {
-            margin-bottom: 1.3rem;
+            margin-bottom: 1.5rem;
         }
 
         .form-group label {
             display: block;
-            margin-bottom: 0.4rem;
+            margin-bottom: 0.5rem;
             font-weight: bold;
-            color: #444;
+            color: #555;
         }
 
-        .form-group input[type="text"],
-        .form-group input[type="number"],
-        .form-group input[type="date"] {
+        .form-group input[type="text"] {
             width: 100%;
-            padding: 0.75rem;
+            padding: 0.8rem;
             border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-
-        /* 画像ボックス（前の小さめレイアウト） */
-        .image-box {
-            text-align: center;
-            margin-right: 10px;
-            margin-bottom: 10px;
-        }
-
-        /* 削除ボタン */
-        .btn-delete {
-            background: red;
-            color: #fff;
-            padding: 5px 10px;
-            border: none;
             border-radius: 5px;
-            cursor: pointer;
-            margin-top: 4px;
-        }
-
-        /* 更新ボタン */
-        .btn-update {
-            width: 100%;
-            background: #c77c4a;
-            color: #fff;
-            padding: 0.9rem;
             font-size: 1rem;
+            box-sizing: border-box;
+            transition: 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #c07148;
+            box-shadow: 0 0 0 3px rgba(192, 113, 72, 0.1);
+        }
+
+        .btn-update,
+        .btn-back {
+            width: 100%;
             border: none;
             border-radius: 5px;
             cursor: pointer;
-            margin-top: 1rem;
+            transition: 0.3s;
+            font-weight: bold;
+        }
+
+        .btn-update {
+            padding: 1rem;
+            font-size: 1.1rem;
+            background: #c07148;
+            color: #fff;
+            box-shadow: 0 3px 10px rgba(192, 113, 72, 0.3);
+            margin-bottom: 0.8rem;
         }
 
         .btn-update:hover {
-            background: #b66c3a;
+            background: #a85d38;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(192, 113, 72, 0.4);
         }
 
-        /* 戻るリンク（中央寄せ） */
-        .back-link {
-            text-align: center;
-            margin-top: 1.5rem;
+        .btn-back {
+            padding: 0.6rem;
+            font-size: 1rem;
+            background: #fff;
+            color: #c07148;
+            border: 2px solid #c07148;
         }
 
-        .back-link a {
-            color: #666;
-            text-decoration: none;
+        .btn-back:hover {
+            background: #c07148;
+            color: #fff;
         }
 
-        .back-link a:hover {
-            color: #c77c4a;
+        @media screen and (max-width: 600px) {
+            .edit-container {
+                margin: 20px;
+                padding: 1.5rem;
+            }
+
+            .edit-container h1 {
+                font-size: 1.5rem;
+            }
         }
     </style>
 </head>
 <body>
+<div id="container">
+    <!-- ヘッダー -->
+    <jsp:include page="/store_jsp/header_store.jsp" />
 
-<jsp:include page="/store_jsp/header_store.jsp" />
+    <!-- メインコンテンツ -->
+    <main class="column">
+        <div class="main-contents">
+            <div class="edit-container">
+                <h1>社員情報編集</h1>
 
-<main class="column">
-    <div class="edit-wrapper">
-        <div class="edit-container">
+                <form action="${pageContext.request.contextPath}/foodloss/EmployeeUpdate.action" method="post">
+                    <input type="hidden" name="id" value="<%= employee.getId() %>">
 
-            <div class="edit-header">
-                <h1>商品情報編集</h1>
-            </div>
-
-            <form action="${pageContext.request.contextPath}/foodloss/MerchandiseEdit.action" method="post" enctype="multipart/form-data">
-                <input type="hidden" name="merchandiseId" value="<%= m.getMerchandiseId() %>">
-
-                <!-- 商品名 -->
-                <div class="form-group">
-                    <label>商品名</label>
-                    <input type="text" name="merchandiseName" value="<%= m.getMerchandiseName() %>" required>
-                </div>
-
-                <!-- 価格 -->
-                <div class="form-group">
-                    <label>価格</label>
-                    <input type="number" name="price" value="<%= m.getPrice() %>" required>
-                </div>
-
-                <!-- 在庫 -->
-                <div class="form-group">
-                    <label>在庫数</label>
-                    <input type="number" name="stock" value="<%= m.getStock() %>" required>
-                </div>
-
-                <!-- 消費期限 -->
-                <div class="form-group">
-                    <label>消費期限</label>
-                    <input type="date" name="useByDate" value="<%= useByDateStr %>" required>
-                </div>
-
-                <!-- 社員番号 -->
-                <div class="form-group">
-                    <label>担当社員番号</label>
-                    <input type="number" name="employeeId" value="<%= m.getEmployeeId() %>" required>
-                </div>
-
-                <!-- タグ -->
-                <div class="form-group">
-                    <label>タグ</label>
-                    <input type="text" name="merchandiseTag" value="<%= m.getMerchandiseTag() %>">
-                </div>
-
-                <!-- ★ 既存画像表示 -->
-                <div class="form-group">
-                    <label>登録済み画像</label>
-
-                    <div style="display:flex; flex-wrap:wrap;">
-                    <%
-                        if (images != null && !images.isEmpty()) {
-                            int index = 0;
-                            for (MerchandiseImage img : images) {
-                                boolean isMain = (index == 0);
-                    %>
-
-                        <div class="image-box">
-                            <img src="<%= request.getContextPath() %>/foodloss/ImageDisplay.action?id=<%= img.getImageId() %>"
-                                 style="width:120px; height:120px; object-fit:cover; border:<%= isMain ? "3px solid red" : "1px solid #ccc" %>;">
-                            <% if (isMain) { %>
-                                <div style="color:red; font-weight:bold; margin-top:4px;">メイン</div>
-                            <% } %>
-
-                            <form action="${pageContext.request.contextPath}/foodloss/DeleteImage.action" method="post">
-                                <input type="hidden" name="imageId" value="<%= img.getImageId() %>">
-                                <input type="hidden" name="merchandiseId" value="<%= m.getMerchandiseId() %>">
-                                <button class="btn-delete">削除</button>
-                            </form>
-                        </div>
-
-                    <%
-                                index++;
-                            }
-                        } else {
-                    %>
-                        <p>画像なし</p>
-                    <% } %>
+                    <div class="form-group">
+                        <label for="employeeCode">社員コード</label>
+                        <input type="text" id="employeeCode" name="employeeCode" value="<%= employee.getEmployeeCode() %>" required>
                     </div>
-                </div>
 
-                <!-- ★ 削除用フォームを JS で作成して送信 -->
-				<script>
-				function deleteImage(imageId, merchandiseId) {
-				    if (!confirm("画像を削除しますか？")) return;
+                    <div class="form-group">
+                        <label for="employeeName">氏名</label>
+                        <input type="text" id="employeeName" name="employeeName" value="<%= employee.getEmployeeName() %>" required>
+                    </div>
 
-				    const form = document.createElement("form");
-				    form.method = "post";
-				    form.action = "<%= request.getContextPath() %>/foodloss/DeleteImage.action";
+                    <button type="submit" class="btn-update">更新</button>
+                </form>
 
-				    const i1 = document.createElement("input");
-				    i1.type = "hidden";
-				    i1.name = "imageId";
-				    i1.value = imageId;
-				    form.appendChild(i1);
-
-				    const i2 = document.createElement("input");
-				    i2.type = "hidden";
-				    i2.name = "merchandiseId";
-				    i2.value = merchandiseId;
-				    form.appendChild(i2);
-
-				    document.body.appendChild(form);
-				    form.submit();
-				}
-				</script>
-
-                <!-- 新しい画像アップロード -->
-                <div class="form-group">
-                    <label>画像を追加（複数可）</label>
-                    <input type="file" name="imageFile" id="imageFile" multiple>
-                </div>
-
-                <!-- プレビュー -->
-                <div id="preview" style="margin-top:10px;"></div>
-
-                <script>
-                    document.getElementById('imageFile').addEventListener('change', function (event) {
-                        const preview = document.getElementById('preview');
-                        preview.innerHTML = "";
-
-                        for (const file of event.target.files) {
-                            const reader = new FileReader();
-                            reader.onload = e => {
-                                const img = document.createElement("img");
-                                img.src = e.target.result;
-                                img.style.width = "120px";
-                                img.style.height = "120px";
-                                img.style.objectFit = "cover";
-                                img.style.marginRight = "10px";
-                                img.style.marginBottom = "10px";
-                                preview.appendChild(img);
-                            };
-                            reader.readAsDataURL(file);
-                        }
-                    });
-                </script>
-
-                <button type="submit" class="btn-update">更新する</button>
-            </form>
-
-            <div class="back-link">
-                <a href="${pageContext.request.contextPath}/foodloss/MerchandiseList.action">← 戻る</a>
+                <!-- 戻るボタン（フォームの外） -->
+                <button type="button" class="btn-back"
+                        onclick="location.href='${pageContext.request.contextPath}/foodloss/EmployeeList.action'">
+                    戻る
+                </button>
             </div>
-
         </div>
-    </div>
-</main>
+    </main>
 
-<jsp:include page="/jsp/footer.jsp" />
+    <!-- フッター -->
+    <jsp:include page="/jsp/footer.jsp" />
+</div>
+
+<!-- JS -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
+<script src="${pageContext.request.contextPath}/js/slick.js"></script>
+<script src="${pageContext.request.contextPath}/js/main.js"></script>
 
 </body>
 </html>
