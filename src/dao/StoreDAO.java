@@ -159,4 +159,32 @@ public class StoreDAO {
 
         return s;
     }
+// ===== 以下、検索機能を追加 =====
+
+    /**
+     * 店舗名で検索（部分一致）
+     * @param keyword 検索キーワード
+     * @return 検索結果のリスト
+     * @throws SQLException
+     */
+    public List<Store> searchByKeyword(String keyword) throws SQLException {
+        List<Store> list = new ArrayList<>();
+
+        String sql = "SELECT * FROM T001_store " +
+                     "WHERE T001_FD1_store LIKE ? " +
+                     "ORDER BY T001_PK1_store";
+
+        try (PreparedStatement st = con.prepareStatement(sql)) {
+            st.setString(1, "%" + keyword + "%");
+
+            try (ResultSet rs = st.executeQuery()) {
+                while (rs.next()) {
+                    Store s = mapResultSetToStore(rs);
+                    list.add(s);
+                }
+            }
+        }
+
+        return list;
+    }
 }
