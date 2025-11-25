@@ -71,13 +71,6 @@
             box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
         }
 
-        .success-icon::after {
-            content: "✓";
-            color: white;
-            font-size: 50px;
-            font-weight: bold;
-        }
-
         @keyframes scaleIn {
             from {
                 transform: scale(0);
@@ -301,10 +294,10 @@
     <main class="column">
         <div class="main-contents">
             <div class="success-container">
-                <div class="success-icon"></div>
 
 
-                <h1>✨ 申請完了！</h1>
+
+                <h1> 申請完了！</h1>
 
                 <p class="message">
                     店舗登録の申請が正常に完了しました。<br>
@@ -338,7 +331,7 @@
                 </div>
 
                 <div class="button-group">
-                    <a href="${pageContext.request.contextPath}/index.jsp" class="btn btn-primary">
+                    <a href="${pageContext.request.contextPath}/jsp/index.jsp" class="btn btn-primary">
                         トップページへ戻る
                     </a>
                     <a href="${pageContext.request.contextPath}/store_jsp/login_store.jsp" class="btn btn-secondary">
