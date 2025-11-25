@@ -99,7 +99,7 @@ public class SearchAction extends Action {
                 }
             }
 
-            // 結果をリクエストに設定
+            //？ 結果をリクエストに設定
             request.setAttribute("searchResults", searchResults);
             request.setAttribute("keyword", keyword);
 
