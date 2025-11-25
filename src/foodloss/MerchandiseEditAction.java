@@ -22,8 +22,6 @@ import tool.DBManager;
 @MultipartConfig(maxFileSize = 10 * 1024 * 1024)  // 最大10MB
 public class MerchandiseEditAction extends Action {
 
-
-
     @Override
     public void execute(HttpServletRequest request, HttpServletResponse response) throws IOException {
         try {
