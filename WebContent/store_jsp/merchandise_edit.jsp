@@ -274,7 +274,7 @@
 <script>
     document.getElementById('imageFile').addEventListener('change', function (event) {
         const preview = document.getElementById('preview');
-        preview.innerHTML = ''; // 既存のプレビューをクリア
+        preview.innerHTML = ''; //  既存のプレビューをクリア
 
         const files = event.target.files;
 
