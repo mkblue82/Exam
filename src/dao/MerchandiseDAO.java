@@ -419,4 +419,81 @@ public class MerchandiseDAO {
         return list;
     }
 
+
+	 // =============================
+	 // 期限切れ商品と画像をまとめて削除する（完全版）
+	 // =============================
+	 public int deleteExpiredWithImages() throws Exception {
+	     PreparedStatement st1 = null;
+	     PreparedStatement st2 = null;
+	     boolean originalAutoCommit = connection.getAutoCommit();
+	     int deletedCount = 0;
+
+	     try {
+	         connection.setAutoCommit(false); // トランザクション開始
+
+	         // 1. 期限切れ商品のID一覧を取得
+	         st1 = connection.prepareStatement(
+	             "SELECT T002_PK1_merchandise " +
+	             "FROM T002_merchandise " +
+	             "WHERE T002_FD3_merchandise < CURRENT_DATE"
+	         );
+	         ResultSet rs = st1.executeQuery();
+
+	         List<Integer> expiredIds = new ArrayList<>();
+	         while (rs.next()) {
+	             expiredIds.add(rs.getInt("T002_PK1_merchandise"));
+	         }
+	         rs.close();
+	         st1.close();
+
+	         // 期限切れ商品がない場合は終了
+	         if (expiredIds.isEmpty()) {
+	             connection.setAutoCommit(originalAutoCommit);
+	             return 0;
+	         }
+
+	         // 2. 画像削除（★重要：外部キーは T002_1_FD1_merchandise_id）
+	         st1 = connection.prepareStatement(
+	             "DELETE FROM T002_1_merchandise_image " +
+	             "WHERE T002_1_FD1_merchandise_id = ?"
+	         );
+
+	         for (int id : expiredIds) {
+	             st1.setInt(1, id);
+	             st1.executeUpdate();
+	         }
+	         st1.close();
+
+	         // 3. 商品削除
+	         st2 = connection.prepareStatement(
+	             "DELETE FROM T002_merchandise " +
+	             "WHERE T002_PK1_merchandise = ?"
+	         );
+
+	         for (int id : expiredIds) {
+	             st2.setInt(1, id);
+	             deletedCount += st2.executeUpdate();
+	         }
+
+	         // 全て成功したらコミット
+	         connection.commit();
+
+	     } catch (Exception e) {
+	         // エラーがあればロールバック
+	         connection.rollback();
+	         e.printStackTrace();
+	         throw e;
+	     } finally {
+	         connection.setAutoCommit(originalAutoCommit);
+	         if (st1 != null) st1.close();
+	         if (st2 != null) st2.close();
+	     }
+
+	     return deletedCount;
+	 }
+
+
+
+
 }
