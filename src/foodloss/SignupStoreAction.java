@@ -100,9 +100,11 @@ public class SignupStoreAction extends Action {
             int applicationId = appDAO.insert(app);
             if (applicationId == 0) { forwardWithError(req, res, "申請登録に失敗しました。"); return; }
 
+            // ★★★ 重要：メール送信前にセッションに保存 ★★★
+            session.setAttribute("pendingApplication", app);
             session.removeAttribute("csrfToken");
 
-            // 運営メール
+            // 運営メール送信URL
             String approvalUrl = req.getScheme() + "://" +
                     req.getServerName() + ":" + req.getServerPort() +
                     req.getContextPath() + "/foodloss/ApproveStore.action?token=" + approvalToken;
@@ -115,19 +117,30 @@ public class SignupStoreAction extends Action {
                     "承認するには下記URLをクリックしてください:\n" + approvalUrl + "\n\n" +
                     "営業許可証を添付ファイルでご確認ください。";
 
-            MailSender.sendEmailWithAttachment(
-                    "admin@example.com",
-                    "【要承認】新規店舗申請通知 - " + storeName,
-                    adminBody,
-                    permitFileData,
-                    storeName + "_permit.pdf"
-            );
+            // メール送信（エラーが出てもセッションには既に保存済み）
+            try {
+                MailSender.sendEmailWithAttachment(
+                        "mklblue82@gmail.com",
+                        "【要承認】新規店舗申請通知 - " + storeName,
+                        adminBody,
+                        permitFileData,
+                        storeName + "_permit.pdf"
+                );
 
-            // 店舗に受付メール
-            String storeBody = storeName + " 様\n\n申請を受け付けました。\n";
-            MailSender.sendEmail(email, "【店舗申請受付】" + storeName, storeBody);
+                // 店舗に受付メール
+                String storeBody = storeName + " 様\n\n" +
+                        "店舗登録の申請を受け付けました。\n" +
+                        "審査完了までしばらくお待ちください。\n\n" +
+                        "審査完了後、メールにてご連絡いたします。";
+                MailSender.sendEmail(email, "【店舗申請受付】" + storeName, storeBody);
 
-            session.setAttribute("pendingApplication", app);
+                System.out.println("✓ メール送信成功: " + email);
+
+            } catch (Exception mailError) {
+                // メール送信失敗してもログだけ出して処理を続行
+                mailError.printStackTrace();
+                System.err.println("✗ メール送信エラー（処理は継続）: " + mailError.getMessage());
+            }
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -136,6 +149,11 @@ public class SignupStoreAction extends Action {
         } finally {
             if (conn != null) conn.close();
         }
+
+        // デバッグ用
+        System.out.println("=== 申請完了画面へ遷移 ===");
+        System.out.println("pendingApplication: " + session.getAttribute("pendingApplication"));
+        System.out.println("Store Name: " + storeName);
 
         req.getRequestDispatcher("/store_jsp/signup_done_store.jsp").forward(req, res);
     }
