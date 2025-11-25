@@ -15,7 +15,6 @@
             border-radius: 10px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
             text-align: center;
-            margin-top: 150px;
         }
         .discount-setting-container h1 {
             color: #c07148;
@@ -109,6 +108,23 @@
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(192, 113, 72, 0.4);
         }
+        .btn-back-list {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid #c07148;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.3s;
+            font-weight: bold;
+            background: #fff;
+            color: #c07148;
+            margin-top: 0.8rem;
+        }
+        .btn-back-list:hover {
+            background: #c07148;
+            color: #fff;
+        }
     </style>
 </head>
 <body>
@@ -165,6 +181,12 @@
                     <!-- 送信ボタン -->
                     <button type="submit" class="btn-submit">設定</button>
                 </form>
+
+                <!-- 一覧に戻るボタン（フォームの外） -->
+                <button type="button" class="btn-back-list"
+                        onclick="location.href='${pageContext.request.contextPath}/foodloss/MerchandiseList.action'">
+                    一覧に戻る
+                </button>
             </div>
         </div>
     </main>

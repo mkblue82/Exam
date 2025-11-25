@@ -129,23 +129,32 @@
             text-decoration: none;
             display: block;
             text-align: center;
+            font-weight: bold;
         }
         .btn-submit {
-            padding: 1.2rem;
+            padding: 1rem;
             font-size: 1.1rem;
-            font-weight: bold;
             background: #c07148;
             color: #fff;
+            box-shadow: 0 3px 10px rgba(192, 113, 72, 0.3);
             margin-bottom: 0.8rem;
         }
-        .btn-submit:hover { background: #a85d38; }
+        .btn-submit:hover {
+            background: #a85d38;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(192, 113, 72, 0.4);
+        }
         .btn-cancel {
-            padding: 0.6rem;
+            padding: 0.5rem;
+            font-size: 1rem;
             background: #fff;
             color: #c07148;
-            border: 1px solid #c07148;
+            border: 2px solid #c07148;
         }
-        .btn-cancel:hover { background: #c07148; color: #fff; }
+        .btn-cancel:hover {
+            background: #c07148;
+            color: #fff;
+        }
     </style>
 </head>
 <body>
@@ -328,7 +337,7 @@ function updateFileCount() {
     var elem = document.getElementById('fileCount');
     elem.textContent = count > 0 ? count + '枚の画像を選択中' : '';
 }
-//hh
+
 function validateForm() {
     if (imageDataList.length === 0) {
         alert('少なくとも1枚の画像を選択してください');

@@ -15,209 +15,283 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>商品編集 ‑ フードロス削減システム</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>商品編集</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
     <style>
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
-            background: #f5f5f5;
+            background: #fff;
             min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+        }
+
+        .column {
+            flex: 1;
+            width: 100%;
+        }
+
+        .main-contents {
+            width: 100%;
             padding: 20px;
         }
-        .edit-wrapper {
-            width: 100%;
-            max-width: 440px;
-            margin: 3rem auto;
-        }
+
         .edit-container {
+            max-width: 600px;
+            width: 100%;
+            margin: 40px auto;
+            padding: 2rem;
             background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            padding: 3rem 2.5rem;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
         }
-        .edit-header {
+
+        .edit-container h1 {
+            color: #c07148;
             text-align: center;
             margin-bottom: 2rem;
-        }
-        .edit-header h1 {
-            color: #c77c4a;
             font-size: 2rem;
-            font-weight: 700;
-            margin: 0 0 1rem 0;
+            border-bottom: 2px solid #c07148;
+            padding-bottom: 1rem;
         }
-        .edit-header::after {
-            content: '';
-            display: block;
-            width: 70%;
-            height: 3px;
-            background: #c77c4a;
-            margin: 0 auto;
-        }
+
         .form-group {
             margin-bottom: 1.5rem;
         }
+
         .form-group label {
             display: block;
             margin-bottom: 0.5rem;
-            font-weight: 600;
-            color: #333;
-            font-size: 1rem;
+            font-weight: bold;
+            color: #555;
         }
+
         .form-group input[type="text"],
         .form-group input[type="number"],
         .form-group input[type="date"],
         .form-group input[type="file"] {
             width: 100%;
             padding: 0.8rem;
-            border: 2px solid #ddd;
-            border-radius: 4px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
             font-size: 1rem;
-            background: #fff;
+            box-sizing: border-box;
+            transition: 0.3s;
         }
+
         .form-group input:focus {
             outline: none;
-            border-color: #c77c4a;
+            border-color: #c07148;
+            box-shadow: 0 0 0 3px rgba(192, 113, 72, 0.1);
         }
-        .btn-update {
+
+        .image-display {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 0.5rem;
+        }
+
+        .image-display img {
+            max-width: 120px;
+            max-height: 120px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            object-fit: cover;
+        }
+
+        .image-display p {
+            color: #999;
+            font-style: italic;
+        }
+
+        #preview {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 1rem;
+        }
+
+        #preview img {
+            max-width: 120px;
+            max-height: 120px;
+            border: 2px solid #c07148;
+            border-radius: 5px;
+            object-fit: cover;
+        }
+
+        .btn-update,
+        .btn-back {
             width: 100%;
-            padding: 1rem;
             border: none;
-            border-radius: 4px;
+            border-radius: 5px;
             font-size: 1rem;
             cursor: pointer;
-            transition: all 0.3s ease;
-            font-weight: 600;
-            background: #c77c4a;
+            transition: 0.3s;
+            font-weight: bold;
+            text-decoration: none;
+            display: block;
+            text-align: center;
+        }
+
+        .btn-update {
+            padding: 1.2rem;
+            font-size: 1.1rem;
+            background: #c07148;
+            color: #fff;
+            box-shadow: 0 3px 10px rgba(192, 113, 72, 0.3);
+            margin-bottom: 0.8rem;
+        }
+
+        .btn-update:hover {
+            background: #a85d38;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(192, 113, 72, 0.4);
+        }
+
+        .btn-back {
+            padding: 0.6rem;
+            background: #fff;
+            color: #c07148;
+            border: 2px solid #c07148;
+        }
+
+        .btn-back:hover {
+            background: #c07148;
             color: #fff;
         }
-        .btn-update:hover {
-            background: #b56c3a;
-        }
-        .back-link {
-            text-align: center;
-            margin-top: 1.5rem;
-        }
-        .back-link a {
-            color: #666;
-            text-decoration: none;
-            font-size: 0.9rem;
-        }
-        .back-link a:hover {
-            color: #c77c4a;
+
+        @media screen and (max-width: 600px) {
+            .edit-container {
+                margin: 20px;
+                padding: 1.5rem;
+            }
+
+            .edit-container h1 {
+                font-size: 1.5rem;
+            }
         }
     </style>
 </head>
 <body>
+<div id="container">
+    <!-- ヘッダー -->
+    <jsp:include page="/store_jsp/header_store.jsp" />
 
-<jsp:include page="/store_jsp/header_store.jsp" />
-
-<main class="column">
-    <div class="edit-wrapper">
-        <div class="edit-container">
-            <div class="edit-header">
+    <!-- メインコンテンツ -->
+    <main class="column">
+        <div class="main-contents">
+            <div class="edit-container">
                 <h1>商品情報編集</h1>
-            </div>
 
-            <form action="${pageContext.request.contextPath}/foodloss/MerchandiseEdit.action" method="post" enctype="multipart/form-data">
-                <input type="hidden" name="merchandiseId" value="<%= m.getMerchandiseId() %>">
+                <form action="${pageContext.request.contextPath}/foodloss/MerchandiseEdit.action" method="post" enctype="multipart/form-data">
+                    <input type="hidden" name="merchandiseId" value="<%= m.getMerchandiseId() %>">
 
-                <div class="form-group">
-                    <label for="merchandiseName">商品名</label>
-                    <input type="text" id="merchandiseName" name="merchandiseName" value="<%= m.getMerchandiseName() %>" required>
-                </div>
+                    <div class="form-group">
+                        <label for="merchandiseName">商品名</label>
+                        <input type="text" id="merchandiseName" name="merchandiseName" value="<%= m.getMerchandiseName() %>" required>
+                    </div>
 
-                <div class="form-group">
-                    <label for="price">価格</label>
-                    <input type="number" id="price" name="price" value="<%= m.getPrice() %>" required>
-                </div>
+                    <div class="form-group">
+                        <label for="price">価格</label>
+                        <input type="number" id="price" name="price" value="<%= m.getPrice() %>" required>
+                    </div>
 
-                <div class="form-group">
-                    <label for="stock">在庫数</label>
-                    <input type="number" id="stock" name="stock" value="<%= m.getStock() %>" required>
-                </div>
+                    <div class="form-group">
+                        <label for="stock">在庫数</label>
+                        <input type="number" id="stock" name="stock" value="<%= m.getStock() %>" required>
+                    </div>
 
-                <div class="form-group">
-                    <label for="useByDate">消費期限</label>
-                    <input type="date" id="useByDate" name="useByDate" value="<%= useByDateStr %>" required>
-                </div>
+                    <div class="form-group">
+                        <label for="useByDate">消費期限</label>
+                        <input type="date" id="useByDate" name="useByDate" value="<%= useByDateStr %>" required>
+                    </div>
 
-                <div class="form-group">
-                    <label for="employeeId">担当社員番号</label>
-                    <input type="number" id="employeeId" name="employeeId" value="<%= m.getEmployeeId() %>" required>
-                </div>
+                    <div class="form-group">
+                        <label for="employeeId">担当社員番号</label>
+                        <input type="number" id="employeeId" name="employeeId" value="<%= m.getEmployeeId() %>" required>
+                    </div>
 
-                <div class="form-group">
-                    <label for="merchandiseTag">タグ</label>
-                    <input type="text" id="merchandiseTag" name="merchandiseTag" value="<%= m.getMerchandiseTag() %>">
-                </div>
+                    <div class="form-group">
+                        <label for="merchandiseTag">タグ</label>
+                        <input type="text" id="merchandiseTag" name="merchandiseTag" value="<%= m.getMerchandiseTag() %>">
+                    </div>
 
-                <div class="form-group">
-				    <label>現在の画像</label><br>
-				    <%
-				        if (images != null && !images.isEmpty()) {
-				            for (MerchandiseImage img : images) {
-				                byte[] data = img.getImageData();
-				                if (data != null) {
-				                    String base64 = Base64.getEncoder().encodeToString(data);
-				    %>
-				                    <img src="data:image/jpeg;base64,<%= base64 %>" alt="商品画像" style="max-width:120px; max-height:120px; margin-right:10px;">
-				    <%
-				                }
-				            }
-				        } else {
-				    %>
-				        <p>画像なし</p>
-				    <% } %>
-				</div>
+                    <div class="form-group">
+                        <label>現在の画像</label>
+                        <div class="image-display">
+                        <%
+                            if (images != null && !images.isEmpty()) {
+                                for (MerchandiseImage img : images) {
+                                    byte[] data = img.getImageData();
+                                    if (data != null) {
+                                        String base64 = Base64.getEncoder().encodeToString(data);
+                        %>
+                                        <img src="data:image/jpeg;base64,<%= base64 %>" alt="商品画像">
+                        <%
+                                    }
+                                }
+                            } else {
+                        %>
+                            <p>画像なし</p>
+                        <% } %>
+                        </div>
+                    </div>
 
+                    <div class="form-group">
+                        <label for="imageFile">画像を変更（複数可）</label>
+                        <input type="file" id="imageFile" name="imageFile" multiple>
+                    </div>
 
-                <div class="form-group">
-				    <label for="imageFile">画像を変更（複数可）</label>
-				    <input type="file" id="imageFile" name="imageFile" multiple>
-				</div>
+                    <div id="preview"></div>
 
-				<div id="preview" style="margin-top: 1rem;"></div>
+                    <button type="submit" class="btn-update">更新する</button>
+                </form>
 
-				<script>
-				    document.getElementById('imageFile').addEventListener('change', function (event) {
-				        const preview = document.getElementById('preview');
-				        preview.innerHTML = ''; // 既存のプレビューをクリア
-
-				        const files = event.target.files;
-
-				        for (let i = 0; i < files.length; i++) {
-				            const file = files[i];
-				            const reader = new FileReader();
-
-				            reader.onload = function (e) {
-				                const img = document.createElement('img');
-				                img.src = e.target.result;
-				                img.style.maxWidth = '120px';
-				                img.style.maxHeight = '120px';
-				                img.style.marginRight = '10px';
-				                img.style.marginBottom = '10px';
-				                preview.appendChild(img);
-				            };
-
-				            reader.readAsDataURL(file);
-				        }
-				    });
-				</script>
-
-
-
-
-                <button type="submit" class="btn-update">更新する</button>
-            </form>
-
-            <div class="back-link">
-                <a href="${pageContext.request.contextPath}/foodloss/MerchandiseList.action">← 戻る</a>
+                <!-- 戻るボタン（フォームの外） -->
+                <a href="${pageContext.request.contextPath}/foodloss/MerchandiseList.action" class="btn-back">戻る</a>
             </div>
         </div>
-    </div>
-</main>
+    </main>
 
-<jsp:include page="/jsp/footer.jsp" />
+    <!-- フッター -->
+    <jsp:include page="/jsp/footer.jsp" />
+</div>
+
+<!-- JS -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
+<script src="${pageContext.request.contextPath}/js/slick.js"></script>
+<script src="${pageContext.request.contextPath}/js/main.js"></script>
+
+<script>
+    document.getElementById('imageFile').addEventListener('change', function (event) {
+        const preview = document.getElementById('preview');
+        preview.innerHTML = ''; // 既存のプレビューをクリア
+
+        const files = event.target.files;
+
+        for (let i = 0; i < files.length; i++) {
+            const file = files[i];
+            const reader = new FileReader();
+
+            reader.onload = function (e) {
+                const img = document.createElement('img');
+                img.src = e.target.result;
+                preview.appendChild(img);
+            };
+
+            reader.readAsDataURL(file);
+        }
+    });
+</script>
 
 </body>
 </html>
