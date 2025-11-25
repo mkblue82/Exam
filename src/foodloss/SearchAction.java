@@ -16,6 +16,7 @@ import tool.Action;
 
 public class SearchAction extends Action {
 
+    @Override
     public void execute(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
         // 検索キーワードを取得
@@ -23,19 +24,22 @@ public class SearchAction extends Action {
 
         if (keyword == null || keyword.trim().isEmpty()) {
             request.setAttribute("error", "検索キーワードを入力してください");
-            return "search.jsp";
+            request.getRequestDispatcher("/jsp/search.jsp").forward(request, response);
+            return;
         }
 
         keyword = keyword.trim();
 
         // データベース接続を取得
         DAO dao = new DAO();
-        Connection connection = dao.getConnection();
-
-        // 検索結果を格納するリスト
-        List<SearchResult> searchResults = new ArrayList<>();
+        Connection connection = null;
 
         try {
+            connection = dao.getConnection();
+
+            // 検索結果を格納するリスト
+            List<SearchResult> searchResults = new ArrayList<>();
+
             // 商品名またはタグで検索
             List<Merchandise> merchandises = searchMerchandisesByKeyword(connection, keyword);
 
@@ -77,7 +81,7 @@ public class SearchAction extends Action {
                 for (SearchResult result : searchResults) {
                     if (result.getStoreId() == store.getStoreId()) {
                         storeExists = true;
-                        // 重複しない商品のみ追加
+                        // 重複しない商品のみ追加？
                         for (Merchandise m : storeMerchandises) {
                             if (!result.hasMerchandise(m.getMerchandiseId())) {
                                 result.addMerchandise(m);
@@ -95,18 +99,26 @@ public class SearchAction extends Action {
                 }
             }
 
-            // 結果をリクエストに設定
+            //？ 結果をリクエストに設定
             request.setAttribute("searchResults", searchResults);
             request.setAttribute("keyword", keyword);
 
         } catch (Exception e) {
+            // 本番環境ではログに記録し、ユーザーには一般的なメッセージのみ表示
             e.printStackTrace();
-            request.setAttribute("error", "検索中にエラーが発生しました: " + e.getMessage());
+            request.setAttribute("error", "検索中にエラーが発生しました。");
         } finally {
             if (connection != null) {
-                connection.close();
+                try {
+                    connection.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         }
+
+        // 検索結果ページにフォワード
+        request.getRequestDispatcher("/jsp/search.jsp").forward(request, response);
     }
 
     // 商品を検索（商品名またはタグで部分一致）
@@ -118,31 +130,39 @@ public class SearchAction extends Action {
                     "T002_FD5_merchandise, T002_FD6_merchandise, T002_FD7_merchandise, " +
                     "T002_FD8_merchandise, T002_FD9_merchandise " +
                     "FROM T002_merchandise " +
-                    "WHERE T002_FD5_merchandise LIKE ? OR T002_FD4_merchandise LIKE ? " +
+                    "WHERE (T002_FD5_merchandise LIKE ? OR T002_FD4_merchandise LIKE ?) " +
+                    "AND T002_FD1_merchandise > 0 " + // 在庫があるもののみ
                     "ORDER BY T002_FD8_merchandise, T002_PK1_merchandise";
 
-        PreparedStatement st = connection.prepareStatement(sql);
-        st.setString(1, "%" + keyword + "%");
-        st.setString(2, "%" + keyword + "%");
+        PreparedStatement st = null;
+        ResultSet rs = null;
 
-        ResultSet rs = st.executeQuery();
+        try {
+            st = connection.prepareStatement(sql);
+            st.setString(1, "%" + keyword + "%");
+            st.setString(2, "%" + keyword + "%");
 
-        while (rs.next()) {
-            Merchandise m = new Merchandise();
-            m.setMerchandiseId(rs.getInt("T002_PK1_merchandise"));
-            m.setStock(rs.getInt("T002_FD1_merchandise"));
-            m.setPrice(rs.getInt("T002_FD2_merchandise"));
-            m.setUseByDate(rs.getDate("T002_FD3_merchandise"));
-            m.setMerchandiseTag(rs.getString("T002_FD4_merchandise"));
-            m.setMerchandiseName(rs.getString("T002_FD5_merchandise"));
-            m.setEmployeeId(rs.getInt("T002_FD6_merchandise"));
-            m.setRegistrationTime(rs.getTimestamp("T002_FD7_merchandise"));
-            m.setStoreId(rs.getInt("T002_FD8_merchandise"));
-            m.setBookingStatus(rs.getBoolean("T002_FD9_merchandise"));
-            list.add(m);
+            rs = st.executeQuery();
+
+            while (rs.next()) {
+                Merchandise m = new Merchandise();
+                m.setMerchandiseId(rs.getInt("T002_PK1_merchandise"));
+                m.setStock(rs.getInt("T002_FD1_merchandise"));
+                m.setPrice(rs.getInt("T002_FD2_merchandise"));
+                m.setUseByDate(rs.getDate("T002_FD3_merchandise"));
+                m.setMerchandiseTag(rs.getString("T002_FD4_merchandise"));
+                m.setMerchandiseName(rs.getString("T002_FD5_merchandise"));
+                m.setEmployeeId(rs.getInt("T002_FD6_merchandise"));
+                m.setRegistrationTime(rs.getTimestamp("T002_FD7_merchandise"));
+                m.setStoreId(rs.getInt("T002_FD8_merchandise"));
+                m.setBookingStatus(rs.getBoolean("T002_FD9_merchandise"));
+                list.add(m);
+            }
+        } finally {
+            if (rs != null) rs.close();
+            if (st != null) st.close();
         }
 
-        st.close();
         return list;
     }
 
@@ -156,22 +176,29 @@ public class SearchAction extends Action {
                     "WHERE T001_FD1_store LIKE ? " +
                     "ORDER BY T001_PK1_store";
 
-        PreparedStatement st = connection.prepareStatement(sql);
-        st.setString(1, "%" + keyword + "%");
+        PreparedStatement st = null;
+        ResultSet rs = null;
 
-        ResultSet rs = st.executeQuery();
+        try {
+            st = connection.prepareStatement(sql);
+            st.setString(1, "%" + keyword + "%");
 
-        while (rs.next()) {
-            Store store = new Store();
-            store.setStoreId(rs.getInt("T001_PK1_store"));
-            store.setStoreName(rs.getString("T001_FD1_store"));
-            store.setAddress(rs.getString("T001_FD2_store"));
-            store.setPhone(rs.getString("T001_FD3_store"));
-            store.setEmail(rs.getString("T001_FD7_store"));
-            list.add(store);
+            rs = st.executeQuery();
+
+            while (rs.next()) {
+                Store store = new Store();
+                store.setStoreId(rs.getInt("T001_PK1_store"));
+                store.setStoreName(rs.getString("T001_FD1_store"));
+                store.setAddress(rs.getString("T001_FD2_store"));
+                store.setPhone(rs.getString("T001_FD3_store"));
+                store.setEmail(rs.getString("T001_FD7_store"));
+                list.add(store);
+            }
+        } finally {
+            if (rs != null) rs.close();
+            if (st != null) st.close();
         }
 
-        st.close();
         return list;
     }
 
@@ -184,23 +211,30 @@ public class SearchAction extends Action {
                     "FROM T001_store " +
                     "WHERE T001_PK1_store = ?";
 
-        PreparedStatement st = connection.prepareStatement(sql);
-        st.setInt(1, storeId);
+        PreparedStatement st = null;
+        ResultSet rs = null;
 
-        ResultSet rs = st.executeQuery();
+        try {
+            st = connection.prepareStatement(sql);
+            st.setInt(1, storeId);
 
-        if (rs.next()) {
-            store = new Store();
-            store.setStoreId(rs.getInt("T001_PK1_store"));
-            store.setStoreName(rs.getString("T001_FD1_store"));
-            store.setAddress(rs.getString("T001_FD2_store"));
-            store.setPhone(rs.getString("T001_FD3_store"));
-            store.setDiscountTime(rs.getTime("T001_FD5_store"));
-            store.setDiscountRate(rs.getInt("T001_FD6_store"));
-            store.setEmail(rs.getString("T001_FD7_store"));
+            rs = st.executeQuery();
+
+            if (rs.next()) {
+                store = new Store();
+                store.setStoreId(rs.getInt("T001_PK1_store"));
+                store.setStoreName(rs.getString("T001_FD1_store"));
+                store.setAddress(rs.getString("T001_FD2_store"));
+                store.setPhone(rs.getString("T001_FD3_store"));
+                store.setDiscountTime(rs.getTime("T001_FD5_store"));
+                store.setDiscountRate(rs.getInt("T001_FD6_store"));
+                store.setEmail(rs.getString("T001_FD7_store"));
+            }
+        } finally {
+            if (rs != null) rs.close();
+            if (st != null) st.close();
         }
 
-        st.close();
         return store;
     }
 
@@ -214,29 +248,37 @@ public class SearchAction extends Action {
                     "T002_FD8_merchandise, T002_FD9_merchandise " +
                     "FROM T002_merchandise " +
                     "WHERE T002_FD8_merchandise = ? " +
+                    "AND T002_FD1_merchandise > 0 " + // 在庫があるもののみ
                     "ORDER BY T002_PK1_merchandise";
 
-        PreparedStatement st = connection.prepareStatement(sql);
-        st.setInt(1, storeId);
+        PreparedStatement st = null;
+        ResultSet rs = null;
 
-        ResultSet rs = st.executeQuery();
+        try {
+            st = connection.prepareStatement(sql);
+            st.setInt(1, storeId);
 
-        while (rs.next()) {
-            Merchandise m = new Merchandise();
-            m.setMerchandiseId(rs.getInt("T002_PK1_merchandise"));
-            m.setStock(rs.getInt("T002_FD1_merchandise"));
-            m.setPrice(rs.getInt("T002_FD2_merchandise"));
-            m.setUseByDate(rs.getDate("T002_FD3_merchandise"));
-            m.setMerchandiseTag(rs.getString("T002_FD4_merchandise"));
-            m.setMerchandiseName(rs.getString("T002_FD5_merchandise"));
-            m.setEmployeeId(rs.getInt("T002_FD6_merchandise"));
-            m.setRegistrationTime(rs.getTimestamp("T002_FD7_merchandise"));
-            m.setStoreId(rs.getInt("T002_FD8_merchandise"));
-            m.setBookingStatus(rs.getBoolean("T002_FD9_merchandise"));
-            list.add(m);
+            rs = st.executeQuery();
+
+            while (rs.next()) {
+                Merchandise m = new Merchandise();
+                m.setMerchandiseId(rs.getInt("T002_PK1_merchandise"));
+                m.setStock(rs.getInt("T002_FD1_merchandise"));
+                m.setPrice(rs.getInt("T002_FD2_merchandise"));
+                m.setUseByDate(rs.getDate("T002_FD3_merchandise"));
+                m.setMerchandiseTag(rs.getString("T002_FD4_merchandise"));
+                m.setMerchandiseName(rs.getString("T002_FD5_merchandise"));
+                m.setEmployeeId(rs.getInt("T002_FD6_merchandise"));
+                m.setRegistrationTime(rs.getTimestamp("T002_FD7_merchandise"));
+                m.setStoreId(rs.getInt("T002_FD8_merchandise"));
+                m.setBookingStatus(rs.getBoolean("T002_FD9_merchandise"));
+                list.add(m);
+            }
+        } finally {
+            if (rs != null) rs.close();
+            if (st != null) st.close();
         }
 
-        st.close();
         return list;
     }
 
