@@ -1,22 +1,14 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ page import="bean.Merchandise" %>
-<%@ page import="bean.MerchandiseImage" %>
-<%@ page import="java.util.List" %>
-<%@ page import="java.util.Base64" %>
-
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page import="bean.Employee" %>
 <%
-    Merchandise m = (Merchandise) request.getAttribute("merchandise");
-    List<MerchandiseImage> images = (List<MerchandiseImage>) request.getAttribute("images");
-
-    String useByDateStr = (m.getUseByDate() != null) ? m.getUseByDate().toString() : "";
+    Employee employee = (Employee) request.getAttribute("employee");
 %>
-
 <!DOCTYPE html>
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>商品編集</title>
+    <title>社員情報編集</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
     <style>
         body {
@@ -44,7 +36,7 @@
         }
 
         .edit-container {
-            max-width: 600px;
+            max-width: 450px;
             width: 100%;
             margin: 40px auto;
             padding: 2rem;
@@ -73,10 +65,7 @@
             color: #555;
         }
 
-        .form-group input[type="text"],
-        .form-group input[type="number"],
-        .form-group input[type="date"],
-        .form-group input[type="file"] {
+        .form-group input[type="text"] {
             width: 100%;
             padding: 0.8rem;
             border: 1px solid #ccc;
@@ -92,57 +81,18 @@
             box-shadow: 0 0 0 3px rgba(192, 113, 72, 0.1);
         }
 
-        .image-display {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-top: 0.5rem;
-        }
-
-        .image-display img {
-            max-width: 120px;
-            max-height: 120px;
-            border: 2px solid #ddd;
-            border-radius: 5px;
-            object-fit: cover;
-        }
-
-        .image-display p {
-            color: #999;
-            font-style: italic;
-        }
-
-        #preview {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-top: 1rem;
-        }
-
-        #preview img {
-            max-width: 120px;
-            max-height: 120px;
-            border: 2px solid #c07148;
-            border-radius: 5px;
-            object-fit: cover;
-        }
-
         .btn-update,
         .btn-back {
             width: 100%;
             border: none;
             border-radius: 5px;
-            font-size: 1rem;
             cursor: pointer;
             transition: 0.3s;
             font-weight: bold;
-            text-decoration: none;
-            display: block;
-            text-align: center;
         }
 
         .btn-update {
-            padding: 1.2rem;
+            padding: 1rem;
             font-size: 1.1rem;
             background: #c07148;
             color: #fff;
@@ -158,6 +108,7 @@
 
         .btn-back {
             padding: 0.6rem;
+            font-size: 1rem;
             background: #fff;
             color: #c07148;
             border: 2px solid #c07148;
@@ -189,74 +140,29 @@
     <main class="column">
         <div class="main-contents">
             <div class="edit-container">
-                <h1>商品情報編集</h1>
+                <h1>社員情報編集</h1>
 
-                <form action="${pageContext.request.contextPath}/foodloss/MerchandiseEdit.action" method="post" enctype="multipart/form-data">
-                    <input type="hidden" name="merchandiseId" value="<%= m.getMerchandiseId() %>">
+                <form action="${pageContext.request.contextPath}/foodloss/EmployeeUpdate.action" method="post">
+                    <input type="hidden" name="id" value="<%= employee.getId() %>">
 
                     <div class="form-group">
-                        <label for="merchandiseName">商品名</label>
-                        <input type="text" id="merchandiseName" name="merchandiseName" value="<%= m.getMerchandiseName() %>" required>
+                        <label for="employeeCode">社員コード</label>
+                        <input type="text" id="employeeCode" name="employeeCode" value="<%= employee.getEmployeeCode() %>" required>
                     </div>
 
                     <div class="form-group">
-                        <label for="price">価格</label>
-                        <input type="number" id="price" name="price" value="<%= m.getPrice() %>" required>
+                        <label for="employeeName">氏名</label>
+                        <input type="text" id="employeeName" name="employeeName" value="<%= employee.getEmployeeName() %>" required>
                     </div>
 
-                    <div class="form-group">
-                        <label for="stock">在庫数</label>
-                        <input type="number" id="stock" name="stock" value="<%= m.getStock() %>" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="useByDate">消費期限</label>
-                        <input type="date" id="useByDate" name="useByDate" value="<%= useByDateStr %>" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="employeeId">担当社員番号</label>
-                        <input type="number" id="employeeId" name="employeeId" value="<%= m.getEmployeeId() %>" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="merchandiseTag">タグ</label>
-                        <input type="text" id="merchandiseTag" name="merchandiseTag" value="<%= m.getMerchandiseTag() %>">
-                    </div>
-
-                    <div class="form-group">
-                        <label>現在の画像</label>
-                        <div class="image-display">
-                        <%
-                            if (images != null && !images.isEmpty()) {
-                                for (MerchandiseImage img : images) {
-                                    byte[] data = img.getImageData();
-                                    if (data != null) {
-                                        String base64 = Base64.getEncoder().encodeToString(data);
-                        %>
-                                        <img src="data:image/jpeg;base64,<%= base64 %>" alt="商品画像">
-                        <%
-                                    }
-                                }
-                            } else {
-                        %>
-                            <p>画像なし</p>
-                        <% } %>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="imageFile">画像を変更（複数可）</label>
-                        <input type="file" id="imageFile" name="imageFile" multiple>
-                    </div>
-
-                    <div id="preview"></div>
-
-                    <button type="submit" class="btn-update">更新する</button>
+                    <button type="submit" class="btn-update">更新</button>
                 </form>
 
                 <!-- 戻るボタン（フォームの外） -->
-                <a href="${pageContext.request.contextPath}/foodloss/MerchandiseList.action" class="btn-back">戻る</a>
+                <button type="button" class="btn-back"
+                        onclick="location.href='${pageContext.request.contextPath}/foodloss/EmployeeList.action'">
+                    戻る
+                </button>
             </div>
         </div>
     </main>
@@ -270,28 +176,6 @@
 <script src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
 <script src="${pageContext.request.contextPath}/js/slick.js"></script>
 <script src="${pageContext.request.contextPath}/js/main.js"></script>
-
-<script>
-    document.getElementById('imageFile').addEventListener('change', function (event) {
-        const preview = document.getElementById('preview');
-        preview.innerHTML = ''; // 既存のプレビューをクリア
-
-        const files = event.target.files;
-
-        for (let i = 0; i < files.length; i++) {
-            const file = files[i];
-            const reader = new FileReader();
-
-            reader.onload = function (e) {
-                const img = document.createElement('img');
-                img.src = e.target.result;
-                preview.appendChild(img);
-            };
-
-            reader.readAsDataURL(file);
-        }
-    });
-</script>
 
 </body>
 </html>
