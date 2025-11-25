@@ -117,6 +117,7 @@
             flex-wrap: wrap;
             gap: 10px;
             margin-top: 1rem;
+            margin-bottom: 1.5rem;
         }
 
         #preview img {

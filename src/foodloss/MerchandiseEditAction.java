@@ -116,7 +116,7 @@ public class MerchandiseEditAction extends Action {
                     // ============================
                     // ★ 商品と画像を同時に更新
                     // ============================
-                    int result = dao.updateWithImages(merchandise, newImages, false);
+                    int result = dao.updateWithImages(merchandise, newImages, true);
 
                     if (result > 0) {
                         response.sendRedirect(request.getContextPath() + "/foodloss/MerchandiseList.action");
