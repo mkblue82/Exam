@@ -303,6 +303,7 @@
             <div class="success-container">
                 <div class="success-icon"></div>
 
+
                 <h1>✨ 申請完了！</h1>
 
                 <p class="message">
