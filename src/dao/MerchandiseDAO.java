@@ -379,4 +379,44 @@ public class MerchandiseDAO {
         return exists;
     }
     public List<Merchandise> selectByStoreId2(int storeId) throws Exception {         List<Merchandise> list = new ArrayList<>();          PreparedStatement st = connection.prepareStatement(             "select T002_PK1_merchandise, T002_FD1_merchandise, " +             "T002_FD2_merchandise, T002_FD3_merchandise, T002_FD4_merchandise, " +             "T002_FD5_merchandise, T002_FD6_merchandise, T002_FD7_merchandise, " +             "T002_FD8_merchandise, T002_FD9_merchandise " +             "from T002_merchandise " +             "where T002_FD8_merchandise = ? " +             "order by T002_PK1_merchandise"         );          st.setInt(1, storeId);         ResultSet rs = st.executeQuery();          while (rs.next()) {             Merchandise m = new Merchandise();             m.setMerchandiseId(rs.getInt(1));             m.setStock(rs.getInt(2));             m.setPrice(rs.getInt(3));             m.setUseByDate(rs.getDate(4));             m.setMerchandiseTag(rs.getString(5));             m.setMerchandiseName(rs.getString(6));             m.setEmployeeId(rs.getInt(7));             m.setRegistrationTime(rs.getTimestamp(8));             m.setStoreId(rs.getInt(9));             m.setBookingStatus(rs.getBoolean(10));             list.add(m);         }          st.close();         return list;     }
+// ===== 以下、検索機能を追加 =====
+
+    // 商品を検索（商品名またはタグで部分一致）
+    public List<Merchandise> searchByKeyword(String keyword) throws Exception {
+        List<Merchandise> list = new ArrayList<>();
+
+        PreparedStatement st = connection.prepareStatement(
+            "SELECT T002_PK1_merchandise, T002_FD1_merchandise, " +
+            "T002_FD2_merchandise, T002_FD3_merchandise, T002_FD4_merchandise, " +
+            "T002_FD5_merchandise, T002_FD6_merchandise, T002_FD7_merchandise, " +
+            "T002_FD8_merchandise, T002_FD9_merchandise " +
+            "FROM T002_merchandise " +
+            "WHERE (T002_FD5_merchandise LIKE ? OR T002_FD4_merchandise LIKE ?) " +
+            "AND T002_FD1_merchandise > 0 " + // 在庫があるもののみ
+            "ORDER BY T002_FD8_merchandise, T002_PK1_merchandise");
+
+        st.setString(1, "%" + keyword + "%");
+        st.setString(2, "%" + keyword + "%");
+
+        ResultSet rs = st.executeQuery();
+
+        while (rs.next()) {
+            Merchandise m = new Merchandise();
+            m.setMerchandiseId(rs.getInt("T002_PK1_merchandise"));
+            m.setStock(rs.getInt("T002_FD1_merchandise"));
+            m.setPrice(rs.getInt("T002_FD2_merchandise"));
+            m.setUseByDate(rs.getDate("T002_FD3_merchandise"));
+            m.setMerchandiseTag(rs.getString("T002_FD4_merchandise"));
+            m.setMerchandiseName(rs.getString("T002_FD5_merchandise"));
+            m.setEmployeeId(rs.getInt("T002_FD6_merchandise"));
+            m.setRegistrationTime(rs.getTimestamp("T002_FD7_merchandise"));
+            m.setStoreId(rs.getInt("T002_FD8_merchandise"));
+            m.setBookingStatus(rs.getBoolean("T002_FD9_merchandise"));
+            list.add(m);
+        }
+
+        st.close();
+        return list;
+    }
+
 }
