@@ -101,6 +101,7 @@ public class ApproveStoreAction extends Action {
         }
     }
 
+
     private void sendAlert(HttpServletResponse res, String msg) throws Exception {
         res.setContentType("text/html;charset=UTF-8");
         res.getWriter().println("<script>alert('" + msg.replace("'", "\\'") + "'); window.close();</script>");
