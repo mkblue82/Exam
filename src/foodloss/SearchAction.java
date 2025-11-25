@@ -81,7 +81,7 @@ public class SearchAction extends Action {
                 for (SearchResult result : searchResults) {
                     if (result.getStoreId() == store.getStoreId()) {
                         storeExists = true;
-                        // 重複しない商品のみ追加
+                        // 重複しない商品のみ追加？
                         for (Merchandise m : storeMerchandises) {
                             if (!result.hasMerchandise(m.getMerchandiseId())) {
                                 result.addMerchandise(m);
