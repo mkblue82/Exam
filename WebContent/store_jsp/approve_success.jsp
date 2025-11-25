@@ -259,12 +259,10 @@
         </div>
 
         <div class="btn-container">
-            <a href="<%= request.getContextPath() %>/index.jsp" class="btn btn-primary">
+            <a href="<%= request.getContextPath() %>/jsp/index.jsp" class="btn btn-primary">
                 トップページへ
             </a>
-            <a href="<%= request.getContextPath() %>/admin_jsp/pending_applications.jsp" class="btn btn-secondary">
-                申請一覧へ
-            </a>
+
         </div>
     </div>
 </body>
