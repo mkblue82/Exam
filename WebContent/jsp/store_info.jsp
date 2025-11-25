@@ -208,12 +208,14 @@
     <jsp:include page="footer.jsp" />
 </div>
 
-<!-- Google Maps API -->
-<script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&callback=initMap" async defer></script>
-<script>
-let map;
-let marker;
+<!-- JS -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
+<script src="${pageContext.request.contextPath}/js/slick.js"></script>
+<script src="${pageContext.request.contextPath}/js/main.js"></script>
 
+<!-- Google Maps API -->
+<script>
 function initMap() {
     // 店舗の住所
     const storeAddress = "<%= store.getAddress() != null ? store.getAddress() : "" %>";
@@ -222,23 +224,27 @@ function initMap() {
     const defaultLocation = { lat: 35.6812, lng: 139.7671 };
 
     // マップを初期化
-    map = new google.maps.Map(document.getElementById('map'), {
+    const map = new google.maps.Map(document.getElementById('map'), {
         zoom: 15,
-        center: defaultLocation
+        center: defaultLocation,
+        mapTypeControl: false,
+        streetViewControl: false,
+        fullscreenControl: false
     });
 
     // 住所から緯度経度を取得してマーカーを設置
     if (storeAddress) {
         const geocoder = new google.maps.Geocoder();
-        geocoder.geocode({ address: storeAddress }, function(results, status) {
+        geocoder.geocode({ address: storeAddress, region: 'JP' }, function(results, status) {
             if (status === 'OK') {
                 const location = results[0].geometry.location;
                 map.setCenter(location);
 
-                marker = new google.maps.Marker({
+                const marker = new google.maps.Marker({
                     map: map,
                     position: location,
-                    title: "<%= store.getStoreName() %>"
+                    title: "<%= store.getStoreName() %>",
+                    animation: google.maps.Animation.DROP
                 });
 
                 // 情報ウィンドウを追加
@@ -251,17 +257,16 @@ function initMap() {
                 });
             } else {
                 console.error('Geocode was not successful for the following reason: ' + status);
+                alert('店舗の位置情報を取得できませんでした。');
             }
         });
+    } else {
+        alert('店舗の住所が登録されていません。');
     }
 }
 </script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAvnTYa4i9SmVZpTBEnzWN-wyLn0CPWtuQ&callback=initMap" async defer></script>
 
-<!-- JS -->
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
-<script src="${pageContext.request.contextPath}/js/slick.js"></script>
-<script src="${pageContext.request.contextPath}/js/main.js"></script>
 <script>
 $(document).ready(function() {
     // お気に入りボタンのクリックイベント
