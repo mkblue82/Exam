@@ -4,7 +4,6 @@ import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.naming.directory.SearchResult;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -38,7 +37,7 @@ public class SearchAction extends Action {
         Connection connection = null;
 
         // 検索結果を格納するリスト
-        List<SearchResult> searchResults = new ArrayList<>();
+        List<Search> searchResults = new ArrayList<>();
 
         try {
             connection = dao.getConnection();
@@ -61,12 +60,12 @@ public class SearchAction extends Action {
                     if (store == null) continue;
 
                     // 既存の店舗結果を探す
-                    SearchResult existingResult = findResultByStoreId(searchResults, store.getStoreId());
+                    Search existingResult = findResultByStoreId(searchResults, store.getStoreId());
 
                     if (existingResult != null) {
                         existingResult.addMerchandise(merchandise);
                     } else {
-                        SearchResult newResult = new SearchResult();
+                        Search newResult = new Search();
                         newResult.setStore(store);
                         newResult.addMerchandise(merchandise);
                         searchResults.add(newResult);
@@ -78,7 +77,7 @@ public class SearchAction extends Action {
             for (Store store : stores) {
                 List<Merchandise> storeMerchandises = merchandiseDAO.selectByStoreId(store.getStoreId());
 
-                SearchResult existingResult = findResultByStoreId(searchResults, store.getStoreId());
+                Search existingResult = findResultByStoreId(searchResults, store.getStoreId());
 
                 if (existingResult != null) {
                     // 重複しない商品のみ追加
@@ -88,7 +87,7 @@ public class SearchAction extends Action {
                         }
                     }
                 } else if (!storeMerchandises.isEmpty()) {
-                    SearchResult newResult = new Search();
+                    Search newResult = new Search();
                     newResult.setStore(store);
                     newResult.setMerchandises(storeMerchandises);
                     searchResults.add(newResult);
@@ -111,7 +110,7 @@ public class SearchAction extends Action {
             // 本番環境ではログに記録し、ユーザーには一般的なメッセージのみ表示
             e.printStackTrace();
             request.setAttribute("error", "検索中にエラーが発生しました。");
-            request.setAttribute("search", new ArrayList<>());
+            request.setAttribute("searchResults", new ArrayList<>());
             request.setAttribute("keyword", keyword);
         } finally {
             if (connection != null) {
@@ -131,7 +130,7 @@ public class SearchAction extends Action {
      * 店舗IDで検索結果を探す
      */
     private Search findResultByStoreId(List<Search> results, int storeId) {
-        for (SearchResult result : results) {
+        for (Search result : results) {
             if (result.getStoreId() == storeId) {
                 return result;
             }
