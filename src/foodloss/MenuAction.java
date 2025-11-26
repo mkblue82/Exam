@@ -1,5 +1,4 @@
 package foodloss;
-
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -28,7 +27,7 @@ public class MenuAction extends Action {
         Object userObj = session.getAttribute("user");
 
         Map<Store, List<Merchandise>> shopMerchMap = new LinkedHashMap<>();
-        List<Merchandise> defaultList = new ArrayList<>(); // ★追加
+        List<Merchandise> defaultList = new ArrayList<>();
 
         try (Connection con = new DBManager().getConnection()) {
             StoreDAO storeDAO = new StoreDAO(con);
@@ -40,47 +39,76 @@ public class MenuAction extends Action {
             System.out.println("店舗数: " + storeList.size());
 
             for (Store store : storeList) {
-                // 商品取得
-                List<Merchandise> merchList = merchDAO.selectByStoreId2(store.getStoreId());
-                System.out.println("店舗ID " + store.getStoreId() + " の商品数: " + merchList.size());
+                try {
+                    // 商品取得 (修正: selectByStoreId2 → selectByStoreId)
+                    List<Merchandise> merchList = merchDAO.selectByStoreId(store.getStoreId());
+                    System.out.println("店舗ID " + store.getStoreId() + " の商品数: " + merchList.size());
 
-                // 商品ごとに画像を取得してセット
-                for (Merchandise m : merchList) {
-                    List<MerchandiseImage> images = imageDAO.selectByMerchandiseId(m.getMerchandiseId());
-                    m.setImages(images);
+                    // 商品ごとに画像を取得してセット
+                    for (Merchandise m : merchList) {
+                        try {
+                            List<MerchandiseImage> images = imageDAO.selectByMerchandiseId(m.getMerchandiseId());
+                            m.setImages(images);
 
-                    // ★ defaultListに全商品を追加
-                    defaultList.add(m);
+                            // defaultListに全商品を追加
+                            defaultList.add(m);
 
-                    // デバッグ出力
-                    System.out.println("  商品: " + m.getMerchandiseName() + " / 画像数: " + images.size());
-                    for (MerchandiseImage img : images) {
-                        System.out.println("    画像ファイル名: " + img.getFileName());
+                            // デバッグ出力
+                            System.out.println("  商品: " + m.getMerchandiseName() + " / 画像数: " + images.size());
+                            for (MerchandiseImage img : images) {
+                                System.out.println("    画像ファイル名: " + img.getFileName());
+                            }
+                        } catch (Exception imgEx) {
+                            System.out.println("  商品ID " + m.getMerchandiseId() + " の画像取得でエラー:");
+                            imgEx.printStackTrace();
+                            // 画像がなくても商品は表示できるようにする
+                            m.setImages(new ArrayList<>());
+                            defaultList.add(m);
+                        }
                     }
-                }
 
-                shopMerchMap.put(store, merchList);
+                    shopMerchMap.put(store, merchList);
+                } catch (Exception storeEx) {
+                    System.out.println("店舗ID " + store.getStoreId() + " の処理でエラー:");
+                    storeEx.printStackTrace();
+                    // この店舗はスキップして次へ
+                }
             }
 
             req.setAttribute("shopMerchMap", shopMerchMap);
-            req.setAttribute("defaultList", defaultList); // ★追加
+            req.setAttribute("defaultList", defaultList);
+
+            System.out.println("defaultList件数: " + defaultList.size());
+            System.out.println("shopMerchMap店舗数: " + shopMerchMap.size());
 
         } catch (Exception e) {
             System.out.println("MenuActionで例外発生:");
             e.printStackTrace();
+            // スタックトレース全体を出力
+            System.out.println("詳細エラー: " + e.getClass().getName() + ": " + e.getMessage());
+
             // エラー時は共通エラーページにフォワード
-            req.setAttribute("errorMessage", "メニューの取得中にエラーが発生しました。");
+            req.setAttribute("errorMessage", "メニューの取得中にエラーが発生しました: " + e.getMessage());
             req.getRequestDispatcher("/jsp/error.jsp").forward(req, res);
             return;
         }
 
         // JSPへ遷移
-        if (storeObj != null) {
-            req.getRequestDispatcher("/store_jsp/main_store.jsp").forward(req, res);
-        } else if (userObj != null) {
-            req.getRequestDispatcher("/jsp/main_user.jsp").forward(req, res);
-        } else {
-            res.sendRedirect(req.getContextPath() + "/jsp/index.jsp");
+        try {
+            if (storeObj != null) {
+                System.out.println("店舗ユーザーとして main_store.jsp へ");
+                req.getRequestDispatcher("/store_jsp/main_store.jsp").forward(req, res);
+            } else if (userObj != null) {
+                System.out.println("一般ユーザーとして main_user.jsp へ");
+                req.getRequestDispatcher("/jsp/main_user.jsp").forward(req, res);
+            } else {
+                System.out.println("未ログイン、index.jsp へリダイレクト");
+                res.sendRedirect(req.getContextPath() + "/jsp/index.jsp");
+            }
+        } catch (Exception fwdEx) {
+            System.out.println("JSPへのフォワードでエラー:");
+            fwdEx.printStackTrace();
+            throw fwdEx;
         }
 
         System.out.println("===== MenuAction END =====");
