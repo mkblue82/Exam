@@ -125,7 +125,7 @@
 
             <div class="button-group">
                 <a href="${pageContext.request.contextPath}/foodloss/Menu.action" class="btn-primary">商品一覧へ</a>
-                <a href="${pageContext.request.contextPath}/foodloss/MyReservations.action" class="btn-secondary">予約一覧を見る</a>
+                <a href="${pageContext.request.contextPath}/foodloss/BookingUserList.action" class="btn-secondary">予約一覧を見る</a>
             </div>
         </div>
     </main>
