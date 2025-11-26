@@ -7,6 +7,7 @@
     <button type="submit" class="logout-btn">ログアウト</button>
   </form>
 </header>
+
 <!-- メニューバー -->
 <div id="menubar">
   <nav>
