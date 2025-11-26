@@ -4,9 +4,11 @@
   <h1 id="logo"><span>タイトル募集</span></h1>
 
   <!-- ログアウトボタン -->
-  <form action="${pageContext.request.contextPath}/foodloss/Logout.action" method="post" id="logout-form">
-    <button type="submit" class="logout-btn">ログアウト</button>
-  </form>
+  <form action="${pageContext.request.contextPath}/foodloss/Logout.action" method="post"
+      style="text-align: right; margin: 0;">
+  <button type="submit" class="logout-btn">ログアウト</button>
+</form>
+
 </header>
 
 <!-- メニューバー -->
