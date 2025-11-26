@@ -491,21 +491,40 @@ public class MerchandiseDAO {
 	     return deletedCount;
 	 }
 
-	 public boolean decreaseStock(int merchandiseId, int quantity) throws Exception {
-		    PreparedStatement st = connection.prepareStatement(
-		        "update T002_merchandise " +
-		        "set T002_FD1_merchandise = T002_FD1_merchandise - ? " +
-		        "where T002_PK1_merchandise = ? " +
-		        "and T002_FD1_merchandise >= ?"); // 在庫が十分にあることを確認
+	// 在庫を減らす
+	 public int decreaseStock(int merchandiseId, int quantity) throws Exception {
+		    // まず現在の在庫を確認
+		    PreparedStatement stCheck = connection.prepareStatement(
+		        "select T002_FD1_merchandise from T002_merchandise where T002_PK1_merchandise = ?");
+		    stCheck.setInt(1, merchandiseId);
+		    ResultSet rs = stCheck.executeQuery();
 
-		    st.setInt(1, quantity);
+		    if (!rs.next()) {
+		        rs.close();
+		        stCheck.close();
+		        return 0; // 商品が見つからない
+		    }
+
+		    int currentStock = rs.getInt("T002_FD1_merchandise");
+		    rs.close();
+		    stCheck.close();
+
+		    if (currentStock < quantity) {
+		        return 0; // 在庫不足
+		    }
+
+		    // 在庫を減らす
+		    int newStock = currentStock - quantity;
+		    PreparedStatement st = connection.prepareStatement(
+		        "update T002_merchandise set T002_FD1_merchandise = ? where T002_PK1_merchandise = ?");
+		    st.setInt(1, newStock);
 		    st.setInt(2, merchandiseId);
-		    st.setInt(3, quantity);
 
 		    int line = st.executeUpdate();
 		    st.close();
-		    return line > 0;
+		    return line;
 		}
+
 
 
 }
