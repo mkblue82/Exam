@@ -96,9 +96,9 @@ public class ReserveExecuteAction extends Action {
 
             // 予約をデータベースに登録
             BookingDAO bookingDAO = new BookingDAO();
-            boolean insertSuccess = bookingDAO.insert(booking);
+            int insertResult = bookingDAO.insert(booking);
 
-            if (!insertSuccess) {
+            if (insertResult == 0) {
                 request.setAttribute("errorMessage", "予約の登録に失敗しました。");
                 return "error.jsp";
             }
