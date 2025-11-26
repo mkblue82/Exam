@@ -18,8 +18,6 @@ public class MerchandiseDAO {
     }
 
 
-
-
     // 全商品を取得（店舗名も取得）
     public List<Merchandise> selectAll() throws Exception {
         List<Merchandise> list = new ArrayList<>();
