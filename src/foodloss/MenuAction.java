@@ -1,6 +1,7 @@
 package foodloss;
 
 import java.sql.Connection;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,19 +20,17 @@ import tool.Action;
 import tool.DBManager;
 
 public class MenuAction extends Action {
-
     @Override
     public void execute(HttpServletRequest req, HttpServletResponse res) throws Exception {
         System.out.println("===== MenuAction START =====");
-
         HttpSession session = req.getSession();
         Object storeObj = session.getAttribute("store");
         Object userObj = session.getAttribute("user");
 
         Map<Store, List<Merchandise>> shopMerchMap = new LinkedHashMap<>();
+        List<Merchandise> defaultList = new ArrayList<>(); // ★追加
 
         try (Connection con = new DBManager().getConnection()) {
-
             StoreDAO storeDAO = new StoreDAO(con);
             MerchandiseDAO merchDAO = new MerchandiseDAO(con);
             MerchandiseImageDAO imageDAO = new MerchandiseImageDAO(con);
@@ -50,6 +49,9 @@ public class MenuAction extends Action {
                     List<MerchandiseImage> images = imageDAO.selectByMerchandiseId(m.getMerchandiseId());
                     m.setImages(images);
 
+                    // ★ defaultListに全商品を追加
+                    defaultList.add(m);
+
                     // デバッグ出力
                     System.out.println("  商品: " + m.getMerchandiseName() + " / 画像数: " + images.size());
                     for (MerchandiseImage img : images) {
@@ -61,11 +63,11 @@ public class MenuAction extends Action {
             }
 
             req.setAttribute("shopMerchMap", shopMerchMap);
+            req.setAttribute("defaultList", defaultList); // ★追加
 
         } catch (Exception e) {
             System.out.println("MenuActionで例外発生:");
             e.printStackTrace();
-
             // エラー時は共通エラーページにフォワード
             req.setAttribute("errorMessage", "メニューの取得中にエラーが発生しました。");
             req.getRequestDispatcher("/jsp/error.jsp").forward(req, res);

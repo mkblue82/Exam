@@ -8,133 +8,58 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import bean.Merchandise;
-import bean.Search;
-import bean.Store;
-import dao.DAO;
+import bean.MerchandiseImage;
 import dao.MerchandiseDAO;
-import dao.StoreDAO;
+import dao.MerchandiseImageDAO;
 import tool.Action;
+import tool.DBManager;
 
 public class SearchAction extends Action {
-
     @Override
-    public void execute(HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public void execute(HttpServletRequest req, HttpServletResponse res) throws Exception {
+        System.out.println("===== SearchAction START =====");
 
-        // 検索キーワードを取得
-        String keyword = request.getParameter("keyword");
+        String keyword = req.getParameter("keyword");
+        System.out.println("検索キーワード: [" + keyword + "]");
 
-        if (keyword == null || keyword.trim().isEmpty()) {
-            request.setAttribute("error", "検索キーワードを入力してください");
-            request.setAttribute("searchResults", new ArrayList<>());
-            request.getRequestDispatcher("/jsp/search.jsp").forward(request, response);
-            return;
-        }
+        List<Merchandise> searchResults = new ArrayList<>();
 
-        keyword = keyword.trim();
+        try (Connection con = new DBManager().getConnection()) {
+            MerchandiseDAO merchDAO = new MerchandiseDAO(con);
+            MerchandiseImageDAO imageDAO = new MerchandiseImageDAO(con);
 
-        // データベース接続を取得
-        DAO dao = new DAO();
-        Connection connection = null;
+            if (keyword != null && !keyword.trim().isEmpty()) {
+                // キーワードで検索
+                System.out.println("searchByKeyword実行前");
+                searchResults = merchDAO.searchByKeyword(keyword.trim());
+                System.out.println("検索結果: " + searchResults.size() + "件");
 
-        // 検索結果を格納するリスト
-        List<Search> searchResults = new ArrayList<>();
-
-        try {
-            connection = dao.getConnection();
-
-            // DAOの初期化
-            MerchandiseDAO merchandiseDAO = new MerchandiseDAO(connection);
-            StoreDAO storeDAO = new StoreDAO(connection);
-
-            // 商品名またはタグで検索
-            List<Merchandise> merchandises = merchandiseDAO.searchByKeyword(keyword);
-
-            // 店舗名で検索
-            List<Store> stores = storeDAO.searchByKeyword(keyword);
-
-            // 店舗ごとにグループ化
-            if (!merchandises.isEmpty()) {
-                for (Merchandise merchandise : merchandises) {
-                    Store store = storeDAO.selectById(merchandise.getStoreId());
-
-                    if (store == null) continue;
-
-                    // 既存の店舗結果を探す
-                    Search existingResult = findResultByStoreId(searchResults, store.getStoreId());
-
-                    if (existingResult != null) {
-                        existingResult.addMerchandise(merchandise);
-                    } else {
-                        Search newResult = new Search();
-                        newResult.setStore(store);
-                        newResult.addMerchandise(merchandise);
-                        searchResults.add(newResult);
-                    }
+                // 各商品に画像をセット
+                for (Merchandise m : searchResults) {
+                    List<MerchandiseImage> images = imageDAO.selectByMerchandiseId(m.getMerchandiseId());
+                    m.setImages(images);
+                    System.out.println("  商品: " + m.getMerchandiseName() + " / 画像数: " + images.size());
                 }
+            } else {
+                System.out.println("キーワードがnullまたは空です");
             }
 
-            // 店舗名で検索された場合、その店舗の全商品を追加
-            for (Store store : stores) {
-                List<Merchandise> storeMerchandises = merchandiseDAO.selectByStoreId(store.getStoreId());
+            // 検索結果をリクエストスコープにセット
+            req.setAttribute("itemList", searchResults);
+            req.setAttribute("searchKeyword", keyword);
 
-                Search existingResult = findResultByStoreId(searchResults, store.getStoreId());
-
-                if (existingResult != null) {
-                    // 重複しない商品のみ追加
-                    for (Merchandise m : storeMerchandises) {
-                        if (!existingResult.hasMerchandise(m.getMerchandiseId())) {
-                            existingResult.addMerchandise(m);
-                        }
-                    }
-                } else if (!storeMerchandises.isEmpty()) {
-                    Search newResult = new Search();
-                    newResult.setStore(store);
-                    newResult.setMerchandises(storeMerchandises);
-                    searchResults.add(newResult);
-                }
-            }
-
-            // 結果をリクエストに設定
-            request.setAttribute("searchResults", searchResults);
-            request.setAttribute("keyword", keyword);
-
-            // デバッグ用ログ
-            System.out.println("=== 検索結果デバッグ ===");
-            System.out.println("キーワード: " + keyword);
-            System.out.println("検索結果数: " + searchResults.size());
-            for (Search result : searchResults) {
-                System.out.println("店舗: " + result.getStoreName() + ", 商品数: " + result.getMerchandiseCount());
-            }
+            System.out.println("itemListセット完了: " + searchResults.size() + "件");
 
         } catch (Exception e) {
-            // 本番環境ではログに記録し、ユーザーには一般的なメッセージのみ表示
+            System.out.println("SearchActionで例外発生:");
             e.printStackTrace();
-            request.setAttribute("error", "検索中にエラーが発生しました。");
-            request.setAttribute("searchResults", new ArrayList<>());
-            request.setAttribute("keyword", keyword);
-        } finally {
-            if (connection != null) {
-                try {
-                    connection.close();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
+            req.setAttribute("errorMessage", "検索中にエラーが発生しました。");
         }
 
-        // 検索結果ページにフォワード
-        request.getRequestDispatcher("/jsp/search.jsp").forward(request, response);
-    }
+        // main_user.jspにフォワード
+        System.out.println("main_user.jspへフォワード");
+        req.getRequestDispatcher("/jsp/main_user.jsp").forward(req, res);
 
-    /**
-     * 店舗IDで検索結果を探す
-     */
-    private Search findResultByStoreId(List<Search> results, int storeId) {
-        for (Search result : results) {
-            if (result.getStoreId() == storeId) {
-                return result;
-            }
-        }
-        return null;
+        System.out.println("===== SearchAction END =====");
     }
 }
