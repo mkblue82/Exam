@@ -428,6 +428,7 @@ public class MerchandiseDAO {
             "WHERE (T002_FD5_merchandise LIKE ? OR T002_FD4_merchandise LIKE ?) " +
             "ORDER BY T002_FD8_merchandise, T002_PK1_merchandise");
 
+
         st.setString(1, "%" + keyword + "%");
         st.setString(2, "%" + keyword + "%");
 
