@@ -28,7 +28,7 @@ public class ReserveConfirmAction extends Action {
         HttpSession session = request.getSession(false);
         if (session == null || session.getAttribute("user") == null) {
             request.setAttribute("errorMessage", "ログインが必要です。");
-            request.getRequestDispatcher("/foodloss_jsp/login.jsp").forward(request, response);
+            request.getRequestDispatcher("/jsp/login.jsp").forward(request, response);
             return;
         }
         User user = (User) session.getAttribute("user");
@@ -111,7 +111,7 @@ public class ReserveConfirmAction extends Action {
             request.setAttribute("user", user);
 
             // 確認画面へフォワード
-            request.getRequestDispatcher("/foodloss_jsp/reserve_confirm.jsp")
+            request.getRequestDispatcher("/jsp/reserve_confirm.jsp")
                    .forward(request, response);
 
         } catch (Exception e) {

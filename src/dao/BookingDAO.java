@@ -205,25 +205,25 @@ public class BookingDAO extends DAO {
 
 
     // 予約を作成
-    public int insert(Booking booking) throws Exception {
-        Connection con = getConnection();
-        PreparedStatement st = con.prepareStatement(
-            "insert into T005_booking (T005_FD1_booking, T005_FD2_booking, " +
-            "T005_FD3_booking, T005_FD4_booking, T005_FD5_booking, T005_FD6_booking) " +
-            "values (?, ?, ?, ?, ?, ?)");
-
-        st.setInt(1, booking.getCount());
-        st.setInt(2, booking.getUserId());
-        st.setTimestamp(3, booking.getPickupTime());
-        st.setInt(4, booking.getProductId());
-        st.setTimestamp(5, booking.getBookingTime());
-        st.setBoolean(6, booking.getPickupStatus());
-
-        int line = st.executeUpdate();
-        st.close();
-        con.close();
-        return line;
-    }
+//    public int insert(Booking booking) throws Exception {
+//        Connection con = getConnection();
+//        PreparedStatement st = con.prepareStatement(
+//            "insert into T005_booking (T005_FD1_booking, T005_FD2_booking, " +
+//            "T005_FD3_booking, T005_FD4_booking, T005_FD5_booking, T005_FD6_booking) " +
+//            "values (?, ?, ?, ?, ?, ?)");
+//
+//        st.setInt(1, booking.getCount());
+//        st.setInt(2, booking.getUserId());
+//        st.setTimestamp(3, booking.getPickupTime());
+//        st.setInt(4, booking.getProductId());
+//        st.setTimestamp(5, booking.getBookingTime());
+//        st.setBoolean(6, booking.getPickupStatus());
+//
+//        int line = st.executeUpdate();
+//        st.close();
+//        con.close();
+//        return line;
+//    }
 
     // 予約を更新
     public int update(Booking booking) throws Exception {
@@ -258,5 +258,24 @@ public class BookingDAO extends DAO {
         st.close();
         con.close();
         return line;
+    }
+    public boolean insert(Booking booking) throws Exception {
+        Connection con = getConnection();
+        PreparedStatement st = con.prepareStatement(
+            "insert into T005_booking (T005_FD1_booking, T005_FD2_booking, " +
+            "T005_FD3_booking, T005_FD4_booking, T005_FD5_booking, T005_FD6_booking) " +
+            "values (?, ?, ?, ?, ?, ?)");
+
+        st.setInt(1, booking.getCount());
+        st.setInt(2, booking.getUserId());
+        st.setTimestamp(3, booking.getPickupTime());
+        st.setInt(4, booking.getProductId());
+        st.setTimestamp(5, booking.getBookingTime());
+        st.setBoolean(6, booking.getPickupStatus());
+
+        int line = st.executeUpdate();
+        st.close();
+        con.close();
+        return line > 0;
     }
 }
