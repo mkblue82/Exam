@@ -21,7 +21,7 @@ public class MerchDetailAction extends Action {
         String merchIdStr = req.getParameter("merchId");
 
         if (merchIdStr == null) {
-            res.sendRedirect(req.getContextPath() + "/Menu.action");
+            res.sendRedirect(req.getContextPath() + "/foodloss/Menu.action");
             return;
         }
 

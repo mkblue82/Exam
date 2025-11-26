@@ -4,8 +4,7 @@
 <%
     HttpSession userSession = request.getSession(false);
     if (userSession == null || userSession.getAttribute("user") == null) {
-        request.setAttribute("errorMessage", "セッションが切れています。");
-        request.getRequestDispatcher("/error.jsp").forward(request, response);
+        response.sendRedirect(request.getContextPath() + "/jsp/index.jsp");
         return;
     }
 %>
