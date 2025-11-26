@@ -224,7 +224,7 @@
                     <input type="time" id="pickupTime" name="pickupTime" required>
                 </div>
                 <p style="margin-top:10px; color:#666; font-size:0.9rem;">
-                    ※ 店舗の営業時間内でご指定ください
+                    ※ 店舗の営業時間内、かつ消費期限(<%= merch.getUseByDate() %>)までにご指定ください
                 </p>
             </div>
 
@@ -257,6 +257,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const unitPrice = <%= merch.getPrice() %>;
     const maxStock = <%= merch.getStock() %>;
+    const useByDate = '<%= merch.getUseByDate() %>'; // 消費期限 (YYYY-MM-DD形式を想定)
 
     // 数量変更時に合計金額を更新
     quantityInput.addEventListener('input', function() {
@@ -283,6 +284,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const mm = String(today.getMonth() + 1).padStart(2, '0');
     const dd = String(today.getDate()).padStart(2, '0');
     pickupDateInput.min = yyyy + '-' + mm + '-' + dd;
+
+    // 消費期限を最大値に設定
+    pickupDateInput.max = useByDate;
 
     // デフォルトで明日の日付を設定
     const tomorrow = new Date(today);
@@ -324,6 +328,13 @@ document.addEventListener('DOMContentLoaded', function() {
         const now = new Date();
         if (selectedDateTime <= now) {
             showError('受け取り日時は現在より後の日時を指定してください。');
+            return false;
+        }
+
+        // 消費期限チェック
+        const useByDateTime = new Date(useByDate + 'T23:59:59');
+        if (selectedDateTime > useByDateTime) {
+            showError('受け取り日時は消費期限(' + useByDate + ')内で指定してください。');
             return false;
         }
 
