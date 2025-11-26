@@ -61,6 +61,7 @@
             padding: 12px;
             font-weight: bold;
             border: 1px solid #c07148;
+            white-space: nowrap;
         }
 
         td {
@@ -75,15 +76,20 @@
         }
 
         .pickup-btn {
-            display: inline-block;
-            padding: 8px 25px;
-            background-color: #c07148;
-            color: white;
-            border-radius: 5px;
-            text-decoration: none;
-            transition: 0.3s;
-            font-weight: bold;
-        }
+		    display: inline-block;
+		    padding: 8px 25px;
+		    background-color: #c07148;
+		    color: white;
+		    border-radius: 5px;
+		    text-decoration: none;
+		    transition: 0.3s;
+		    font-weight: bold;
+
+		    white-space: nowrap;   /* ← これが改行禁止 */
+		    min-width: 120px;      /* ← 横幅調整（必要なら増やす） */
+		    text-align: center;    /* 横中央 */
+		}
+
 
         .pickup-btn:hover {
             background-color: #a85d38;
@@ -133,6 +139,15 @@
                 padding: 8px;
             }
         }
+
+        th:nth-child(1), td:nth-child(1) { width: 80px; }   /* 予約ID */
+		th:nth-child(2), td:nth-child(2) { width: 150px; }  /* 商品名 */
+		th:nth-child(3), td:nth-child(3) { width: 130px; }  /* 予約ユーザーID */
+		th:nth-child(4), td:nth-child(4) { width: 80px; }   /* 数量 */
+		th:nth-child(5), td:nth-child(5) { width: 180px; }  /* 受取予定時刻 */
+		th:nth-child(6), td:nth-child(6) { width: 180px; }  /* 予約日時 */
+		th:nth-child(7), td:nth-child(7) { width: 100px; }  /* 受取状態 */
+		th:nth-child(8), td:nth-child(8) { width: 120px; }  /* ボタン */
     </style>
 </head>
 
