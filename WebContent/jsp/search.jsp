@@ -11,6 +11,7 @@
     <header>
         <h1 id="logo"><span>タイトル募集</span></h1>
 
+
         <!-- 検索フォーム -->
         <form action="${pageContext.request.contextPath}/foodloss/Search.action" method="get" id="search-form">
             <input type="text" name="keyword" placeholder="商品・店舗を検索..." value="${keyword}" required>
