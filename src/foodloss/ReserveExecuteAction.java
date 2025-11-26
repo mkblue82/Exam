@@ -1,5 +1,6 @@
 package foodloss;
 
+import java.sql.Connection;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -18,13 +19,14 @@ import tool.Action;
 public class ReserveExecuteAction extends Action {
 
     @Override
-    public String execute(HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public void execute(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
         // セッションチェック
         HttpSession session = request.getSession(false);
         if (session == null || session.getAttribute("user") == null) {
             request.setAttribute("errorMessage", "セッションが切れています。ログインし直してください。");
-            return "error.jsp";
+            request.getRequestDispatcher("error.jsp").forward(request, response);
+            return;
         }
 
         User user = (User) session.getAttribute("user");
@@ -39,7 +41,8 @@ public class ReserveExecuteAction extends Action {
             if (merchandiseIdStr == null || quantityStr == null || pickupDateTime == null ||
                 merchandiseIdStr.isEmpty() || quantityStr.isEmpty() || pickupDateTime.isEmpty()) {
                 request.setAttribute("errorMessage", "必要な情報が不足しています。");
-                return "error.jsp";
+                request.getRequestDispatcher("error.jsp").forward(request, response);
+                return;
             }
 
             // パラメータ変換
@@ -58,27 +61,35 @@ public class ReserveExecuteAction extends Action {
 
             if (merchandise == null) {
                 request.setAttribute("errorMessage", "商品が見つかりませんでした。");
-                return "error.jsp";
+                con.close();
+                request.getRequestDispatcher("error.jsp").forward(request, response);
+                return;
             }
 
             // 在庫チェック
             if (merchandise.getStock() < quantity) {
                 request.setAttribute("errorMessage", "在庫が不足しています。");
-                return "error.jsp";
+                con.close();
+                request.getRequestDispatcher("error.jsp").forward(request, response);
+                return;
             }
 
             // 消費期限チェック
             Date useByDate = merchandise.getUseByDate();
             if (pickupDate.after(useByDate)) {
                 request.setAttribute("errorMessage", "受け取り日時が消費期限を超えています。");
-                return "error.jsp";
+                con.close();
+                request.getRequestDispatcher("error.jsp").forward(request, response);
+                return;
             }
 
             // 現在時刻より後かチェック
             Date now = new Date();
             if (pickupDate.before(now) || pickupDate.equals(now)) {
                 request.setAttribute("errorMessage", "受け取り日時は現在より後の日時を指定してください。");
-                return "error.jsp";
+                con.close();
+                request.getRequestDispatcher("error.jsp").forward(request, response);
+                return;
             }
 
             // 合計金額を計算
@@ -100,17 +111,20 @@ public class ReserveExecuteAction extends Action {
 
             if (!insertSuccess) {
                 request.setAttribute("errorMessage", "予約の登録に失敗しました。");
-                return "error.jsp";
+                con.close();
+                request.getRequestDispatcher("error.jsp").forward(request, response);
+                return;
             }
 
             // 在庫を減らす
-            boolean updateSuccess = merchandiseDAO.decreaseStock(merchandiseId, quantity);
+            int updateResult = merchandiseDAO.decreaseStock(merchandiseId, quantity);
 
-            if (!updateSuccess) {
+            if (updateResult == 0) {
                 // 在庫更新失敗時は予約もロールバック（本来はトランザクション処理が必要）
                 con.close();
                 request.setAttribute("errorMessage", "在庫の更新に失敗しました。");
-                return "error.jsp";
+                request.getRequestDispatcher("error.jsp").forward(request, response);
+                return;
             }
 
             con.close();
@@ -121,17 +135,17 @@ public class ReserveExecuteAction extends Action {
             request.setAttribute("totalPrice", totalPrice);
             request.setAttribute("message", "予約が完了しました。");
 
-            return "reserve_complete.jsp";
+            request.getRequestDispatcher("/jsp/reserve_success.jsp").forward(request, response);
 
         } catch (NumberFormatException e) {
             e.printStackTrace();
             request.setAttribute("errorMessage", "数値の形式が正しくありません。");
-            return "error.jsp";
+            request.getRequestDispatcher("error.jsp").forward(request, response);
 
         } catch (Exception e) {
             e.printStackTrace();
             request.setAttribute("errorMessage", "予約処理中にエラーが発生しました: " + e.getMessage());
-            return "error.jsp";
+            request.getRequestDispatcher("error.jsp").forward(request, response);
         }
     }
 }

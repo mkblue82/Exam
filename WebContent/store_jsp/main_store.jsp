@@ -7,6 +7,7 @@
     <title>店舗メインメニュー</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
     <style>
+
         .main-content {
             max-width: 700px;
             margin: 40px auto;

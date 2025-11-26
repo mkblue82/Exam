@@ -223,6 +223,7 @@ public class BookingDAO extends DAO {
         return line > 0;
     }
 
+<<<<<<< HEAD
 	 // =========================================================
 	 // 予約を更新（共有コネクション対応）
 	 // =========================================================
@@ -320,3 +321,6 @@ public class BookingDAO extends DAO {
 
 
 }
+=======
+}
+>>>>>>> branch 'master' of https://github.com/mkblue82/Exam.git

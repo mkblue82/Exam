@@ -151,6 +151,26 @@
                 font-size: 1.5rem;
             }
         }
+
+        .btn-back {
+            width: 100%;
+            padding: 0.8rem;
+            border: none;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: 0.3s;
+            font-weight: normal;
+            background: #f5f5f5;
+            color: #666;
+            border: 1px solid #ddd;
+        }
+
+        .btn-back:hover {
+            background: #e0e0e0;
+            color: #333;
+        }
+
     </style>
 </head>
 <body>
@@ -200,6 +220,12 @@
                     新規登録
                 </button>
 
+
+				 <!--トップページに戻るボタン -->
+                <button type="button" class="btn-back"
+                        onclick="location.href='${pageContext.request.contextPath}/jsp/index.jsp'">
+                    トップページに戻る
+                </button>
             </div>
         </div>
     </main>

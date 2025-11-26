@@ -4,8 +4,7 @@
 <%
     HttpSession userSession = request.getSession(false);
     if (userSession == null || userSession.getAttribute("user") == null) {
-        request.setAttribute("errorMessage", "セッションが切れています。");
-        request.getRequestDispatcher("/error.jsp").forward(request, response);
+        response.sendRedirect(request.getContextPath() + "/jsp/index.jsp");
         return;
     }
 %>
@@ -94,14 +93,68 @@
     <main class="column">
         <div class="main-contents">
 
-            <h2 style="text-align:center; margin:30px 0; color:#c07148;">出店店舗と商品一覧</h2>
-
             <%
+                // 検索結果を取得
+                List<Merchandise> itemList = (List<Merchandise>) request.getAttribute("itemList");
+                String searchKeyword = (String) request.getAttribute("searchKeyword");
+
+                // 通常の店舗ごとの商品マップを取得
                 Map<Store, List<Merchandise>> shopMerchMap =
                     (Map<Store, List<Merchandise>>) request.getAttribute("shopMerchMap");
+
+                // デバッグ出力
+                System.out.println("=== JSP デバッグ ===");
+                System.out.println("itemList: " + (itemList != null ? itemList.size() + "件" : "null"));
+                System.out.println("searchKeyword: " + searchKeyword);
+                System.out.println("shopMerchMap: " + (shopMerchMap != null ? "あり" : "null"));
             %>
 
-            <% if (shopMerchMap != null) { %>
+            <% if (itemList != null) { %>
+                <!-- ========== 検索結果表示 ========== -->
+                <h2 style="text-align:center; margin:30px 0; color:#c07148;">検索結果: "<%= searchKeyword %>"</h2>
+
+                <% if (itemList.isEmpty()) { %>
+                    <p style="text-align:center;">該当する商品はありませんでした。</p>
+                    <p style="text-align:center;"><a href="${pageContext.request.contextPath}/foodloss/Menu.action">ホームに戻る</a></p>
+                <% } else { %>
+                    <p style="text-align:center;"><%= itemList.size() %>件の商品が見つかりました</p>
+
+                    <div class="store-box">
+                        <div class="merch-list">
+                            <% for (Merchandise merch : itemList) { %>
+                                <div class="merch-item">
+                                    <!-- 画像クリック → 商品詳細へ -->
+                                    <a href="<%= request.getContextPath() %>/merch/<%= merch.getMerchandiseId() %>">
+                                        <div class="merch-image">
+                                            <%
+                                            List<MerchandiseImage> images = merch.getImages();
+                                            if (images != null && !images.isEmpty()) {
+                                                MerchandiseImage img = images.get(0);
+                                            %>
+                                                <img src="<%= request.getContextPath() %>/image/<%= img.getImageId() %>"
+                                                     alt="<%= merch.getMerchandiseName() %>">
+                                            <%
+                                            } else {
+                                            %>
+                                                <div class="no-image">画像なし</div>
+                                            <%
+                                            }
+                                            %>
+                                        </div>
+                                    </a>
+
+                                    <!-- 商品名と値段 -->
+                                    <div style="margin-top:8px;"><%= merch.getMerchandiseName() %></div>
+                                    <div class="merch-price">¥ <%= merch.getPrice() %></div>
+                                </div>
+                            <% } %>
+                        </div>
+                    </div>
+                <% } %>
+
+            <% } else if (shopMerchMap != null) { %>
+                <!-- ========== 通常の店舗ごと表示 ========== -->
+                <h2 style="text-align:center; margin:30px 0; color:#c07148;">出店店舗と商品一覧</h2>
 
                 <% for (Map.Entry<Store, List<Merchandise>> entry : shopMerchMap.entrySet()) {
                     Store store = entry.getKey();
@@ -125,31 +178,31 @@
                         <% for (Merchandise merch : merchList) { %>
 
                             <div class="merch-item">
-							    <!-- 画像クリック → 商品詳細へ -->
-							    <a href="<%= request.getContextPath() %>/merch/<%= merch.getMerchandiseId() %>">
-							        <div class="merch-image">
-							            <%
-							            List<MerchandiseImage> images = merch.getImages();
-							            if (images != null && !images.isEmpty()) {
-							                MerchandiseImage img = images.get(0);
-							            %>
-							                <img src="<%= request.getContextPath() %>/image/<%= img.getImageId() %>"
-							                     alt="<%= merch.getMerchandiseName() %>">
-							            <%
-							            } else {
-							            %>
-							                <div class="no-image">画像なし</div>
-							            <%
-							            }
-							            %>
-							        </div>
-							    </a>
+                                <!-- 画像クリック → 商品詳細へ -->
+                                <a href="<%= request.getContextPath() %>/merch/<%= merch.getMerchandiseId() %>">
+                                    <div class="merch-image">
+                                        <%
+                                        List<MerchandiseImage> images = merch.getImages();
+                                        if (images != null && !images.isEmpty()) {
+                                            MerchandiseImage img = images.get(0);
+                                        %>
+                                            <img src="<%= request.getContextPath() %>/image/<%= img.getImageId() %>"
+                                                 alt="<%= merch.getMerchandiseName() %>">
+                                        <%
+                                        } else {
+                                        %>
+                                            <div class="no-image">画像なし</div>
+                                        <%
+                                        }
+                                        %>
+                                    </div>
+                                </a>
 
-							    <!-- 値段のみ表示 -->
-							    <div class="merch-price">
-							        ¥ <%= merch.getPrice() %>
-							    </div>
-							</div>
+                                <!-- 値段のみ表示 -->
+                                <div class="merch-price">
+                                    ¥ <%= merch.getPrice() %>
+                                </div>
+                            </div>
 
                         <% } %>
 
