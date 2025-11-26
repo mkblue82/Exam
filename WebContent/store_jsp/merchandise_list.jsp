@@ -177,14 +177,24 @@
             }
         }
 
-        .btn-delete {
+        /* 編集・削除ボタンを横長に */
+		.table-button {
+		    display: inline-block;
+		    width: 100px;          /* ★ 横幅を広げる（必要なら120px,150pxに調整OK） */
+		    padding: 8px 0;
+		    text-align: center;
+		    box-sizing: border-box;
+		}
+
+		/* 削除ボタンの色はそのまま */
+		.btn-delete {
 		    background-color: #d9534f;
 		}
 
 		.btn-delete:hover {
 		    background-color: #c9302c;
-		    transform: translateY(-2px);
 		}
+
 
     </style>
 </head>
@@ -242,7 +252,8 @@
                                 <th>在庫</th>
                                 <th>消費期限</th>
                                 <th>登録日時</th>
-                                <th>編集</th>
+                                <th style="width:120px;">編集</th>
+                                <th style="width:120px;">削除</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -269,19 +280,18 @@
                                     <td><%= m.getUseByDate() %></td>
                                     <td><%= m.getRegistrationTime() %></td>
                                     <td>
-                                        <a class="btn"
-                                           href="${pageContext.request.contextPath}/foodloss/MerchandiseEdit.action?id=<%= m.getMerchandiseId() %>">
-                                           編集
-                                        </a>
-
-                                        <!-- 削除ボタンを追加 -->
-									    <a class="btn btn-delete"
+                                        <a class="btn table-button"
+										   href="${pageContext.request.contextPath}/foodloss/MerchandiseEdit.action?id=<%= m.getMerchandiseId() %>">
+										   編集
+										</a>
+                                    </td>
+                                    <td>
+									    <a class="btn btn-delete table-button"
 										   href="${pageContext.request.contextPath}/foodloss/MerchandiseDelete.action?id=<%= m.getMerchandiseId() %>"
 										   onclick="return confirm('本当に削除しますか？');">
 										   削除
 										</a>
-
-                                    </td>
+									</td>
                                 </tr>
                             <% } %>
                         </tbody>
