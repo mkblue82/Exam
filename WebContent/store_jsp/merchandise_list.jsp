@@ -176,6 +176,16 @@
                 max-width: 300px;
             }
         }
+
+        .btn-delete {
+		    background-color: #d9534f;
+		}
+
+		.btn-delete:hover {
+		    background-color: #c9302c;
+		    transform: translateY(-2px);
+		}
+
     </style>
 </head>
 
@@ -191,6 +201,19 @@
             <div class="main-content">
 
                 <h2>登録商品一覧</h2>
+
+                <%
+				    String deleteError = (String) session.getAttribute("deleteError");
+				    if (deleteError != null) {
+				%>
+				    <div style="color: #d9534f; font-weight: bold; text-align:center; margin-bottom:20px;">
+				        <%= deleteError %>
+				    </div>
+				<%
+				        session.removeAttribute("deleteError"); // 1回で消えるように
+				    }
+				%>
+
 
                 <!-- ログイン店舗の表示 -->
                 <div class="store-info">
@@ -250,6 +273,14 @@
                                            href="${pageContext.request.contextPath}/foodloss/MerchandiseEdit.action?id=<%= m.getMerchandiseId() %>">
                                            編集
                                         </a>
+
+                                        <!-- 削除ボタンを追加 -->
+									    <a class="btn btn-delete"
+										   href="${pageContext.request.contextPath}/foodloss/MerchandiseDelete.action?id=<%= m.getMerchandiseId() %>"
+										   onclick="return confirm('本当に削除しますか？');">
+										   削除
+										</a>
+
                                     </td>
                                 </tr>
                             <% } %>
