@@ -130,7 +130,7 @@
             <% if (merch.getStock() > 0) { %>
             <div class="reserve-section">
                 <div class="reserve-btn">
-                    <form action="<%= request.getContextPath() %>/ReserveConfirm.action" method="get">
+                    <form action="<%= request.getContextPath() %>/foodloss/ReserveConfirm.action" method="get">
                         <input type="hidden" name="merchandiseId" value="<%= merch.getMerchandiseId() %>">
                         <input type="hidden" name="quantity" value="1">
                         <button type="submit">この商品を予約する</button>
