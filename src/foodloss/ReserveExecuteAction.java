@@ -135,7 +135,7 @@ public class ReserveExecuteAction extends Action {
             request.setAttribute("totalPrice", totalPrice);
             request.setAttribute("message", "予約が完了しました。");
 
-            request.getRequestDispatcher("/jsp/reserve_complete.jsp").forward(request, response);
+            request.getRequestDispatcher("/jsp/reserve_success.jsp").forward(request, response);
 
         } catch (NumberFormatException e) {
             e.printStackTrace();

@@ -135,7 +135,7 @@
                         <input type="hidden" name="quantity" value="1">
                         <button type="submit">この商品を予約する</button>
                     </form>
-                </div>
+<!--                 </div> -->
             </div>
             <% } else { %>
             <div class="reserve-section">
@@ -145,7 +145,7 @@
 
             <!-- 戻るボタン -->
             <div class="back-btn">
-                <a href="<%= request.getContextPath() %>/Menu.action">商品一覧へ戻る</a>
+                <a href="<%= request.getContextPath() %>/foodloss/Menu.action">商品一覧へ戻る</a>
             </div>
         </div>
     </main>
