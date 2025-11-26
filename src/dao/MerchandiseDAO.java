@@ -491,7 +491,21 @@ public class MerchandiseDAO {
 	     return deletedCount;
 	 }
 
+	 public boolean decreaseStock(int merchandiseId, int quantity) throws Exception {
+		    PreparedStatement st = connection.prepareStatement(
+		        "update T002_merchandise " +
+		        "set T002_FD1_merchandise = T002_FD1_merchandise - ? " +
+		        "where T002_PK1_merchandise = ? " +
+		        "and T002_FD1_merchandise >= ?"); // 在庫が十分にあることを確認
 
+		    st.setInt(1, quantity);
+		    st.setInt(2, merchandiseId);
+		    st.setInt(3, quantity);
+
+		    int line = st.executeUpdate();
+		    st.close();
+		    return line > 0;
+		}
 
 
 }
