@@ -316,10 +316,4 @@ public class BookingDAO extends DAO {
 
 	    return list;
 	}
-
-
-
 }
-
-
-

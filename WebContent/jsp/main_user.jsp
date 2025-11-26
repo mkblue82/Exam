@@ -121,7 +121,12 @@
 
                     <div class="store-box">
                         <div class="merch-list">
-                            <% for (Merchandise merch : itemList) { %>
+                            <% for (Merchandise merch : itemList) {
+                                // 在庫0の商品はスキップ
+                                if (merch.getStock() == 0) {
+                                    continue;
+                                }
+                            %>
                                 <div class="merch-item">
                                     <!-- 画像クリック → 商品詳細へ -->
                                     <a href="<%= request.getContextPath() %>/merch/<%= merch.getMerchandiseId() %>">
@@ -175,7 +180,12 @@
 
                         <div class="merch-list">
 
-                        <% for (Merchandise merch : merchList) { %>
+                        <% for (Merchandise merch : merchList) {
+                            // 在庫0の商品はスキップ
+                            if (merch.getStock() == 0) {
+                                continue;
+                            }
+                        %>
 
                             <div class="merch-item">
                                 <!-- 画像クリック → 商品詳細へ -->
@@ -198,7 +208,8 @@
                                     </div>
                                 </a>
 
-                                <!-- 値段のみ表示 -->
+                                <!-- 商品名と値段 -->
+                                <div style="margin-top:8px;"><%= merch.getMerchandiseName() %></div>
                                 <div class="merch-price">
                                     ¥ <%= merch.getPrice() %>
                                 </div>
