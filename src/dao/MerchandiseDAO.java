@@ -17,9 +17,6 @@ public class MerchandiseDAO {
         this.connection = connection;
     }
 
-
-
-
     // 全商品を取得（店舗名も取得）
     public List<Merchandise> selectAll() throws Exception {
         List<Merchandise> list = new ArrayList<>();
@@ -378,11 +375,48 @@ public class MerchandiseDAO {
         st.close();
         return exists;
     }
-    public List<Merchandise> selectByStoreId2(int storeId) throws Exception {         List<Merchandise> list = new ArrayList<>();          PreparedStatement st = connection.prepareStatement(             "select T002_PK1_merchandise, T002_FD1_merchandise, " +             "T002_FD2_merchandise, T002_FD3_merchandise, T002_FD4_merchandise, " +             "T002_FD5_merchandise, T002_FD6_merchandise, T002_FD7_merchandise, " +             "T002_FD8_merchandise, T002_FD9_merchandise " +             "from T002_merchandise " +             "where T002_FD8_merchandise = ? " +             "order by T002_PK1_merchandise"         );          st.setInt(1, storeId);         ResultSet rs = st.executeQuery();          while (rs.next()) {             Merchandise m = new Merchandise();             m.setMerchandiseId(rs.getInt(1));             m.setStock(rs.getInt(2));             m.setPrice(rs.getInt(3));             m.setUseByDate(rs.getDate(4));             m.setMerchandiseTag(rs.getString(5));             m.setMerchandiseName(rs.getString(6));             m.setEmployeeId(rs.getInt(7));             m.setRegistrationTime(rs.getTimestamp(8));             m.setStoreId(rs.getInt(9));             m.setBookingStatus(rs.getBoolean(10));             list.add(m);         }          st.close();         return list;     }
-// ===== 以下、検索機能を追加 =====
+
+    public List<Merchandise> selectByStoreId2(int storeId) throws Exception {
+        List<Merchandise> list = new ArrayList<>();
+        PreparedStatement st = connection.prepareStatement(
+            "select T002_PK1_merchandise, T002_FD1_merchandise, " +
+            "T002_FD2_merchandise, T002_FD3_merchandise, T002_FD4_merchandise, " +
+            "T002_FD5_merchandise, T002_FD6_merchandise, T002_FD7_merchandise, " +
+            "T002_FD8_merchandise, T002_FD9_merchandise " +
+            "from T002_merchandise " +
+            "where T002_FD8_merchandise = ? " +
+            "order by T002_PK1_merchandise"
+        );
+
+        st.setInt(1, storeId);
+        ResultSet rs = st.executeQuery();
+
+        while (rs.next()) {
+            Merchandise m = new Merchandise();
+            m.setMerchandiseId(rs.getInt(1));
+            m.setStock(rs.getInt(2));
+            m.setPrice(rs.getInt(3));
+            m.setUseByDate(rs.getDate(4));
+            m.setMerchandiseTag(rs.getString(5));
+            m.setMerchandiseName(rs.getString(6));
+            m.setEmployeeId(rs.getInt(7));
+            m.setRegistrationTime(rs.getTimestamp(8));
+            m.setStoreId(rs.getInt(9));
+            m.setBookingStatus(rs.getBoolean(10));
+            list.add(m);
+        }
+
+        st.close();
+        return list;
+    }
+
+    // ===== 以下、検索機能を追加 =====
 
     // 商品を検索（商品名またはタグで部分一致）
     public List<Merchandise> searchByKeyword(String keyword) throws Exception {
+        System.out.println("===== searchByKeyword START =====");
+        System.out.println("検索キーワード: [" + keyword + "]");
+
         List<Merchandise> list = new ArrayList<>();
 
         PreparedStatement st = connection.prepareStatement(
@@ -392,11 +426,12 @@ public class MerchandiseDAO {
             "T002_FD8_merchandise, T002_FD9_merchandise " +
             "FROM T002_merchandise " +
             "WHERE (T002_FD5_merchandise LIKE ? OR T002_FD4_merchandise LIKE ?) " +
-            "AND T002_FD1_merchandise > 0 " + // 在庫があるもののみ
             "ORDER BY T002_FD8_merchandise, T002_PK1_merchandise");
 
         st.setString(1, "%" + keyword + "%");
         st.setString(2, "%" + keyword + "%");
+
+        System.out.println("SQL実行: LIKE '%" + keyword + "%'");
 
         ResultSet rs = st.executeQuery();
 
@@ -412,103 +447,15 @@ public class MerchandiseDAO {
             m.setRegistrationTime(rs.getTimestamp("T002_FD7_merchandise"));
             m.setStoreId(rs.getInt("T002_FD8_merchandise"));
             m.setBookingStatus(rs.getBoolean("T002_FD9_merchandise"));
+
+            System.out.println("  見つかった商品: " + m.getMerchandiseName() + " (在庫:" + m.getStock() + ", タグ:" + m.getMerchandiseTag() + ")");
             list.add(m);
         }
 
         st.close();
+
+        System.out.println("検索結果件数: " + list.size());
+        System.out.println("===== searchByKeyword END =====");
         return list;
     }
-
-
-	 // =============================
-	 // 期限切れ商品と画像をまとめて削除する（完全版）
-	 // =============================
-	 public int deleteExpiredWithImages() throws Exception {
-	     PreparedStatement st1 = null;
-	     PreparedStatement st2 = null;
-	     boolean originalAutoCommit = connection.getAutoCommit();
-	     int deletedCount = 0;
-
-	     try {
-	         connection.setAutoCommit(false); // トランザクション開始
-
-	         // 1. 期限切れ商品のID一覧を取得
-	         st1 = connection.prepareStatement(
-	             "SELECT T002_PK1_merchandise " +
-	             "FROM T002_merchandise " +
-	             "WHERE T002_FD3_merchandise < CURRENT_DATE"
-	         );
-	         ResultSet rs = st1.executeQuery();
-
-	         List<Integer> expiredIds = new ArrayList<>();
-	         while (rs.next()) {
-	             expiredIds.add(rs.getInt("T002_PK1_merchandise"));
-	         }
-	         rs.close();
-	         st1.close();
-
-	         // 期限切れ商品がない場合は終了
-	         if (expiredIds.isEmpty()) {
-	             connection.setAutoCommit(originalAutoCommit);
-	             return 0;
-	         }
-
-	         // 2. 画像削除（★重要：外部キーは T002_1_FD1_merchandise_id）
-	         st1 = connection.prepareStatement(
-	             "DELETE FROM T002_1_merchandise_image " +
-	             "WHERE T002_1_FD1_merchandise_id = ?"
-	         );
-
-	         for (int id : expiredIds) {
-	             st1.setInt(1, id);
-	             st1.executeUpdate();
-	         }
-	         st1.close();
-
-	         // 3. 商品削除
-	         st2 = connection.prepareStatement(
-	             "DELETE FROM T002_merchandise " +
-	             "WHERE T002_PK1_merchandise = ?"
-	         );
-
-	         for (int id : expiredIds) {
-	             st2.setInt(1, id);
-	             deletedCount += st2.executeUpdate();
-	         }
-
-	         // 全て成功したらコミット
-	         connection.commit();
-
-	     } catch (Exception e) {
-	         // エラーがあればロールバック
-	         connection.rollback();
-	         e.printStackTrace();
-	         throw e;
-	     } finally {
-	         connection.setAutoCommit(originalAutoCommit);
-	         if (st1 != null) st1.close();
-	         if (st2 != null) st2.close();
-	     }
-
-	     return deletedCount;
-	 }
-	 public boolean decreaseStock(int merchandiseId, int quantity) throws Exception {
-		    PreparedStatement st = connection.prepareStatement(
-		        "update T002_merchandise " +
-		        "set T002_FD1_merchandise = T002_FD1_merchandise - ? " +
-		        "where T002_PK1_merchandise = ? " +
-		        "and T002_FD1_merchandise >= ?"); // 在庫が十分にあることを確認
-
-		    st.setInt(1, quantity);
-		    st.setInt(2, merchandiseId);
-		    st.setInt(3, quantity);
-
-		    int line = st.executeUpdate();
-		    st.close();
-		    return line > 0;
-		}
-
-
-
-
 }

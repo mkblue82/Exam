@@ -120,7 +120,7 @@ public class SignupStoreAction extends Action {
             // メール送信（エラーが出てもセッションには既に保存済み）
             try {
                 MailSender.sendEmailWithAttachment(
-                        "mklblue82@gmail.com",
+                        "ahi559933@gmail.com",
                         "【要承認】新規店舗申請通知 - " + storeName,
                         adminBody,
                         permitFileData,
