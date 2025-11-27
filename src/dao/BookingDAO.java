@@ -293,11 +293,12 @@ public class BookingDAO extends DAO {
 	    PreparedStatement st = con.prepareStatement(
 	        "SELECT b.T005_PK1_booking, b.T005_FD1_booking, b.T005_FD2_booking, " +
 	        "b.T005_FD3_booking, b.T005_FD4_booking, b.T005_FD5_booking, b.T005_FD6_booking, " +
+	        "b.T005_FD7_booking, " +  // ← 金額を追加
 	        "m.T002_FD5_merchandise AS merchandiseName " +
 	        "FROM T005_booking b " +
 	        "JOIN T002_merchandise m " +
 	        "ON b.T005_FD4_booking = m.T002_PK1_merchandise " +
-	        "WHERE m.T002_FD8_merchandise = ? " +    // 店舗IDで絞る
+	        "WHERE m.T002_FD8_merchandise = ? " +
 	        "ORDER BY b.T005_PK1_booking"
 	    );
 
@@ -313,6 +314,7 @@ public class BookingDAO extends DAO {
 	        b.setProductId(rs.getInt("T005_FD4_booking"));
 	        b.setBookingTime(rs.getTimestamp("T005_FD5_booking"));
 	        b.setPickupStatus(rs.getBoolean("T005_FD6_booking"));
+	        b.setAmount(rs.getInt("T005_FD7_booking"));  // ← 金額をセット
 
 	        // ★ 商品名セット
 	        b.setMerchandiseName(rs.getString("merchandiseName"));
