@@ -28,7 +28,7 @@
 
     <style>
         .main-content {
-            max-width: 1000px;
+            max-width: 1200px;
             margin: 40px auto;
             padding: 2rem;
             background: #fff;
@@ -78,19 +78,22 @@
             background-color: #f5f5f5;
         }
 
-        .pickup-btn {
+        .cancel-btn {
             display: inline-block;
             padding: 8px 25px;
-            background-color: #c07148;
+            background-color: #999;
             color: white;
             border-radius: 5px;
             text-decoration: none;
             transition: 0.3s;
             font-weight: bold;
+            border: none;
+            cursor: pointer;
         }
 
-        .pickup-btn:hover {
-            background-color: #a85d38;
+        .cancel-btn:hover {
+            background-color: #dc3545;
+            color: white;
             transform: translateY(-2px);
         }
 
@@ -123,7 +126,7 @@
             transform: translateY(-3px);
         }
 
-        @media screen and (max-width: 1000px) {
+        @media screen and (max-width: 1200px) {
             .main-content {
                 margin: 20px;
                 padding: 1.5rem;
@@ -171,6 +174,7 @@
                                 <th>受取予定時刻</th>
                                 <th>予約日時</th>
                                 <th>受取状態</th>
+                                <th>予約取消</th>
                             </tr>
                         </thead>
 
@@ -184,6 +188,16 @@
                                     <td><%= b.getPickupTime() != null ? sdf.format(b.getPickupTime()) : "−" %></td>
                                     <td><%= b.getBookingTime() != null ? sdf.format(b.getBookingTime()) : "−" %></td>
                                     <td><%= b.getPickupStatus() ? "受取済" : "未受取" %></td>
+                                    <td>
+                                        <% if (!b.getPickupStatus()) { %>
+                                            <a class="cancel-btn"
+                                               href="${pageContext.request.contextPath}/foodloss/BookingCancel.action?bookingId=<%= b.getBookingId() %>">
+                                                予約取消
+                                            </a>
+                                        <% } else { %>
+                                            −
+                                        <% } %>
+                                    </td>
                                 </tr>
                             <% } %>
                         </tbody>

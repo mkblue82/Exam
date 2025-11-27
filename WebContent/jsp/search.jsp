@@ -102,30 +102,53 @@
 }
 
 .store-card {
-    background:#f9f9f9;
-    padding:20px;
-    border-radius:8px;
-    margin-bottom:15px;
-    border:1px solid #e0e0e0;
-    transition: all 0.3s;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    padding: 20px;
+    margin-bottom: 15px;
+    background-color: #fafafa;
+    transition: background-color 0.2s;
 }
 
 .store-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    background-color: #f0f0f0;
 }
 
-.store-card-title {
-    font-size:1.3rem;
-    font-weight:bold;
-    color:#c07148;
-    margin-bottom:10px;
+.store-content {
+    flex: 1;
 }
 
-.store-card-info {
-    color:#666;
-    font-size:0.95rem;
-    line-height:1.6;
+.store-header {
+    margin-bottom: 10px;
+}
+
+.store-name-link {
+    text-decoration: none;
+    color: inherit;
+    display: inline-block;
+    transition: color 0.2s;
+}
+
+.store-name-link:hover {
+    color: #c07148;
+}
+
+.store-name {
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.store-name-link:hover .store-name {
+    text-decoration: underline;
+}
+
+.store-info {
+    color: #666;
+    font-size: 13px;
+    margin-bottom: 15px;
 }
 
 .result-count {
@@ -186,15 +209,22 @@
 
                         <% for (Store store : storeList) { %>
                             <div class="store-card">
-                                <div class="store-card-title">
-                                    <a href="StoreInfo.action?storeId=<%= store.getStoreId() %>"
-                                       style="text-decoration:none; color:#c07148;">
-                                        <%= store.getStoreName() %>
-                                    </a>
-                                </div>
-                                <div class="store-card-info">
-                                    <p>📍 <%= store.getAddress() %></p>
-                                    <p>📞 <%= store.getPhone() %></p>
+                                <div class="store-content">
+                                    <div class="store-header">
+                                        <a href="${pageContext.request.contextPath}/foodloss/StoreInfo.action?storeId=<%= store.getStoreId() %>" class="store-name-link">
+                                            <div class="store-name"><%= store.getStoreName() %></div>
+                                        </a>
+                                    </div>
+                                    <% if (store.getAddress() != null && !store.getAddress().isEmpty()) { %>
+                                    <div class="store-info">
+                                        📍 <%= store.getAddress() %>
+                                    </div>
+                                    <% } %>
+                                    <% if (store.getPhone() != null && !store.getPhone().isEmpty()) { %>
+                                    <div class="store-info">
+                                        📞 <%= store.getPhone() %>
+                                    </div>
+                                    <% } %>
                                 </div>
 
                                 <!-- この店舗の商品を表示 -->
