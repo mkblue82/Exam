@@ -3,7 +3,7 @@
   <h1 id="logo"><span>タイトル募集</span></h1>
   <!-- 検索フォーム -->
   <form action="${pageContext.request.contextPath}/foodloss/Search.action" method="get" id="search-form">
-    <input type="text" name="keyword" placeholder="商品・店舗を検索..." required>
+    <input type="text" name="keyword" placeholder="商品・キーワード・店舗を検索..." required>
     <button type="submit"><i class="fa fa-search"></i></button>
   </form>
 </header>

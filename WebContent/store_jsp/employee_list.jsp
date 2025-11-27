@@ -82,11 +82,21 @@
             text-decoration: none;
             transition: 0.3s;
             font-weight: bold;
+            border: none;
+            cursor: pointer;
         }
 
         .btn:hover {
             background-color: #a85d38;
             transform: translateY(-2px);
+        }
+
+        .btn-delete {
+            background-color: #dc3545;
+        }
+
+        .btn-delete:hover {
+            background-color: #c82333;
         }
 
         .no-data {
@@ -119,6 +129,80 @@
             transform: translateY(-3px);
         }
 
+        /* 削除確認ダイアログのスタイル */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+        }
+
+        .modal-content h3 {
+            color: #dc3545;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+
+        .modal-content p {
+            margin-bottom: 30px;
+            color: #333;
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        .modal-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .modal-buttons button {
+            padding: 10px 30px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .btn-confirm {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .btn-confirm:hover {
+            background-color: #c82333;
+        }
+
+        .btn-cancel {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        .btn-cancel:hover {
+            background-color: #5a6268;
+        }
+
         @media screen and (max-width: 1000px) {
             .main-content {
                 margin: 20px;
@@ -133,10 +217,19 @@
                 padding: 8px;
             }
 
+            .btn {
+                padding: 6px 15px;
+                font-size: 0.85rem;
+            }
+
             .back-button a {
                 display: block;
                 margin: 10px auto;
                 max-width: 300px;
+            }
+
+            .modal-content {
+                padding: 20px;
             }
         }
     </style>
@@ -169,6 +262,7 @@
                                 <th>社員コード</th>
                                 <th>氏名</th>
                                 <th>編集</th>
+                                <th>削除</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -179,6 +273,9 @@
                                     <td><%= emp.getEmployeeName() %></td>
                                     <td>
                                         <a class="btn" href="${pageContext.request.contextPath}/foodloss/EmployeeEdit.action?id=<%= emp.getId() %>">編集</a>
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-delete" onclick="showDeleteConfirm(<%= emp.getId() %>, '<%= emp.getEmployeeName() %>')">削除</button>
                                     </td>
                                 </tr>
                             <% } %>
@@ -204,10 +301,59 @@
 
 </div>
 
+<!-- 削除確認モーダル -->
+<div id="deleteModal" class="modal-overlay">
+    <div class="modal-content">
+        <h3>社員の削除確認</h3>
+        <p id="deleteMessage"></p>
+        <p style="color: #999; font-size: 0.9rem;">この操作は取り消せません。</p>
+        <div class="modal-buttons">
+            <button class="btn-cancel" onclick="hideDeleteConfirm()">キャンセル</button>
+            <button class="btn-confirm" onclick="deleteEmployee()">削除する</button>
+        </div>
+    </div>
+</div>
+
+<!-- 削除用のフォーム（非表示） -->
+<form id="deleteForm" method="post" action="${pageContext.request.contextPath}/foodloss/EmployeeDelete.action" style="display: none;">
+    <input type="hidden" id="deleteEmployeeId" name="id">
+</form>
+
 <!-- JS -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
 <script src="${pageContext.request.contextPath}/js/slick.js"></script>
 <script src="${pageContext.request.contextPath}/js/main.js"></script>
+
+<script>
+    let deleteEmployeeIdValue = null;
+
+    function showDeleteConfirm(employeeId, employeeName) {
+        deleteEmployeeIdValue = employeeId;
+        document.getElementById('deleteMessage').innerHTML =
+            '<strong>' + employeeName + '</strong> さんを削除してもよろしいですか?';
+        document.getElementById('deleteModal').classList.add('active');
+    }
+
+    function hideDeleteConfirm() {
+        deleteEmployeeIdValue = null;
+        document.getElementById('deleteModal').classList.remove('active');
+    }
+
+    function deleteEmployee() {
+        if (deleteEmployeeIdValue !== null) {
+            document.getElementById('deleteEmployeeId').value = deleteEmployeeIdValue;
+            document.getElementById('deleteForm').submit();
+        }
+    }
+
+    // モーダル外をクリックした時に閉じる
+    document.getElementById('deleteModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            hideDeleteConfirm();
+        }
+    });
+</script>
+
 </body>
 </html>

@@ -1,121 +1,381 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page import="java.util.*, bean.Store, bean.Merchandise, bean.MerchandiseImage" %>
+
+<%
+    HttpSession userSession = request.getSession(false);
+    if (userSession == null || userSession.getAttribute("user") == null) {
+        response.sendRedirect(request.getContextPath() + "/jsp/index.jsp");
+        return;
+    }
+%>
+
+
 <!DOCTYPE html>
-<html>
+<html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <title>検索結果 - タイトル募集</title>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<meta charset="UTF-8">
+<title>出店店舗と商品一覧</title>
+
+<link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
+
+<style>
+/* 店舗枠 */
+.store-box {
+    background:#fff;
+    padding:20px;
+    border-radius:10px;
+    margin-bottom:40px;
+    box-shadow:0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* 店舗名 */
+.store-title {
+    font-size:1.6rem;
+    font-weight:bold;
+    color:#c07148;
+    border-bottom:2px solid #c07148;
+    padding-bottom:8px;
+    margin-bottom:15px;
+}
+
+/* 商品横並び全体 */
+.merch-list {
+    display:flex;
+    gap:20px;
+    flex-wrap:wrap;
+}
+
+/* 商品1つの箱 */
+.merch-item {
+    width:200px;
+    padding:15px;
+    border-radius:10px;
+    background:#fafafa;
+    box-shadow:0 1px 5px rgba(0,0,0,0.1);
+    text-align:center;
+}
+
+/* 商品画像 */
+.merch-image img {
+    width:180px;
+    height:130px;
+    object-fit:cover;
+    border-radius:8px;
+}
+
+/* 金額表示 */
+.merch-price {
+    margin-top:8px;
+    font-size:1.1rem;
+    font-weight:bold;
+    color:#c07148;
+}
+
+/* 画像がない場合 */
+.no-image {
+    width:180px;
+    height:130px;
+    background:#ddd;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:#666;
+    border-radius:8px;
+}
+
+/* 検索結果用のスタイル追加 */
+.search-section {
+    background:#fff;
+    padding:20px;
+    border-radius:10px;
+    margin-bottom:30px;
+    box-shadow:0 2px 8px rgba(0,0,0,0.1);
+}
+
+.section-header {
+    font-size:1.4rem;
+    font-weight:bold;
+    color:#333;
+    border-left:5px solid #c07148;
+    padding-left:15px;
+    margin-bottom:20px;
+}
+
+.store-card {
+    background:#f9f9f9;
+    padding:20px;
+    border-radius:8px;
+    margin-bottom:15px;
+    border:1px solid #e0e0e0;
+    transition: all 0.3s;
+}
+
+.store-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.store-card-title {
+    font-size:1.3rem;
+    font-weight:bold;
+    color:#c07148;
+    margin-bottom:10px;
+}
+
+.store-card-info {
+    color:#666;
+    font-size:0.95rem;
+    line-height:1.6;
+}
+
+.result-count {
+    text-align:center;
+    color:#666;
+    font-size:1rem;
+    margin:10px 0;
+}
+
+.no-result {
+    text-align:center;
+    color:#999;
+    padding:30px;
+    background:#f9f9f9;
+    border-radius:8px;
+}
+</style>
 </head>
+
 <body>
-    <header>
-        <h1 id="logo"><span>タイトル募集</span></h1>
+<div id="container">
 
+    <!-- ヘッダー -->
+    <jsp:include page="header_user.jsp" />
 
-        <!-- 検索フォーム -->
-        <form action="${pageContext.request.contextPath}/foodloss/Search.action" method="get" id="search-form">
-            <input type="text" name="keyword" placeholder="商品・店舗を検索..." value="${keyword}" required>
-            <button type="submit"><i class="fa fa-search"></i></button>
-        </form>
-    </header>
+    <main class="column">
+        <div class="main-contents">
 
-    <!-- メニューバー -->
-    <div id="menubar">
-        <nav>
-            <ul>
-                <li><a href="${pageContext.request.contextPath}/foodloss/Menu.action">ホーム<span>Home</span></a></li>
-                <li><a href="${pageContext.request.contextPath}/foodloss/MyPage.action">マイページ<span>MyPage</span></a></li>
-                <li><a href="${pageContext.request.contextPath}/jsp/booking_list.jsp">予約リスト<span>Reservation List</span></a></li>
-                <li><a href="${pageContext.request.contextPath}/foodloss/NotificationSetting.action">通知設定<span>Notification Settings</span></a></li>
-            </ul>
-        </nav>
-    </div>
+            <%
+                // 検索結果を取得
+                List<Merchandise> itemList = (List<Merchandise>) request.getAttribute("itemList");
+                List<Store> storeList = (List<Store>) request.getAttribute("storeList");
+                Map<Store, List<Merchandise>> storeToMerchMap = (Map<Store, List<Merchandise>>) request.getAttribute("storeToMerchMap");
+                String searchKeyword = (String) request.getAttribute("searchKeyword");
 
-    <main>
-        <h2>検索結果: "<c:out value="${keyword}" />"</h2>
+                // 通常の店舗ごとの商品マップを取得
+                Map<Store, List<Merchandise>> shopMerchMap =
+                    (Map<Store, List<Merchandise>>) request.getAttribute("shopMerchMap");
 
-        <!-- 🔻 エラーメッセージ削除（赤枠が出ない） -->
+                // デバッグ出力
+                System.out.println("=== JSP デバッグ ===");
+                System.out.println("itemList: " + (itemList != null ? itemList.size() + "件" : "null"));
+                System.out.println("storeList: " + (storeList != null ? storeList.size() + "件" : "null"));
+                System.out.println("searchKeyword: " + searchKeyword);
+                System.out.println("shopMerchMap: " + (shopMerchMap != null ? "あり" : "null"));
+            %>
 
-        <!-- 🔻 検索結果がない場合のみ表示 -->
-        <c:if test="${empty shopMerchMap}">
-            <p class="no-results">検索条件に一致する商品・店舗が見つかりませんでした。</p>
-        </c:if>
+            <% if (searchKeyword != null && !searchKeyword.trim().isEmpty()) { %>
+                <!-- ========== 検索結果表示 ========== -->
+                <h2 style="text-align:center; margin:30px 0; color:#c07148;">検索結果: "<%= searchKeyword %>"</h2>
 
-        <!-- 🔻 検索結果がある場合 -->
-        <c:if test="${not empty shopMerchMap}">
-            <p class="result-count">
-                <i class="fa fa-check-circle"></i>
-                ${shopMerchMap.size()}件の店舗が見つかりました
-            </p>
+                <!-- 店舗検索結果 -->
+                <div class="search-section">
+                    <div class="section-header">🏪 店舗検索結果</div>
 
-            <!-- 店舗別に商品表示 -->
-            <c:forEach items="${shopMerchMap}" var="entry">
-                <c:set var="store" value="${entry.key}" />
-                <c:set var="merchList" value="${entry.value}" />
+                    <% if (storeList != null && !storeList.isEmpty()) { %>
+                        <p class="result-count"><%= storeList.size() %>件の店舗が見つかりました</p>
 
-                <section class="shop-section">
-                    <h3><i class="fa fa-store"></i> <c:out value="${store.storeName}" /></h3>
-
-                    <div class="product-grid">
-                        <c:forEach var="merchandise" items="${merchList}">
-                            <div class="product-card">
-                                <div class="product-image">
-                                    <img src="${pageContext.request.contextPath}/getMerchandiseImage?id=${merchandise.merchandiseId}"
-                                         alt="<c:out value='${merchandise.merchandiseName}' />"
-                                         onerror="this.src='${pageContext.request.contextPath}/images/no-image.png'">
+                        <% for (Store store : storeList) { %>
+                            <div class="store-card">
+                                <div class="store-card-title">
+                                    <a href="StoreInfo.action?storeId=<%= store.getStoreId() %>"
+                                       style="text-decoration:none; color:#c07148;">
+                                        <%= store.getStoreName() %>
+                                    </a>
+                                </div>
+                                <div class="store-card-info">
+                                    <p>📍 <%= store.getAddress() %></p>
+                                    <p>📞 <%= store.getPhone() %></p>
                                 </div>
 
-                                <h4><c:out value="${merchandise.merchandiseName}" /></h4>
-
-                                <div class="product-info">
-                                    <p class="price">¥ <fmt:formatNumber value="${merchandise.price}" pattern="#,###" /></p>
-                                    <p class="stock"><i class="fa fa-box"></i> 在庫: ${merchandise.stock}</p>
-
-                                    <c:if test="${not empty merchandise.useByDate}">
-                                        <p class="expiry-date"><i class="fa fa-calendar"></i>
-                                            <fmt:formatDate value="${merchandise.useByDate}" pattern="yyyy/MM/dd" />まで
-                                        </p>
-                                    </c:if>
-
-                                    <c:if test="${not empty merchandise.merchandiseTag}">
-                                        <p class="tag"><span class="tag-badge">
-                                            <i class="fa fa-tag"></i> <c:out value="${merchandise.merchandiseTag}" />
-                                        </span></p>
-                                    </c:if>
-                                </div>
-
-                                <a href="${pageContext.request.contextPath}/foodloss/ProductDetail.action?id=${merchandise.merchandiseId}" class="btn">
-                                    詳細を見る
-                                </a>
+                                <!-- この店舗の商品を表示 -->
+                                <%
+                                    List<Merchandise> storeProducts = null;
+                                    if (storeToMerchMap != null) {
+                                        storeProducts = storeToMerchMap.get(store);
+                                    }
+                                    if (storeProducts != null && !storeProducts.isEmpty()) {
+                                %>
+                                    <div style="margin-top:15px; padding-top:15px; border-top:1px solid #ddd;">
+                                        <div style="font-weight:bold; margin-bottom:10px; color:#666;">この店舗の商品:</div>
+                                        <div class="merch-list">
+                                            <% for (Merchandise merch : storeProducts) { %>
+                                                <div class="merch-item">
+                                                    <a href="<%= request.getContextPath() %>/merch/<%= merch.getMerchandiseId() %>">
+                                                        <div class="merch-image">
+                                                            <%
+                                                            List<MerchandiseImage> images = merch.getImages();
+                                                            if (images != null && !images.isEmpty()) {
+                                                                MerchandiseImage img = images.get(0);
+                                                            %>
+                                                                <img src="<%= request.getContextPath() %>/image/<%= img.getImageId() %>"
+                                                                     alt="<%= merch.getMerchandiseName() %>">
+                                                            <%
+                                                            } else {
+                                                            %>
+                                                                <div class="no-image">画像なし</div>
+                                                            <%
+                                                            }
+                                                            %>
+                                                        </div>
+                                                    </a>
+                                                    <div style="margin-top:8px;"><%= merch.getMerchandiseName() %></div>
+                                                    <div class="merch-price">¥ <%= merch.getPrice() %></div>
+                                                </div>
+                                            <% } %>
+                                        </div>
+                                    </div>
+                                <% } %>
                             </div>
-                        </c:forEach>
+                        <% } %>
+                    <% } else { %>
+                        <p class="no-result">該当する店舗はありませんでした。</p>
+                    <% } %>
+                </div>
+
+                <!-- 商品検索結果 -->
+                <div class="search-section">
+                    <div class="section-header">🛒 商品検索結果</div>
+
+                    <% if (itemList != null && !itemList.isEmpty()) { %>
+                        <p class="result-count"><%= itemList.size() %>件の商品が見つかりました</p>
+
+                        <div class="merch-list">
+                            <% for (Merchandise merch : itemList) { %>
+                                <div class="merch-item">
+                                    <a href="<%= request.getContextPath() %>/merch/<%= merch.getMerchandiseId() %>">
+                                        <div class="merch-image">
+                                            <%
+                                            List<MerchandiseImage> images = merch.getImages();
+                                            if (images != null && !images.isEmpty()) {
+                                                MerchandiseImage img = images.get(0);
+                                            %>
+                                                <img src="<%= request.getContextPath() %>/image/<%= img.getImageId() %>"
+                                                     alt="<%= merch.getMerchandiseName() %>">
+                                            <%
+                                            } else {
+                                            %>
+                                                <div class="no-image">画像なし</div>
+                                            <%
+                                            }
+                                            %>
+                                        </div>
+                                    </a>
+                                    <div style="margin-top:8px;"><%= merch.getMerchandiseName() %></div>
+                                    <div class="merch-price">¥ <%= merch.getPrice() %></div>
+                                </div>
+                            <% } %>
+                        </div>
+                    <% } else { %>
+                        <p class="no-result">該当する商品はありませんでした。</p>
+                    <% } %>
+                </div>
+
+                <!-- 結果が何もない場合 -->
+                <% if ((itemList == null || itemList.isEmpty()) && (storeList == null || storeList.isEmpty())) { %>
+                    <p style="text-align:center; padding:50px; color:#999; font-size:1.2rem;">
+                        「<%= searchKeyword %>」に一致する店舗・商品は見つかりませんでした。
+                    </p>
+                <% } %>
+
+                <p style="text-align:center; margin-top:30px;">
+                    <a href="${pageContext.request.contextPath}/foodloss/Menu.action"
+                       style="display:inline-block; padding:12px 30px; background:#c07148; color:#fff;
+                              text-decoration:none; border-radius:8px; font-weight:bold;">
+                        ホームに戻る
+                    </a>
+                </p>
+
+            <% } else if (shopMerchMap != null) { %>
+                <!-- ========== 通常の店舗ごと表示 ========== -->
+                <h2 style="text-align:center; margin:30px 0; color:#c07148;">出店店舗と商品一覧</h2>
+
+                <% for (Map.Entry<Store, List<Merchandise>> entry : shopMerchMap.entrySet()) {
+                    Store store = entry.getKey();
+                    List<Merchandise> merchList = entry.getValue();
+                %>
+
+                <div class="store-box">
+
+                    <!-- 店舗名（クリックで店舗詳細へ） -->
+                    <div class="store-title">
+                        <a href="StoreInfo.action?storeId=<%= store.getStoreId() %>"
+                           style="text-decoration:none;color:#c07148;">
+                           <%= store.getStoreName() %>
+                        </a>
                     </div>
-                </section>
-            </c:forEach>
-        </c:if>
+
+                    <% if (merchList != null && !merchList.isEmpty()) { %>
+
+                        <div class="merch-list">
+
+                        <% for (Merchandise merch : merchList) { %>
+
+                            <div class="merch-item">
+                                <!-- 画像クリック → 商品詳細へ -->
+                                <a href="<%= request.getContextPath() %>/merch/<%= merch.getMerchandiseId() %>">
+                                    <div class="merch-image">
+                                        <%
+                                        List<MerchandiseImage> images = merch.getImages();
+                                        if (images != null && !images.isEmpty()) {
+                                            MerchandiseImage img = images.get(0);
+                                        %>
+                                            <img src="<%= request.getContextPath() %>/image/<%= img.getImageId() %>"
+                                                 alt="<%= merch.getMerchandiseName() %>">
+                                        <%
+                                        } else {
+                                        %>
+                                            <div class="no-image">画像なし</div>
+                                        <%
+                                        }
+                                        %>
+                                    </div>
+                                </a>
+
+                                <!-- 値段のみ表示 -->
+                                <div class="merch-price">
+                                    ¥ <%= merch.getPrice() %>
+                                </div>
+                            </div>
+
+                        <% } %>
+
+                        </div>
+
+                    <% } else { %>
+
+                        <p>この店舗の商品はありません。</p>
+
+                    <% } %>
+
+                </div>
+
+                <% } %>
+
+            <% } else { %>
+
+                <p style="text-align:center;">商品情報が取得できませんでした。</p>
+
+            <% } %>
+
+        </div>
     </main>
 
-    <!-- CSS（元のまま） -->
-    <style>
-        main { padding: 20px; max-width: 1200px; margin: 0 auto; }
-        h2 { color: #c85a3b; margin-bottom: 20px; font-size: 24px; }
-        .result-count { color: #666; margin-bottom: 30px; font-size: 16px; }
-        .result-count i { color: #4CAF50; }
-        .no-results { text-align: center; padding: 50px; color: #999; font-size: 18px; }
-        .shop-section { margin-bottom: 50px; background: #fff; padding: 20px; border-radius: 8px;
-                        box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .shop-section h3 { background: #f5f5f5; padding: 15px; border-left: 5px solid #c85a3b;
-                           margin: -20px -20px 20px -20px; border-radius: 8px 8px 0 0; font-size: 20px; }
-        .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; }
-        .product-card { border: 1px solid #ddd; border-radius: 8px; padding: 15px; text-align: center;
-                        transition: .3s; background: #fff; }
-        .product-card:hover { transform: translateY(-5px); box-shadow: 0 6px 12px rgba(0,0,0,0.15); }
-        .product-image { width: 100%; height: 150px; overflow: hidden; border-radius: 5px; background: #f5f5f5; margin-bottom: 10px; }
-        .product-image img { width: 100%; height: 100%; object-fit: cover; }
-        .price { color: #c85a3b; font-size: 22px; font-weight: bold; }
-        .btn { display: inline-block; background: #c85a3b; color: white; padding: 10px 24px;
-               border-radius: 5px; text-decoration: none; margin-top: 10px; font-weight: bold; }
-        .btn:hover { background: #a84830; }
-    </style>
+    <!-- フッター -->
+    <jsp:include page="footer.jsp" />
+
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="${pageContext.request.contextPath}/js/main.js"></script>
 </body>
 </html>
