@@ -196,22 +196,22 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="employeeNumber">社員番号 <span>*</span></label>
-                        <select id="employeeNumber" name="employeeNumber" required>
-                            <option value="">-- 社員番号を選択 --</option>
-                            <%
-                                java.util.List<bean.Employee> empList =
-                                    (java.util.List<bean.Employee>) request.getAttribute("employeeList");
-                                if (empList != null) {
-                                    for (bean.Employee emp : empList) {
-                            %>
-                                        <option value="<%= emp.getId() %>"><%= emp.getId() %></option>
-                            <%
-                                    }
-                                }
-                            %>
-                        </select>
-                    </div>
+					    <label for="employeeNumber">社員番号 <span>*</span></label>
+					    <select id="employeeNumber" name="employeeNumber" required>
+					        <option value="">-- 社員番号を選択 --</option>
+					        <%
+					            java.util.List<bean.Employee> empList =
+					                (java.util.List<bean.Employee>) request.getAttribute("employeeList");
+					            if (empList != null) {
+					                for (bean.Employee emp : empList) {
+					        %>
+					                    <option value="<%= emp.getId() %>"><%= emp.getEmployeeNumber() %></option>
+					        <%
+					                }
+					            }
+					        %>
+					    </select>
+					</div>
 
                     <div class="form-group">
                         <label for="tags">タグ</label>
