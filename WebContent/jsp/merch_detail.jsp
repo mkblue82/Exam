@@ -4,6 +4,17 @@
     Merchandise merch = (Merchandise) request.getAttribute("merchandise");
     Store store = (Store) request.getAttribute("store");
 
+    // デバッグ出力
+    System.out.println("=== 商品詳細ページ デバッグ ===");
+    System.out.println("merchandise: " + (merch != null ? "あり" : "null"));
+    if (merch != null) {
+        System.out.println("商品名: " + merch.getMerchandiseName());
+        System.out.println("価格: " + merch.getPrice());
+        System.out.println("在庫: " + merch.getStock());
+        System.out.println("消費期限: " + merch.getUseByDate());
+    }
+    System.out.println("store: " + (store != null ? store.getStoreName() : "null"));
+
     if (merch == null) {
         request.setAttribute("errorMessage", "商品情報が取得できませんでした。");
         request.getRequestDispatcher("/error.jsp").forward(request, response);
@@ -11,7 +22,7 @@
     }
 %>
 <!DOCTYPE html>
-<html>
+<html lang="ja">
 <head>
 <meta charset="UTF-8">
 <title>商品詳細</title>
@@ -98,8 +109,10 @@
 <div id="container">
     <!-- ヘッダー -->
     <jsp:include page="header_user.jsp" />
+
     <main class="column">
-        <div class="detail-box">
+        <div class="main-contents">
+            <div class="detail-box">
             <div class="detail-title"><%= merch.getMerchandiseName() %></div>
 
             <!-- 画像 -->
@@ -118,29 +131,31 @@
                     <p>店舗名：<%= store.getStoreName() %></p>
                 <% } %>
                 <p>価格：<strong>¥<%= merch.getPrice() %></strong></p>
-                <p>在庫：<%= merch.getStock() %>個
+                <p>在庫：<strong><%= merch.getStock() %></strong>個
                     <% if (merch.getStock() <= 0) { %>
                         <span class="stock-warning">（在庫切れ）</span>
                     <% } %>
                 </p>
-                <p>消費期限：<%= merch.getUseByDate() %></p>
+                <% if (merch.getUseByDate() != null) { %>
+                    <p>消費期限：<%= merch.getUseByDate() %></p>
+                <% } %>
             </div>
 
             <!-- 予約ボタン -->
             <% if (merch.getStock() > 0) { %>
-            <div class="reserve-section">
-                <div class="reserve-btn">
-                    <form action="<%= request.getContextPath() %>/foodloss/ReserveConfirm.action" method="get">
-                        <input type="hidden" name="merchandiseId" value="<%= merch.getMerchandiseId() %>">
-                        <input type="hidden" name="quantity" value="1">
-                        <button type="submit">この商品を予約する</button>
-                    </form>
-<!--                 </div> -->
-            </div>
+                <div class="reserve-section">
+                    <div class="reserve-btn">
+                        <form action="<%= request.getContextPath() %>/foodloss/ReserveConfirm.action" method="get">
+                            <input type="hidden" name="merchandiseId" value="<%= merch.getMerchandiseId() %>">
+                            <input type="hidden" name="quantity" value="1">
+                            <button type="submit">この商品を予約する</button>
+                        </form>
+                    </div>
+                </div>
             <% } else { %>
-            <div class="reserve-section">
-                <p class="stock-warning" style="text-align:center;">申し訳ございません。現在在庫切れです。</p>
-            </div>
+                <div class="reserve-section">
+                    <p class="stock-warning" style="text-align:center;">申し訳ございません。現在在庫切れです。</p>
+                </div>
             <% } %>
 
             <!-- 戻るボタン -->
@@ -148,10 +163,14 @@
                 <a href="<%= request.getContextPath() %>/foodloss/Menu.action">商品一覧へ戻る</a>
             </div>
         </div>
+        </div>
     </main>
+
     <!-- フッター -->
     <jsp:include page="footer.jsp" />
 </div>
 
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="${pageContext.request.contextPath}/js/main.js"></script>
 </body>
 </html>

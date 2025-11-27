@@ -14,6 +14,7 @@ import bean.Merchandise;
 import bean.User;
 import dao.BookingDAO;
 import dao.MerchandiseDAO;
+import dao.UserDAO;
 import tool.Action;
 
 public class ReserveExecuteAction extends Action {
@@ -36,6 +37,7 @@ public class ReserveExecuteAction extends Action {
             String merchandiseIdStr = request.getParameter("merchandiseId");
             String quantityStr = request.getParameter("quantity");
             String pickupDateTime = request.getParameter("pickupDateTime");
+            String pointsToUseStr = request.getParameter("pointsToUse");
 
             // 必須パラメータチェック
             if (merchandiseIdStr == null || quantityStr == null || pickupDateTime == null ||
@@ -48,6 +50,7 @@ public class ReserveExecuteAction extends Action {
             // パラメータ変換
             int merchandiseId = Integer.parseInt(merchandiseIdStr);
             int quantity = Integer.parseInt(quantityStr);
+            int pointsToUse = (pointsToUseStr != null && !pointsToUseStr.isEmpty()) ? Integer.parseInt(pointsToUseStr) : 0;
 
             // 日時のパース (YYYY-MM-DD HH:mm:ss 形式)
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -95,6 +98,34 @@ public class ReserveExecuteAction extends Action {
             // 合計金額を計算
             int totalPrice = merchandise.getPrice() * quantity;
 
+            // ポイント使用のバリデーション
+            if (pointsToUse < 0) {
+                request.setAttribute("errorMessage", "ポイント使用数が不正です。");
+                con.close();
+                request.getRequestDispatcher("/error.jsp").forward(request, response);
+                return;
+            }
+
+            // ユーザーの保有ポイントをチェック
+            int userPoints = user.getPoint();
+            if (pointsToUse > userPoints) {
+                request.setAttribute("errorMessage", "保有ポイントが不足しています。");
+                con.close();
+                request.getRequestDispatcher("/error.jsp").forward(request, response);
+                return;
+            }
+
+            // 使用ポイントが合計金額を超えないかチェック
+            if (pointsToUse > totalPrice) {
+                request.setAttribute("errorMessage", "使用ポイントが合計金額を超えています。");
+                con.close();
+                request.getRequestDispatcher("/error.jsp").forward(request, response);
+                return;
+            }
+
+            // 最終支払い金額を計算
+            int finalPrice = totalPrice - pointsToUse;
+
             // Bookingオブジェクトを作成
             Booking booking = new Booking();
             booking.setUserId(user.getUserId());
@@ -104,6 +135,7 @@ public class ReserveExecuteAction extends Action {
             booking.setBookingTime(new Timestamp(now.getTime()));
             booking.setPickupStatus(false); // 未受取
             booking.setMerchandiseName(merchandise.getMerchandiseName());
+            booking.setAmount(finalPrice);
 
             // 予約をデータベースに登録
             BookingDAO bookingDAO = new BookingDAO();
@@ -127,12 +159,27 @@ public class ReserveExecuteAction extends Action {
                 return;
             }
 
+            // ポイントを消費（使用した場合のみ）
+            if (pointsToUse > 0) {
+                int newPoints = userPoints - pointsToUse;
+                user.setPoint(newPoints);
+
+                // UserDAOでポイント更新
+                UserDAO userDAO = new UserDAO(con);
+                userDAO.update(user);
+
+                // セッションのユーザー情報も更新
+                session.setAttribute("user", user);
+            }
+
             con.close();
 
             // 成功時、予約完了ページへ
             request.setAttribute("booking", booking);
             request.setAttribute("merchandise", merchandise);
             request.setAttribute("totalPrice", totalPrice);
+            request.setAttribute("pointsUsed", pointsToUse);
+            request.setAttribute("finalPrice", finalPrice);
             request.setAttribute("message", "予約が完了しました。");
 
             request.getRequestDispatcher("/jsp/reserve_success.jsp").forward(request, response);

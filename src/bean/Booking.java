@@ -11,6 +11,7 @@ public class Booking {
 	private Timestamp bookingTime; // 予約時間
 	private boolean pickupStatus; // 受け取りステータス
 	private String merchandiseName;
+	private int amount;
 
 	public String getMerchandiseName() {
 	    return merchandiseName;
@@ -99,6 +100,13 @@ public class Booking {
 	public void setPickupStatus(boolean pickupStatus){
 		this.pickupStatus = pickupStatus;
 	}
+	public int getAmount() {
+        return amount;
+    }
+
+    public void setAmount(int amount) {
+        this.amount = amount;
+    }
 }
 
 

@@ -4,10 +4,18 @@
     Booking booking = (Booking) request.getAttribute("booking");
     Merchandise merchandise = (Merchandise) request.getAttribute("merchandise");
     Integer totalPrice = (Integer) request.getAttribute("totalPrice");
+    Integer pointsUsed = (Integer) request.getAttribute("pointsUsed");
+    Integer finalPrice = (Integer) request.getAttribute("finalPrice");
     String message = (String) request.getAttribute("message");
+
+    // デフォルト値設定
+    if (pointsUsed == null) pointsUsed = 0;
+    if (finalPrice == null && totalPrice != null) {
+        finalPrice = totalPrice - pointsUsed;
+    }
 %>
 <!DOCTYPE html>
-<html>
+<html lang="ja">
 <head>
 <meta charset="UTF-8">
 <title>予約完了</title>
@@ -57,10 +65,25 @@
     flex: 1;
     color: #333;
 }
+.subtotal-price {
+    font-size: 1.1rem;
+    color: #333;
+}
+.points-discount {
+    color: #4a90e2;
+    font-weight: bold;
+}
 .total-price {
-    font-size: 1.3rem;
+    font-size: 1.4rem;
     color: #c07148;
     font-weight: bold;
+}
+.final-amount-row {
+    background: #fff8f0;
+    margin: 0 -10px;
+    padding: 15px 10px !important;
+    border-radius: 5px;
+    border: 2px solid #c07148 !important;
 }
 .button-group {
     margin-top: 30px;
@@ -91,44 +114,72 @@
 <body>
 <div id="container">
     <jsp:include page="header_user.jsp" />
+
     <main class="column">
-        <div class="success-box">
-            <div class="success-icon">✓</div>
-            <div class="success-message">
-                <%= message != null ? message : "予約が完了しました" %>
-            </div>
+        <div class="main-contents">
+            <div class="success-box">
+                <div class="success-icon">✓</div>
+                <div class="success-message">
+                    <%= message != null ? message : "予約が完了しました" %>
+                </div>
 
-            <% if (booking != null && merchandise != null) { %>
-            <div class="reservation-details">
-                <div class="detail-row">
-                    <div class="detail-label">商品名:</div>
-                    <div class="detail-value"><%= merchandise.getMerchandiseName() %></div>
-                </div>
-                <div class="detail-row">
-                    <div class="detail-label">予約数量:</div>
-                    <div class="detail-value"><%= booking.getCount() %> 個</div>
-                </div>
-                <div class="detail-row">
-                    <div class="detail-label">単価:</div>
-                    <div class="detail-value">¥<%= merchandise.getPrice() %></div>
-                </div>
-                <div class="detail-row">
-                    <div class="detail-label">合計金額:</div>
-                    <div class="detail-value total-price">¥<%= totalPrice != null ? totalPrice : (merchandise.getPrice() * booking.getCount()) %></div>
-                </div>
-                <div class="detail-row">
-                    <div class="detail-label">受け取り日時:</div>
-                    <div class="detail-value"><%= booking.getPickupTime() %></div>
-                </div>
-            </div>
-            <% } %>
+                <% if (booking != null && merchandise != null) { %>
+                <div class="reservation-details">
+                    <div class="detail-row">
+                        <div class="detail-label">商品名:</div>
+                        <div class="detail-value"><%= merchandise.getMerchandiseName() %></div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">予約数量:</div>
+                        <div class="detail-value"><%= booking.getCount() %> 個</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">単価:</div>
+                        <div class="detail-value">¥<%= merchandise.getPrice() %></div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">小計:</div>
+                        <div class="detail-value subtotal-price">
+                            ¥<%= totalPrice != null ? totalPrice : (merchandise.getPrice() * booking.getCount()) %>
+                        </div>
+                    </div>
 
-            <div class="button-group">
-                <a href="${pageContext.request.contextPath}/foodloss/Menu.action" class="btn-primary">商品一覧へ</a>
-                <a href="${pageContext.request.contextPath}/foodloss/BookingUserList.action" class="btn-secondary">予約一覧を見る</a>
+                    <% if (pointsUsed != null && pointsUsed > 0) { %>
+                    <div class="detail-row">
+                        <div class="detail-label">ポイント値引き:</div>
+                        <div class="detail-value points-discount">- ¥<%= pointsUsed %></div>
+                    </div>
+                    <% } %>
+
+                    <div class="detail-row final-amount-row">
+                        <div class="detail-label">お支払い金額:</div>
+                        <div class="detail-value total-price">
+                            ¥<%= finalPrice != null ? finalPrice : (totalPrice != null ? totalPrice : (merchandise.getPrice() * booking.getCount())) %>
+                        </div>
+                    </div>
+
+                    <div class="detail-row">
+                        <div class="detail-label">受け取り日時:</div>
+                        <div class="detail-value"><%= booking.getPickupTime() %></div>
+                    </div>
+                </div>
+
+                <% if (pointsUsed != null && pointsUsed > 0) { %>
+                <p style="color:#4a90e2; font-size:0.95rem; margin-top:15px;">
+                    ✓ <%= pointsUsed %> ポイントを使用しました
+                </p>
+                <% } %>
+
+                <% } %>
+
+                <div class="button-group">
+                    <a href="${pageContext.request.contextPath}/foodloss/Menu.action" class="btn-primary">商品一覧へ</a>
+                    <a href="${pageContext.request.contextPath}/foodloss/BookingUserList.action" class="btn-secondary">予約一覧を見る</a>
+                </div>
             </div>
         </div>
     </main>
+
     <jsp:include page="footer.jsp" />
 </div>
 </body>

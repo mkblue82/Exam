@@ -8,6 +8,7 @@
         return;
     }
 
+    User user = (User) userSession.getAttribute("user");
     Merchandise merch = (Merchandise) request.getAttribute("merchandise");
     Store store = (Store) request.getAttribute("store");
     Integer quantity = (Integer) request.getAttribute("quantity");
@@ -18,6 +19,9 @@
         request.getRequestDispatcher("/error.jsp").forward(request, response);
         return;
     }
+
+    // ユーザーの保有ポイント
+    int userPoints = user.getPoint();
 %>
 <!DOCTYPE html>
 <html lang="ja">
@@ -76,6 +80,93 @@
 .total-price {
     font-size: 1.3rem;
     color: #c07148;
+    font-weight: bold;
+}
+
+/* ポイント使用セクション */
+.points-section {
+    background: #f0f8ff;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 25px;
+    border: 2px solid #4a90e2;
+}
+
+.points-title {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #4a90e2;
+    margin-bottom: 15px;
+}
+
+.points-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+    margin-bottom: 15px;
+}
+
+.user-points {
+    font-size: 1.1rem;
+    color: #333;
+}
+
+.user-points strong {
+    color: #4a90e2;
+    font-size: 1.3rem;
+}
+
+.points-input-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.points-input-group input {
+    width: 120px;
+    padding: 8px;
+    font-size: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.use-all-btn {
+    padding: 6px 15px;
+    background: #4a90e2;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+.use-all-btn:hover {
+    opacity: 0.8;
+}
+
+.points-note {
+    font-size: 0.9rem;
+    color: #666;
+    margin-top: 10px;
+}
+
+.discount-info {
+    background: #ffe4e1;
+    padding: 15px;
+    border-radius: 5px;
+    margin-top: 15px;
+}
+
+.discount-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+}
+
+.final-price {
+    font-size: 1.4rem;
+    color: #d9534f;
     font-weight: bold;
 }
 
@@ -171,74 +262,112 @@
     <jsp:include page="header_user.jsp" />
 
     <main class="column">
-        <div class="confirm-box">
-            <div class="confirm-title">予約内容の確認</div>
+        <div class="main-contents">
+            <div class="confirm-box">
+                <div class="confirm-title">予約内容の確認</div>
 
-            <div id="errorMsg" class="error-message"></div>
+                <div id="errorMsg" class="error-message"></div>
 
-            <!-- 予約内容 -->
-            <div class="confirm-info">
-                <div class="info-row">
-                    <div class="info-label">商品名:</div>
-                    <div class="info-value"><%= merch.getMerchandiseName() %></div>
-                </div>
-                <% if (store != null) { %>
-                <div class="info-row">
-                    <div class="info-label">店舗名:</div>
-                    <div class="info-value"><%= store.getStoreName() %></div>
-                </div>
-                <% } %>
-                <div class="info-row">
-                    <div class="info-label">単価:</div>
-                    <div class="info-value">¥<%= merch.getPrice() %></div>
-                </div>
-                <div class="info-row">
-                    <div class="info-label">予約数量:</div>
-                    <div class="info-value">
-                        <input type="number" id="quantityInput" name="quantity"
-                               min="1" max="<%= merch.getStock() %>" value="<%= quantity %>"
-                               style="width:80px; padding:5px; font-size:1rem; border:1px solid #ddd; border-radius:5px;">
-                        個 (在庫: <%= merch.getStock() %>個)
+                <!-- 予約内容 -->
+                <div class="confirm-info">
+                    <div class="info-row">
+                        <div class="info-label">商品名:</div>
+                        <div class="info-value"><%= merch.getMerchandiseName() %></div>
+                    </div>
+                    <% if (store != null) { %>
+                    <div class="info-row">
+                        <div class="info-label">店舗名:</div>
+                        <div class="info-value"><%= store.getStoreName() %></div>
+                    </div>
+                    <% } %>
+                    <div class="info-row">
+                        <div class="info-label">単価:</div>
+                        <div class="info-value">¥<%= merch.getPrice() %></div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">予約数量:</div>
+                        <div class="info-value">
+                            <input type="number" id="quantityInput" name="quantity"
+                                   min="1" max="<%= merch.getStock() %>" value="<%= quantity %>"
+                                   style="width:80px; padding:5px; font-size:1rem; border:1px solid #ddd; border-radius:5px;">
+                            個 (在庫: <%= merch.getStock() %>個)
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">消費期限:</div>
+                        <div class="info-value"><%= merch.getUseByDate() %></div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">小計:</div>
+                        <div class="info-value total-price" id="totalPrice">¥<%= totalPrice %></div>
                     </div>
                 </div>
-                <div class="info-row">
-                    <div class="info-label">消費期限:</div>
-                    <div class="info-value"><%= merch.getUseByDate() %></div>
+
+                <!-- ポイント使用セクション -->
+                <div class="points-section">
+                    <div class="points-title">ポイントを使用する</div>
+
+                    <div class="points-info">
+                        <div class="user-points">
+                            保有ポイント: <strong id="userPoints"><%= userPoints %></strong> pt
+                        </div>
+                        <div class="points-input-group">
+                            <label>使用ポイント:</label>
+                            <input type="number" id="pointsInput" name="pointsToUse"
+                                   min="0" max="<%= userPoints %>" value="0">
+                            <span>pt</span>
+                            <button type="button" class="use-all-btn" id="useAllPointsBtn">全て使う</button>
+                        </div>
+                    </div>
+
+                    <p class="points-note">※ 1ポイント = 1円として使用できます</p>
+
+                    <div class="discount-info">
+                        <div class="discount-row">
+                            <span>小計:</span>
+                            <span id="subtotal">¥<%= totalPrice %></span>
+                        </div>
+                        <div class="discount-row">
+                            <span>ポイント値引き:</span>
+                            <span id="pointsDiscount" style="color:#4a90e2;">- ¥0</span>
+                        </div>
+                        <div class="discount-row" style="border-top:2px solid #ddd; padding-top:10px; margin-top:10px;">
+                            <span style="font-weight:bold;">お支払い金額:</span>
+                            <span class="final-price" id="finalPrice">¥<%= totalPrice %></span>
+                        </div>
+                    </div>
                 </div>
-                <div class="info-row">
-                    <div class="info-label">合計金額:</div>
-                    <div class="info-value total-price" id="totalPrice">¥<%= totalPrice %></div>
+
+                <!-- 受け取り時刻選択 -->
+                <div class="pickup-section">
+                    <div class="pickup-title">
+                        受け取り希望日時<span class="required-mark">*</span>
+                    </div>
+                    <div class="pickup-inputs">
+                        <label for="pickupDate">日付:</label>
+                        <input type="date" id="pickupDate" name="pickupDate" required>
+
+                        <label for="pickupTime">時刻:</label>
+                        <input type="time" id="pickupTime" name="pickupTime" required>
+                    </div>
+                    <p style="margin-top:10px; color:#666; font-size:0.9rem;">
+                        ※ 店舗の営業時間内、かつ消費期限(<%= merch.getUseByDate() %>)までにご指定ください
+                    </p>
                 </div>
+
+                <!-- ボタン -->
+                <form id="reserveForm" action="<%= request.getContextPath() %>/foodloss/ReserveExecute.action" method="post">
+                    <input type="hidden" name="merchandiseId" value="<%= merch.getMerchandiseId() %>">
+                    <input type="hidden" id="quantityHidden" name="quantity">
+                    <input type="hidden" id="pickupDateTime" name="pickupDateTime">
+                    <input type="hidden" id="pointsToUseHidden" name="pointsToUse">
+
+                    <div class="button-group">
+                        <button type="submit" class="btn btn-confirm">予約を確定する</button>
+                        <a href="javascript:history.back();" class="btn btn-cancel">戻る</a>
+                    </div>
+                </form>
             </div>
-
-            <!-- 受け取り時刻選択 -->
-            <div class="pickup-section">
-                <div class="pickup-title">
-                    受け取り希望日時<span class="required-mark">*</span>
-                </div>
-                <div class="pickup-inputs">
-                    <label for="pickupDate">日付:</label>
-                    <input type="date" id="pickupDate" name="pickupDate" required>
-
-                    <label for="pickupTime">時刻:</label>
-                    <input type="time" id="pickupTime" name="pickupTime" required>
-                </div>
-                <p style="margin-top:10px; color:#666; font-size:0.9rem;">
-                    ※ 店舗の営業時間内、かつ消費期限(<%= merch.getUseByDate() %>)までにご指定ください
-                </p>
-            </div>
-
-            <!-- ボタン -->
-            <form id="reserveForm" action="<%= request.getContextPath() %>/foodloss/ReserveExecute.action" method="post">
-                <input type="hidden" name="merchandiseId" value="<%= merch.getMerchandiseId() %>">
-                <input type="hidden" id="quantityHidden" name="quantity">
-                <input type="hidden" id="pickupDateTime" name="pickupDateTime">
-
-                <div class="button-group">
-                    <button type="submit" class="btn btn-confirm">予約を確定する</button>
-                    <a href="javascript:history.back();" class="btn btn-cancel">戻る</a>
-                </div>
-            </form>
         </div>
     </main>
 
@@ -251,19 +380,51 @@ document.addEventListener('DOMContentLoaded', function() {
     const pickupDateInput = document.getElementById('pickupDate');
     const pickupTimeInput = document.getElementById('pickupTime');
     const quantityInput = document.getElementById('quantityInput');
+    const pointsInput = document.getElementById('pointsInput');
     const totalPriceElement = document.getElementById('totalPrice');
+    const subtotalElement = document.getElementById('subtotal');
+    const pointsDiscountElement = document.getElementById('pointsDiscount');
+    const finalPriceElement = document.getElementById('finalPrice');
+    const useAllPointsBtn = document.getElementById('useAllPointsBtn');
     const form = document.getElementById('reserveForm');
     const errorMsg = document.getElementById('errorMsg');
 
     const unitPrice = <%= merch.getPrice() %>;
     const maxStock = <%= merch.getStock() %>;
-    const useByDate = '<%= merch.getUseByDate() %>'; // 消費期限 (YYYY-MM-DD形式を想定)
+    const userPoints = <%= userPoints %>;
+    const useByDate = '<%= merch.getUseByDate() %>';
 
-    // 数量変更時に合計金額を更新
+    // 金額計算関数
+    function updatePrices() {
+        const qty = parseInt(quantityInput.value) || 1;
+        const pointsToUse = parseInt(pointsInput.value) || 0;
+
+        // 小計計算
+        const subtotal = unitPrice * qty;
+
+        // 使用ポイントの上限チェック（小計を超えない、保有ポイントを超えない）
+        const maxUsablePoints = Math.min(userPoints, subtotal);
+        if (pointsToUse > maxUsablePoints) {
+            pointsInput.value = maxUsablePoints;
+            return updatePrices();
+        }
+
+        // 最終金額計算
+        const finalPrice = subtotal - pointsToUse;
+
+        // 表示更新
+        totalPriceElement.textContent = '¥' + subtotal.toLocaleString();
+        subtotalElement.textContent = '¥' + subtotal.toLocaleString();
+        pointsDiscountElement.textContent = '- ¥' + pointsToUse.toLocaleString();
+        finalPriceElement.textContent = '¥' + finalPrice.toLocaleString();
+
+        // ポイント入力欄の最大値を動的に設定
+        pointsInput.max = maxUsablePoints;
+    }
+
+    // 数量変更時
     quantityInput.addEventListener('input', function() {
         let qty = parseInt(this.value);
-
-        // バリデーション
         if (qty < 1) {
             qty = 1;
             this.value = 1;
@@ -272,10 +433,25 @@ document.addEventListener('DOMContentLoaded', function() {
             qty = maxStock;
             this.value = maxStock;
         }
+        updatePrices();
+    });
 
-        // 合計金額を更新
-        const total = unitPrice * qty;
-        totalPriceElement.textContent = '¥' + total.toLocaleString();
+    // ポイント変更時
+    pointsInput.addEventListener('input', function() {
+        let points = parseInt(this.value) || 0;
+        if (points < 0) {
+            points = 0;
+            this.value = 0;
+        }
+        updatePrices();
+    });
+
+    // 全て使うボタン
+    useAllPointsBtn.addEventListener('click', function() {
+        const subtotal = unitPrice * (parseInt(quantityInput.value) || 1);
+        const maxUsablePoints = Math.min(userPoints, subtotal);
+        pointsInput.value = maxUsablePoints;
+        updatePrices();
     });
 
     // 今日の日付を最小値に設定
@@ -306,6 +482,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const date = pickupDateInput.value;
         const time = pickupTimeInput.value;
         const quantity = parseInt(quantityInput.value);
+        const pointsToUse = parseInt(pointsInput.value) || 0;
 
         // 入力チェック
         if (!date || !time) {
@@ -318,10 +495,16 @@ document.addEventListener('DOMContentLoaded', function() {
             return false;
         }
 
+        if (pointsToUse < 0 || pointsToUse > userPoints) {
+            showError('使用ポイントが不正です。');
+            return false;
+        }
+
         // 日時を組み合わせる
         const pickupDateTime = date + ' ' + time + ':00';
         document.getElementById('pickupDateTime').value = pickupDateTime;
         document.getElementById('quantityHidden').value = quantity;
+        document.getElementById('pointsToUseHidden').value = pointsToUse;
 
         // 過去の日時チェック
         const selectedDateTime = new Date(date + 'T' + time);
@@ -347,6 +530,9 @@ document.addEventListener('DOMContentLoaded', function() {
         errorMsg.style.display = 'block';
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
+
+    // 初期表示時の金額計算
+    updatePrices();
 });
 </script>
 

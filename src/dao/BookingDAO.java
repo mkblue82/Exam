@@ -202,25 +202,35 @@ public class BookingDAO extends DAO {
     // =========================================================
     public boolean insert(Booking booking) throws Exception {
         Connection con = getEffectiveConnection();
+        PreparedStatement st = null;
 
-        PreparedStatement st = con.prepareStatement(
-            "insert into T005_booking (T005_FD1_booking, T005_FD2_booking, " +
-            "T005_FD3_booking, T005_FD4_booking, T005_FD5_booking, T005_FD6_booking) " +
-            "values (?, ?, ?, ?, ?, ?)"
-        );
+        try {
+            String sql = "INSERT INTO T005_booking "
+                       + "(T005_FD1_booking, T005_FD2_booking, T005_FD3_booking, "
+                       + "T005_FD4_booking, T005_FD5_booking, T005_FD6_booking, T005_FD7_booking) "
+                       + "VALUES (?, ?, ?, ?, ?, ?, ?)";
 
-        st.setInt(1, booking.getCount());
-        st.setInt(2, booking.getUserId());
-        st.setTimestamp(3, booking.getPickupTime());
-        st.setInt(4, booking.getProductId());
-        st.setTimestamp(5, booking.getBookingTime());
-        st.setBoolean(6, booking.getPickupStatus());
+            st = con.prepareStatement(sql);
+            st.setInt(1, booking.getCount());
+            st.setInt(2, booking.getUserId());
+            st.setTimestamp(3, booking.getPickupTime());
+            st.setInt(4, booking.getProductId());
+            st.setTimestamp(5, booking.getBookingTime());
+            st.setBoolean(6, booking.getPickupStatus());
+            st.setInt(7, booking.getAmount());  // 金額
 
-        int line = st.executeUpdate();
+            int result = st.executeUpdate();
 
-        st.close();
-        closeIfLocal(con);
-        return line > 0;
+            st.close();
+            closeIfLocal(con);
+
+            return result > 0;
+
+        } catch (Exception e) {
+            if (st != null) st.close();
+            closeIfLocal(con);
+            throw e;
+        }
     }
 
 	 // =========================================================
