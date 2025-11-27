@@ -180,7 +180,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label>価格（円） <span>*</span></label>
+                        <label>価格（税込） <span>*</span></label>
                         <input type="number" name="price" value="<%= m.getPrice() %>" required>
                     </div>
 

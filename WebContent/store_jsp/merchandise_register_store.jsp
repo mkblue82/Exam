@@ -181,7 +181,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="price">価格（円） <span>*</span></label>
+                        <label for="price">価格（税込） <span>*</span></label>
                         <input type="number" id="price" name="price" required min="0" max="999999" placeholder="例: 500">
                     </div>
 

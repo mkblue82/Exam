@@ -124,7 +124,7 @@
 
                 <div class="merchandise-info">
                     <p><strong>商品名：</strong><%= merchandise.getMerchandiseName() %></p>
-                    <p><strong>価格：</strong><%= merchandise.getPrice() %>円</p>
+                    <p><strong>価格(税込)：</strong><%= merchandise.getPrice() %>円</p>
                     <p><strong>在庫数：</strong><%= merchandise.getStock() %>個</p>
                     <p><strong>消費期限：</strong><%= merchandise.getUseByDate() %></p>
                 </div>
