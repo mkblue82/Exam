@@ -16,17 +16,18 @@ public class EmployeeDAO {
         return new DBManager().getConnection();
     }
 
-    // 社員登録
+    // 社員登録（社員番号を追加）
     public int insert(Employee employee) throws Exception {
         String sql =
-            "INSERT INTO t003_employee (t003_fd1_employee, t003_fd2_employee) " +
-            "VALUES (?, ?)";
+            "INSERT INTO t003_employee (t003_fd1_employee, t003_fd2_employee, t003_fd3_employee) " +
+            "VALUES (?, ?, ?)";
 
         try (Connection con = getConnection();
              PreparedStatement st = con.prepareStatement(sql)) {
 
             st.setString(1, employee.getEmployeeName());
             st.setInt(2, Integer.parseInt(employee.getStoreCode()));
+            st.setString(3, employee.getEmployeeNumber());
             return st.executeUpdate();
         }
     }
@@ -35,7 +36,7 @@ public class EmployeeDAO {
     public List<Employee> selectByStoreCode(String storeCode) throws Exception {
         List<Employee> list = new ArrayList<>();
         String sql =
-            "SELECT t003_pk1_employee, t003_fd1_employee, t003_fd2_employee, t001_fd1_store " +
+            "SELECT t003_pk1_employee, t003_fd1_employee, t003_fd2_employee, t003_fd3_employee, t001_fd1_store " +
             "FROM t003_employee " +
             "JOIN t001_store ON t003_employee.t003_fd2_employee = t001_store.t001_pk1_store " +
             "WHERE t003_fd2_employee = ? ORDER BY t003_pk1_employee";
@@ -49,7 +50,8 @@ public class EmployeeDAO {
             while (rs.next()) {
                 Employee e = new Employee();
                 e.setId(rs.getInt("t003_pk1_employee"));
-                e.setEmployeeCode(String.valueOf(rs.getInt("t003_pk1_employee")));  // ← IDを社員コードに代用
+                e.setEmployeeCode(rs.getString("t003_fd3_employee"));  // 社員番号を社員コードとして使用
+                e.setEmployeeNumber(rs.getString("t003_fd3_employee")); // 社員番号
                 e.setEmployeeName(rs.getString("t003_fd1_employee"));
                 e.setStoreCode(String.valueOf(rs.getInt("t003_fd2_employee")));
                 e.setStoreName(rs.getString("t001_fd1_store"));
@@ -63,20 +65,22 @@ public class EmployeeDAO {
     // 社員コードで検索
     public Employee selectByCode(String employeeCode) throws Exception {
         String sql =
-            "SELECT t003_pk1_employee, t003_fd1_employee, t003_fd2_employee, t001_fd1_store " +
+            "SELECT t003_pk1_employee, t003_fd1_employee, t003_fd2_employee, t003_fd3_employee, t001_fd1_store " +
             "FROM t003_employee " +
             "JOIN t001_store ON t003_employee.t003_fd2_employee = t001_store.t001_pk1_store " +
-            "WHERE t003_pk1_employee = ?";
+            "WHERE t003_fd3_employee = ?";
 
         try (Connection con = getConnection();
              PreparedStatement st = con.prepareStatement(sql)) {
 
-            st.setInt(1, Integer.parseInt(employeeCode));
+            st.setString(1, employeeCode);
             ResultSet rs = st.executeQuery();
 
             if (rs.next()) {
                 Employee e = new Employee();
                 e.setId(rs.getInt("t003_pk1_employee"));
+                e.setEmployeeCode(rs.getString("t003_fd3_employee"));
+                e.setEmployeeNumber(rs.getString("t003_fd3_employee"));
                 e.setEmployeeName(rs.getString("t003_fd1_employee"));
                 e.setStoreCode(String.valueOf(rs.getInt("t003_fd2_employee")));
                 e.setStoreName(rs.getString("t001_fd1_store"));
@@ -88,7 +92,7 @@ public class EmployeeDAO {
 
     public Employee selectById(int id) throws Exception {
         String sql =
-            "SELECT t003_pk1_employee, t003_fd1_employee, t003_fd2_employee " +
+            "SELECT t003_pk1_employee, t003_fd1_employee, t003_fd2_employee, t003_fd3_employee " +
             "FROM t003_employee WHERE t003_pk1_employee = ?";
 
         try (Connection con = getConnection();
@@ -100,7 +104,8 @@ public class EmployeeDAO {
             if (rs.next()) {
                 Employee e = new Employee();
                 e.setId(rs.getInt("t003_pk1_employee"));
-                e.setEmployeeCode(String.valueOf(rs.getInt("t003_pk1_employee")));
+                e.setEmployeeCode(rs.getString("t003_fd3_employee"));
+                e.setEmployeeNumber(rs.getString("t003_fd3_employee"));
                 e.setEmployeeName(rs.getString("t003_fd1_employee"));
                 e.setStoreCode(String.valueOf(rs.getInt("t003_fd2_employee")));
                 return e;
@@ -114,7 +119,7 @@ public class EmployeeDAO {
     public List<Employee> selectAll() throws Exception {
         List<Employee> list = new ArrayList<>();
         String sql =
-            "SELECT t003_pk1_employee, t003_fd1_employee, t003_fd2_employee, t001_fd1_store " +
+            "SELECT t003_pk1_employee, t003_fd1_employee, t003_fd2_employee, t003_fd3_employee, t001_fd1_store " +
             "FROM t003_employee " +
             "JOIN t001_store ON t003_employee.t003_fd2_employee = t001_store.t001_pk1_store " +
             "ORDER BY t003_pk1_employee";
@@ -126,6 +131,8 @@ public class EmployeeDAO {
             while (rs.next()) {
                 Employee e = new Employee();
                 e.setId(rs.getInt("t003_pk1_employee"));
+                e.setEmployeeCode(rs.getString("t003_fd3_employee"));
+                e.setEmployeeNumber(rs.getString("t003_fd3_employee"));
                 e.setEmployeeName(rs.getString("t003_fd1_employee"));
                 e.setStoreCode(String.valueOf(rs.getInt("t003_fd2_employee")));
                 e.setStoreName(rs.getString("t001_fd1_store"));
@@ -138,7 +145,7 @@ public class EmployeeDAO {
     // 更新
     public int update(Employee employee) throws Exception {
         String sql =
-            "UPDATE t003_employee SET t003_fd1_employee = ?, t003_fd2_employee = ? " +
+            "UPDATE t003_employee SET t003_fd1_employee = ?, t003_fd2_employee = ?, t003_fd3_employee = ? " +
             "WHERE t003_pk1_employee = ?";
 
         try (Connection con = getConnection();
@@ -146,7 +153,8 @@ public class EmployeeDAO {
 
             st.setString(1, employee.getEmployeeName());
             st.setInt(2, Integer.parseInt(employee.getStoreCode()));
-            st.setInt(3, employee.getId());
+            st.setString(3, employee.getEmployeeNumber());
+            st.setInt(4, employee.getId());
             return st.executeUpdate();
         }
     }
