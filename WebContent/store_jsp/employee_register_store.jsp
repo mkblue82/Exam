@@ -151,11 +151,10 @@
             <div class="register-container">
                 <h1>社員登録</h1>
 
-
                 <form action="${pageContext.request.contextPath}/foodloss/EmployeeRegister.action" method="post">
                     <div class="form-group">
-                        <label for="employeeCode">社員番号</label>
-                        <input type="text" id="employeeCode" name="employeeCode" required>
+                        <label for="employeeNumber">社員番号</label>
+                        <input type="text" id="employeeNumber" name="employeeNumber" placeholder="例: 001, S001など" required>
                     </div>
 
                     <div class="form-group">

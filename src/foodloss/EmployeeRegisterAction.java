@@ -1,5 +1,4 @@
 package foodloss;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -10,11 +9,9 @@ import dao.EmployeeDAO;
 import tool.Action;
 
 public class EmployeeRegisterAction extends Action {
-
     @Override
     public void execute(HttpServletRequest request, HttpServletResponse response)
             throws Exception {
-
         // ========== GET（社員登録画面表示） ==========
         if (request.getMethod().equalsIgnoreCase("GET")) {
             request.getRequestDispatcher("/store_jsp/employee_register_store.jsp")
@@ -24,13 +21,12 @@ public class EmployeeRegisterAction extends Action {
 
         // ========== POST（登録処理） ==========
         request.setCharacterEncoding("UTF-8");
-
-        String employeeCodeStr = request.getParameter("employeeCode");
+        String employeeNumber = request.getParameter("employeeNumber");  // ★変更
         String employeeName = request.getParameter("employeeName");
 
         // 入力チェック
-        if (employeeCodeStr == null || employeeCodeStr.isEmpty()) {
-            request.setAttribute("error", "社員コードを入力してください。");
+        if (employeeNumber == null || employeeNumber.isEmpty()) {  // ★変更
+            request.setAttribute("error", "社員番号を入力してください。");
             request.getRequestDispatcher("/store_jsp/employee_register_store.jsp")
                    .forward(request, response);
             return;
@@ -59,7 +55,8 @@ public class EmployeeRegisterAction extends Action {
         session.setAttribute("storeName", store.getStoreName());
 
         Employee emp = new Employee();
-        emp.setEmployeeCode(employeeCodeStr);
+        emp.setEmployeeNumber(employeeNumber);  // ★追加：社員番号をセット
+        emp.setEmployeeCode(employeeNumber);     // ★変更：社員コードにも同じ値をセット
         emp.setEmployeeName(employeeName);
         emp.setStoreCode(String.valueOf(store.getStoreId()));
 
