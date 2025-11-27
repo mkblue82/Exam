@@ -72,7 +72,10 @@ public class MerchandiseEditAction extends Action {
                 int merchandiseId = Integer.parseInt(idParam);
 
                 try (Connection conn = new DBManager().getConnection()) {
+
                     MerchandiseDAO dao = new MerchandiseDAO(conn);
+                    MerchandiseImageDAO imageDao = new MerchandiseImageDAO(conn);
+
                     Merchandise merchandise = dao.selectById(merchandiseId);
 
                     if (merchandise == null || (storeId != null && merchandise.getStoreId() != storeId)) {
@@ -80,7 +83,9 @@ public class MerchandiseEditAction extends Action {
                         return;
                     }
 
-                    // 入力値取得
+                    // ============================
+                    // 入力値セット
+                    // ============================
                     merchandise.setMerchandiseName(request.getParameter("merchandiseName"));
                     merchandise.setPrice(Integer.parseInt(request.getParameter("price")));
                     merchandise.setStock(Integer.parseInt(request.getParameter("stock")));
@@ -89,7 +94,23 @@ public class MerchandiseEditAction extends Action {
                     merchandise.setMerchandiseTag(request.getParameter("merchandiseTag"));
 
                     // ============================
-                    // ★ 画像処理（複数対応）
+                    // ① 既存画像の削除
+                    // ============================
+                    String deletedIdsParam = request.getParameter("deletedImageIds");
+
+                    if (deletedIdsParam != null && !deletedIdsParam.isEmpty()) {
+                        String[] ids = deletedIdsParam.split(",");
+
+                        for (String idStr : ids) {
+                            try {
+                                int imageId = Integer.parseInt(idStr.trim());
+                                imageDao.delete(imageId);   // ★DAO側で delete by PK を実装しておく
+                            } catch (NumberFormatException ignored) {}
+                        }
+                    }
+
+                    // ============================
+                    // ② 新規画像の登録
                     // ============================
                     List<MerchandiseImage> newImages = new ArrayList<>();
 
@@ -98,23 +119,28 @@ public class MerchandiseEditAction extends Action {
 
                             byte[] data;
                             try (InputStream is = part.getInputStream()) {
-                                data = readAll(is);   // Java8対応版！
+                                data = readAll(is);
                             }
 
                             MerchandiseImage img = new MerchandiseImage();
                             img.setMerchandiseId(merchandiseId);
                             img.setImageData(data);
                             img.setFileName(part.getSubmittedFileName());
-                            img.setDisplayOrder(0);  // 必要なら順番を付ける
+                            img.setDisplayOrder(0);
 
                             newImages.add(img);
                         }
                     }
 
+                    // 追加された画像を DB に保存
+                    for (MerchandiseImage img : newImages) {
+                        imageDao.insert(img);
+                    }
+
                     // ============================
-                    // ★ 商品と画像を同時に更新
+                    // ③ 本体更新
                     // ============================
-                    int result = dao.updateWithImages(merchandise, newImages, true);
+                    int result = dao.update(merchandise);
 
                     if (result > 0) {
                         response.sendRedirect(request.getContextPath() + "/foodloss/MerchandiseList.action");
@@ -125,11 +151,9 @@ public class MerchandiseEditAction extends Action {
                 return;
             }
 
-            showError(request, response, "不正なリクエストです。");
-
         } catch (Exception e) {
             e.printStackTrace();
-            showError(request, response, "システムエラーが発生しました。");
+            showError(request, response, "エラーが発生しました: " + e.getMessage());
         }
     }
 
