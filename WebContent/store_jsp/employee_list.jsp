@@ -259,7 +259,7 @@
                         <thead>
                             <tr>
                                 <th>ID</th>
-                                <th>社員コード</th>
+                                <th>社員番号</th>
                                 <th>氏名</th>
                                 <th>編集</th>
                                 <th>削除</th>
