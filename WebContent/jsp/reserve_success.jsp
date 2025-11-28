@@ -18,6 +18,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>予約完了</title>
 <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
 <style>
@@ -30,14 +31,9 @@
     box-shadow: 0 3px 10px rgba(0,0,0,0.1);
     text-align: center;
 }
-.success-icon {
-    font-size: 4rem;
-    color: #5cb85c;
-    margin-bottom: 20px;
-}
 .success-message {
     font-size: 1.5rem;
-    color: #333;
+    color: #c07148;
     margin-bottom: 30px;
     font-weight: bold;
 }
@@ -92,22 +88,35 @@
     justify-content: center;
 }
 .button-group a {
-    padding: 12px 30px;
+    padding: 12px 40px;
     border-radius: 5px;
     text-decoration: none;
-    transition: opacity 0.3s;
-    font-size: 1rem;
+    font-size: 16px;
+    font-weight: bold;
+    font-family: inherit;
+    display: inline-block;
+    transition: background-color 0.3s, transform 0.1s;
+}
+.button-group a:active {
+    transform: scale(0.98);
 }
 .btn-primary {
-    background: #c07148;
-    color: white;
+    background: #ccc;
+    color: #333;
+}
+.btn-primary:hover {
+    background-color: #c07148;
+    color: #fff;
+    transform: translateY(-3px);
 }
 .btn-secondary {
-    background: #999;
-    color: white;
+    background: #ccc;
+    color: #333;
 }
-.button-group a:hover {
-    opacity: 0.8;
+.btn-secondary:hover {
+    background-color: #c07148;
+    color: #fff;
+    transform: translateY(-3px);
 }
 </style>
 </head>
@@ -118,7 +127,6 @@
     <main class="column">
         <div class="main-contents">
             <div class="success-box">
-                <div class="success-icon">✓</div>
                 <div class="success-message">
                     <%= message != null ? message : "予約が完了しました" %>
                 </div>
@@ -182,5 +190,8 @@
 
     <jsp:include page="footer.jsp" />
 </div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="${pageContext.request.contextPath}/js/main.js"></script>
 </body>
 </html>

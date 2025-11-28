@@ -27,6 +27,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>予約内容確認</title>
 <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
 <style>
@@ -139,6 +140,7 @@
     border-radius: 5px;
     cursor: pointer;
     font-size: 0.9rem;
+    font-family: inherit;
 }
 
 .use-all-btn:hover {
@@ -225,11 +227,17 @@
     padding: 12px 40px;
     border: none;
     border-radius: 5px;
-    font-size: 1.1rem;
+    font-size: 16px;
+    font-weight: bold;
+    font-family: inherit;
     cursor: pointer;
     text-decoration: none;
     display: inline-block;
-    transition: opacity 0.3s;
+    transition: background-color 0.3s, transform 0.1s;
+}
+
+.btn:active {
+    transform: scale(0.98);
 }
 
 .btn-confirm {
@@ -237,13 +245,20 @@
     color: white;
 }
 
-.btn-cancel {
-    background: #999;
-    color: white;
+.btn-confirm:hover {
+    background-color: #a85d38;
+    transform: translateY(-2px);
 }
 
-.btn:hover {
-    opacity: 0.8;
+.btn-cancel {
+    background: #ccc;
+    color: #333;
+}
+
+.btn-cancel:hover {
+    background-color: #c07148;
+    color: #fff;
+    transform: translateY(-3px);
 }
 
 .error-message {
@@ -363,8 +378,8 @@
                     <input type="hidden" id="pointsToUseHidden" name="pointsToUse">
 
                     <div class="button-group">
+                    	<a href="javascript:history.back();" class="btn btn-cancel">戻る</a>
                         <button type="submit" class="btn btn-confirm">予約を確定する</button>
-                        <a href="javascript:history.back();" class="btn btn-cancel">戻る</a>
                     </div>
                 </form>
             </div>
@@ -536,5 +551,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="${pageContext.request.contextPath}/js/main.js"></script>
 </body>
 </html>

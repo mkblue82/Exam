@@ -231,7 +231,25 @@
             .modal-content {
                 padding: 20px;
             }
+
         }
+
+        /* 商品一覧と同じ定義に統一 */
+		.btn.table-button {
+		    width: 100px;
+		    padding: 8px 0;
+		    text-align: center;
+		    box-sizing: border-box;
+		}
+
+		.btn-delete {
+		    background-color: #d9534f;  /* 商品一覧と同じ */
+		}
+
+		.btn-delete:hover {
+		    background-color: #c9302c;  /* 商品一覧と同じ */
+		}
+
     </style>
 </head>
 <body>
@@ -272,11 +290,18 @@
                                     <td><%= emp.getEmployeeCode() %></td>
                                     <td><%= emp.getEmployeeName() %></td>
                                     <td>
-                                        <a class="btn" href="${pageContext.request.contextPath}/foodloss/EmployeeEdit.action?id=<%= emp.getId() %>">編集</a>
-                                    </td>
-                                    <td>
-                                        <button class="btn btn-delete" onclick="showDeleteConfirm(<%= emp.getId() %>, '<%= emp.getEmployeeName() %>')">削除</button>
-                                    </td>
+									  <a class="btn table-button"
+									     href="${pageContext.request.contextPath}/foodloss/EmployeeEdit.action?id=<%= emp.getId() %>">
+									     編集
+									  </a>
+									</td>
+									<td>
+									  <a class="btn btn-delete table-button"
+									     href="#"
+									     onclick="showDeleteConfirm(<%= emp.getId() %>, '<%= emp.getEmployeeName() %>'); return false;">
+									     削除
+									  </a>
+									</td>
                                 </tr>
                             <% } %>
                         </tbody>
