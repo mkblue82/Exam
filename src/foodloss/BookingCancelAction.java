@@ -96,12 +96,18 @@ public class BookingCancelAction extends Action {
                 return;
             }
 
-            // 商品情報を取得して商品名をセット
+            // 商品情報を取得して商品名と価格をセット
             System.out.println("Fetching merchandise...");
             Merchandise merchandise = merchandiseDao.selectById(booking.getProductId());
             if (merchandise != null) {
                 System.out.println("Merchandise found: " + merchandise.getMerchandiseName());
                 booking.setMerchandiseName(merchandise.getMerchandiseName());
+
+                // 価格情報を取得して設定
+                int price = merchandise.getPrice();
+                System.out.println("Merchandise price (int): " + price);
+                request.setAttribute("price", Integer.valueOf(price));
+                System.out.println("Price attribute set: " + request.getAttribute("price"));
             } else {
                 System.out.println("WARNING: Merchandise not found");
             }
@@ -111,6 +117,7 @@ public class BookingCancelAction extends Action {
                 System.out.println("Showing confirm page");
                 request.setAttribute("booking", booking);
                 System.out.println("Booking attribute set: " + (request.getAttribute("booking") != null));
+                System.out.println("Price in request before forward: " + request.getAttribute("price"));
                 request.getRequestDispatcher("/jsp/booking_cancel.jsp").forward(request, response);
                 return;
             }
@@ -121,9 +128,14 @@ public class BookingCancelAction extends Action {
 
             if (result > 0) {
                 System.out.println("Delete successful");
-                // 削除成功 - 完了画面へ
+                // 削除成功 - 完了画面へ（価格情報も渡す）
                 request.setAttribute("bookingId", bookingId);
                 request.setAttribute("booking", booking);
+                // 価格情報を再取得して設定（削除前の情報を表示するため）
+                Merchandise merchandiseForDone = merchandiseDao.selectById(booking.getProductId());
+                if (merchandiseForDone != null) {
+                    request.setAttribute("price", merchandiseForDone.getPrice());
+                }
                 request.getRequestDispatcher("/jsp/booking_cancel_done.jsp").forward(request, response);
             } else {
                 System.out.println("ERROR: Delete failed");

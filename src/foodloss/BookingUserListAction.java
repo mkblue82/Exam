@@ -21,16 +21,9 @@ public class BookingUserListAction extends Action {
 
     @Override
     public void execute(HttpServletRequest request, HttpServletResponse response) throws Exception {
-
         // セッションからログインユーザー情報を取得
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("user");
-
-        // ログインチェック
-        if (user == null) {
-            request.getRequestDispatcher("login.jsp").forward(request, response);
-            return;
-        }
 
         // DAOのインスタンス化
         DAO dao = new DAO();
@@ -47,12 +40,19 @@ public class BookingUserListAction extends Action {
             request.setAttribute("message", "予約商品が存在しません");
             request.setAttribute("bookingList", new ArrayList<Booking>());
         } else {
-            // 予約情報に商品名・店舗名を追加
+            // 予約情報に商品名・店舗名・価格を追加
             for (Booking booking : bookingList) {
                 // 商品情報を取得
                 Merchandise merchandise = merchandiseDao.selectById(booking.getProductId());
                 if (merchandise != null) {
                     booking.setMerchandiseName(merchandise.getMerchandiseName());
+
+                    // 価格情報を設定（int型なので直接取得可能）
+                    int price = merchandise.getPrice();
+                    request.setAttribute("price_" + booking.getBookingId(), price);
+
+                    // デバッグ用ログ
+                    System.out.println("BookingID: " + booking.getBookingId() + ", Price: " + price);
 
                     // 店舗情報を取得
                     Store store = storeDao.selectById(merchandise.getStoreId());
