@@ -108,7 +108,7 @@ public class BookingDAO extends DAO {
         PreparedStatement st = con.prepareStatement(
             "select T005_PK1_booking, T005_FD1_booking, " +
             "T005_FD2_booking, T005_FD3_booking, T005_FD4_booking, " +
-            "T005_FD5_booking, T005_FD6_booking " +
+            "T005_FD5_booking, T005_FD6_booking, T005_FD7_booking " +
             "from T005_booking where T005_PK1_booking = ?"
         );
         st.setInt(1, bookingId);
@@ -125,6 +125,7 @@ public class BookingDAO extends DAO {
             b.setProductId(rs.getInt("T005_FD4_booking"));
             b.setBookingTime(rs.getTimestamp("T005_FD5_booking"));
             b.setPickupStatus(rs.getBoolean("T005_FD6_booking"));
+            b.setAmount(rs.getInt("T005_FD7_booking"));
         }
 
         rs.close();
