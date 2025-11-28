@@ -97,7 +97,7 @@ main {
             <a href="${pageContext.request.contextPath}/foodloss/Login_Store.action" class="btn-main">
                 店舗用<br>ログイン
             </a>
-            <a href="${pageContext.request.contextPath}/foodloss/SignupStore.action" class="sub-link">
+            <a href="${pageContext.request.contextPath}/store_jsp/signup_store.jsp" class="sub-link">
                 加盟店登録
             </a>
         </div>

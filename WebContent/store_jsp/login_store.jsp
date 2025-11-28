@@ -216,7 +216,7 @@
 
                 <!-- フォームの外に配置 -->
                 <button type="button" class="btn-register"
-                        onclick="location.href='${pageContext.request.contextPath}/foodloss/SignupStore.action'">
+                        onclick="location.href='${pageContext.request.contextPath}/store_jsp/signup_store.jsp'">
                     新規登録
                 </button>
 
