@@ -39,3 +39,4 @@ public class EmployeeEditAction extends Action {
         res.sendRedirect(req.getContextPath() + "/foodloss/EmployeeList.action");
     }
 }
+

@@ -25,6 +25,7 @@ public class MerchandiseRegisterAction extends Action {
             return;
         }
 
+
         try {
             // 店舗情報を取得
             bean.Store store = (bean.Store) session.getAttribute("store");
