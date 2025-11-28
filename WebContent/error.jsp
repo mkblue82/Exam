@@ -76,6 +76,7 @@
         }
         .btn-home:hover {
             background-color: #a85d38;
+            color: white;
         }
         .btn-back {
             background-color: #ccc;

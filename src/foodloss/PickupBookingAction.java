@@ -1,6 +1,7 @@
 package foodloss;
 
 import java.io.IOException;
+import java.sql.Connection;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -11,80 +12,138 @@ import javax.servlet.http.HttpSession;
 
 import bean.Booking;
 import bean.Merchandise;
+import bean.User;
 import dao.BookingDAO;
 import dao.DAO;
 import dao.MerchandiseDAO;
+import dao.UserDAO;
 
 @WebServlet("/foodloss/PickupBooking.action")
 public class PickupBookingAction extends HttpServlet {
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
 
-        HttpSession session = request.getSession();
-        Integer storeId = (Integer) session.getAttribute("storeId");
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+	        throws ServletException, IOException {
 
-        if (storeId == null) {
-            response.sendRedirect(request.getContextPath() + "/store_jsp/login_store.jsp");
-            return;
-        }
+	    HttpSession session = request.getSession();
+	    Integer storeId = (Integer) session.getAttribute("storeId");
 
-        int bookingId = Integer.parseInt(request.getParameter("bookingId"));
+	    if (storeId == null) {
+	        response.sendRedirect(request.getContextPath() + "/store_jsp/login_store.jsp");
+	        return;
+	    }
+
+	    int bookingId = Integer.parseInt(request.getParameter("bookingId"));
+
+	    System.out.println("===== 受け取り処理開始 =====");
+	    System.out.println("bookingId: " + bookingId);
+
+	    try {
+	        // ★ コネクション取得（トランザクション用）
+	        DAO db = new DAO();
+	        Connection con = db.getConnection();
+
+	        // ★ 予約情報取得
+	        BookingDAO bookingDAO = new BookingDAO(con);
+	        Booking booking = bookingDAO.selectById(bookingId);
+
+	        System.out.println("booking取得: " + (booking != null ? "成功" : "失敗"));
+	        if (booking != null) {
+	            System.out.println("booking.getAmount(): " + booking.getAmount());
+	            System.out.println("booking.isPickupStatus(): " + booking.getPickupStatus());
+	            System.out.println("booking.getUserId(): " + booking.getUserId());
+	        }
+
+	        if (booking != null && !booking.getPickupStatus()) {
+
+	            // ★ 受取済に変更
+	            booking.setPickupStatus(true);
+	            bookingDAO.update(booking);
+	            System.out.println("受取ステータス更新: 完了");
+
+	            // ★ 商品情報取得
+	            MerchandiseDAO mdao = new MerchandiseDAO(con);
+	            Merchandise m = mdao.selectById(booking.getProductId());
+
+	            if (m != null) {
+	                // ★ 在庫を減らす
+	                int newStock = m.getStock() - booking.getCount();
+	                if (newStock < 0) newStock = 0;
+	                m.setStock(newStock);
+
+	                // ★ 在庫0になったら予約不可にする
+	                if (newStock == 0) {
+	                    m.setBookingStatus(false);
+	                }
+
+	                mdao.update(m);
+	                System.out.println("在庫更新: 完了 (新在庫=" + newStock + ")");
+	            }
+
+	            // ★ ポイント付与（200円につき1ポイント）
+	            int earnedPoints = booking.getAmount() / 200;
+
+	            System.out.println("===== ポイント計算 =====");
+	            System.out.println("金額: " + booking.getAmount());
+	            System.out.println("計算式: " + booking.getAmount() + " / 200 = " + earnedPoints);
+	            System.out.println("========================");
+
+	            if (earnedPoints > 0) {
+	                System.out.println("ポイント付与処理開始...");
+
+	                UserDAO userDAO = new UserDAO(con);
+	                User user = userDAO.findById(booking.getUserId());
+
+	                System.out.println("ユーザー取得: " + (user != null ? "成功" : "失敗"));
+
+	                if (user != null) {
+	                    int oldPoints = user.getPoint();
+	                    int newPoints = oldPoints + earnedPoints;
+	                    user.setPoint(newPoints);
+
+	                    System.out.println("===== ポイント更新前 =====");
+	                    System.out.println("ユーザーID: " + user.getUserId());
+	                    System.out.println("ユーザー名: " + user.getName());
+	                    System.out.println("現在のポイント: " + oldPoints + "pt");
+	                    System.out.println("付与ポイント: " + earnedPoints + "pt");
+	                    System.out.println("新しいポイント: " + newPoints + "pt");
+	                    System.out.println("==========================");
+
+	                    userDAO.update(user);
+
+	                    System.out.println("===== ポイント更新後 =====");
+	                    System.out.println("update()実行完了");
+
+	                    // 更新確認
+	                    User updatedUser = userDAO.findById(booking.getUserId());
+	                    if (updatedUser != null) {
+	                        System.out.println("DBから再取得したポイント: " + updatedUser.getPoint() + "pt");
+	                    }
+	                    System.out.println("==========================");
+	                } else {
+	                    System.out.println("エラー: ユーザーが見つかりません");
+	                }
+	            } else {
+	                System.out.println("ポイント付与なし（200円未満）");
+	            }
 
 
-        try {
-            BookingDAO bookingDAO = new BookingDAO();
-            Booking booking = bookingDAO.selectById(bookingId);
 
-            if (booking != null) {
+	        } else {
+	            System.out.println("処理スキップ: 予約が存在しないか、既に受取済み");
+	        }
 
-                // ★ 受取済に変更
-                booking.setPickupStatus(true);
-                bookingDAO.update(booking);
+	        con.close();
+	        System.out.println("===== 受け取り処理終了 =====");
 
-                // ★ 商品取得
-                DAO db = new DAO();
-                MerchandiseDAO mdao = new MerchandiseDAO(db.getConnection());
-                Merchandise m = mdao.selectById(booking.getProductId());
+	    } catch (Exception e) {
+	        System.out.println("===== エラー発生 =====");
+	        e.printStackTrace();
+	        System.out.println("======================");
+	    }
 
-                if (m != null) {
-
-                    // ★ 在庫を減らす
-                    int newStock = m.getStock() - booking.getCount();
-                    if (newStock < 0) newStock = 0;
-                    m.setStock(newStock);
-
-                    // ★ 在庫0になったら予約不可にする
-                    if (newStock == 0) {
-                        m.setBookingStatus(false);  // ← 予約不可
-                    }
-
-                    // ★ 更新
-                    mdao.update(m);
-
-                    // ★ メール通知（後で追加）
-                    sendPickupMail(booking);
-                }
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        response.sendRedirect(
-            request.getContextPath() + "/foodloss/StoreBookingList.action"
-        );
-    }
-
-    // POST → GET
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        doGet(request, response);
-    }
-
-    /**
-     * ★ 受け取り時のメール送信
-     */
-    private void sendPickupMail(Booking booking) {
-        // 実装は後で説明
-    }
+	    response.sendRedirect(
+	        request.getContextPath() + "/foodloss/StoreBookingList.action"
+	    );
+	}
 }
+

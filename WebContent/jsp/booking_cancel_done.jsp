@@ -5,7 +5,11 @@
 <%
     Integer bookingId = (Integer) request.getAttribute("bookingId");
     Booking booking = (Booking) request.getAttribute("booking");
+    Integer price = (Integer) request.getAttribute("price");
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm");
+
+    // 合計金額を計算
+    int total = (price != null && booking != null) ? price * booking.getCount() : 0;
 %>
 
 <!DOCTYPE html>
@@ -17,8 +21,8 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
 
     <style>
-        .main-content {
-            max-width: 800px;
+        .store-detail-container {
+            max-width: 900px;
             margin: 40px auto;
             padding: 2rem;
             background: #fff;
@@ -26,12 +30,10 @@
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
 
-        h2 {
-            font-size: 1.8rem;
-            text-align: center;
+        .store-detail-container h2 {
             color: #c07148;
-            border-bottom: 2px solid #c07148;
-            padding-bottom: 1rem;
+            text-align: center;
+            font-size: 1.8rem;
             margin-bottom: 2rem;
         }
 
@@ -43,59 +45,66 @@
             margin-bottom: 30px;
             border: 1px solid #c3e6cb;
             text-align: center;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             font-weight: bold;
         }
 
-
-        .booking-info {
-            background-color: #f8f9fa;
-            padding: 20px;
-            border-radius: 5px;
-            margin-bottom: 30px;
+        .detail-section {
+            margin-bottom: 2rem;
         }
 
-        .booking-info h3 {
-            color: #c07148;
-            margin-bottom: 15px;
-            font-size: 1.2rem;
+        .detail-section h3 {
+            font-size: 1.3rem;
+            color: #333;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #e0e0e0;
         }
 
-        .booking-info table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .booking-info th {
-            background-color: #c07148;
-            color: white;
-            padding: 12px;
-            text-align: left;
-            width: 40%;
-        }
-
-        .booking-info td {
-            padding: 12px;
-            border-bottom: 1px solid #ddd;
-        }
-
-        .button-group {
+        .detail-row {
             display: flex;
+            padding: 1rem 0 1rem 50px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            width: 200px;
+            font-weight: bold;
+            color: #666;
+            flex-shrink: 0;
+        }
+
+        .detail-value {
+            flex: 1;
+            color: #333;
+        }
+
+
+        .button-container {
+            display: flex;
+            gap: 15px;
             justify-content: center;
-            gap: 20px;
             margin-top: 30px;
         }
 
         .btn {
-            display: inline-block;
             padding: 12px 40px;
+            border: none;
             border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.1s;
             font-weight: bold;
             text-decoration: none;
-            transition: all 0.3s;
-            border: none;
-            cursor: pointer;
-            font-size: 1rem;
+            display: inline-block;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
         }
 
         .btn-primary {
@@ -106,20 +115,34 @@
         .btn-primary:hover {
             background-color: #a85d38;
             transform: translateY(-2px);
+            color: white;
         }
 
-        @media screen and (max-width: 800px) {
-            .main-content {
+        .error-message {
+            text-align: center;
+            color: #dc3545;
+            padding: 20px;
+            font-size: 1.1rem;
+        }
+
+        @media screen and (max-width: 600px) {
+            .store-detail-container {
                 margin: 20px;
                 padding: 1.5rem;
             }
 
-            .button-group {
+            .detail-row {
                 flex-direction: column;
+                padding-left: 0;
             }
 
-            .btn {
+            .detail-label {
                 width: 100%;
+                margin-bottom: 0.5rem;
+            }
+
+            .button-container {
+                flex-direction: column;
             }
         }
     </style>
@@ -133,45 +156,66 @@
 
     <main class="column">
         <div class="main-contents">
-            <div class="main-content">
+            <div class="store-detail-container">
 
                 <h2>予約取消完了</h2>
-
 
                 <div class="success-message">
                     予約を取り消しました
                 </div>
 
                 <% if (booking != null) { %>
-                    <div class="booking-info">
+                    <div class="detail-section">
                         <h3>取り消した予約情報</h3>
-                        <table>
-                            <tr>
-                                <th>予約ID</th>
-                                <td><%= bookingId != null ? bookingId : booking.getBookingId() %></td>
-                            </tr>
-                            <tr>
-                                <th>商品名</th>
-                                <td><%= booking.getMerchandiseName() != null ? booking.getMerchandiseName() : "−" %></td>
-                            </tr>
-                            <tr>
-                                <th>数量</th>
-                                <td><%= booking.getCount() %>個</td>
-                            </tr>
-                            <tr>
-                                <th>受取予定時刻</th>
-                                <td><%= booking.getPickupTime() != null ? sdf.format(booking.getPickupTime()) : "−" %></td>
-                            </tr>
-                        </table>
+
+                        <div class="detail-row">
+                            <div class="detail-label">予約ID</div>
+                            <div class="detail-value"><%= bookingId != null ? bookingId : booking.getBookingId() %></div>
+                        </div>
+
+                        <div class="detail-row">
+                            <div class="detail-label">商品名</div>
+                            <div class="detail-value"><%= booking.getMerchandiseName() != null ? booking.getMerchandiseName() : "−" %></div>
+                        </div>
+
+                        <div class="detail-row">
+                            <div class="detail-label">合計金額</div>
+                            <div class="detail-value price-value">
+                                <%= total > 0 ? "¥" + String.format("%,d", total) : "−" %>
+                            </div>
+                        </div>
+
+                        <div class="detail-row">
+                            <div class="detail-label">数量</div>
+                            <div class="detail-value"><%= booking.getCount() %>個</div>
+                        </div>
+
+                        <div class="detail-row">
+                            <div class="detail-label">受取予定時刻</div>
+                            <div class="detail-value"><%= booking.getPickupTime() != null ? sdf.format(booking.getPickupTime()) : "−" %></div>
+                        </div>
+
+                        <div class="detail-row">
+                            <div class="detail-label">予約日時</div>
+                            <div class="detail-value"><%= booking.getBookingTime() != null ? sdf.format(booking.getBookingTime()) : "−" %></div>
+                        </div>
+                    </div>
+
+                    <div class="button-container">
+                        <a href="${pageContext.request.contextPath}/foodloss/BookingUserList.action"
+                           class="btn btn-primary">
+                            予約リストに戻る
+                        </a>
+                    </div>
+                <% } else { %>
+                    <p class="error-message">予約情報が取得できませんでした</p>
+                    <div class="button-container">
+                        <a href="${pageContext.request.contextPath}/foodloss/BookingUserList.action"
+                           class="btn btn-primary">
+                            予約リストに戻る
+                        </a>
                     </div>
                 <% } %>
-
-                <div class="button-group">
-                    <a href="${pageContext.request.contextPath}/foodloss/BookingUserList.action"
-                       class="btn btn-primary">
-                        予約リストに戻る
-                    </a>
-                </div>
 
             </div>
         </div>
@@ -184,6 +228,7 @@
 
 <!-- JS -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
 <script src="${pageContext.request.contextPath}/js/slick.js"></script>
 <script src="${pageContext.request.contextPath}/js/main.js"></script>
 

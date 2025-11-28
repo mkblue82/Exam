@@ -4,7 +4,17 @@
 
 <%
     Booking booking = (Booking) request.getAttribute("booking");
+    Integer price = (Integer) request.getAttribute("price");
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm");
+
+    // 合計金額を計算
+    int total = (price != null && booking != null) ? price * booking.getCount() : 0;
+
+    // デバッグ出力
+    System.out.println("=== JSP Debug ===");
+    System.out.println("Booking: " + (booking != null ? booking.getBookingId() : "null"));
+    System.out.println("Price from request: " + price);
+    System.out.println("Total: " + total);
 %>
 
 <!DOCTYPE html>
@@ -107,7 +117,7 @@
         }
 
         .btn-cancel:hover {
-            background-color: #c07148;
+            background-color: #dc3545;
             transform: translateY(-2px);
             color: white;
         }
@@ -204,6 +214,13 @@
                         <div class="detail-row">
                             <div class="detail-label">商品名</div>
                             <div class="detail-value"><%= booking.getMerchandiseName() != null ? booking.getMerchandiseName() : "−" %></div>
+                        </div>
+
+                        <div class="detail-row">
+                            <div class="detail-label">合計金額</div>
+                            <div class="detail-value price-value">
+                                <%= total > 0 ? "¥" + String.format("%,d", total) : "−" %>
+                            </div>
                         </div>
 
                         <div class="detail-row">

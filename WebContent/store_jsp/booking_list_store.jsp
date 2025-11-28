@@ -182,6 +182,7 @@
                                 <th>受取予定時刻</th>
                                 <th>予約日時</th>
                                 <th>受取状態</th>
+                                <th>金額</th>
                                 <th>受け取り</th>
                             </tr>
                         </thead>
@@ -196,6 +197,7 @@
                                     <td><%= b.getPickupTime() %></td>
                                     <td><%= b.getBookingTime() %></td>
                                     <td><%= b.getPickupStatus() ? "受取済" : "未受取" %></td>
+                                    <td><%= b.getAmount() %></td>  <!-- ← 金額を表示 -->
                                     <td>
                                         <% if (!b.getPickupStatus()) { %>
                                             <a class="pickup-btn"

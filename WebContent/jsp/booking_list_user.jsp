@@ -78,6 +78,7 @@
             background-color: #f5f5f5;
         }
 
+
         .cancel-btn {
             display: inline-block;
             padding: 8px 25px;
@@ -170,6 +171,7 @@
                                 <th>予約ID</th>
                                 <th>店舗名</th>
                                 <th>商品名</th>
+                                <th>合計金額</th>
                                 <th>数量</th>
                                 <th>受取予定時刻</th>
                                 <th>予約日時</th>
@@ -180,10 +182,19 @@
 
                         <tbody>
                             <% for (Booking b : bookingList) { %>
+                                <%
+                                    // 価格情報を取得
+                                    Integer price = (Integer) request.getAttribute("price_" + b.getBookingId());
+                                    // 合計金額を計算（価格×数量）
+                                    int total = (price != null) ? price * b.getCount() : 0;
+                                %>
                                 <tr>
                                     <td><%= b.getBookingId() %></td>
                                     <td><%= request.getAttribute("store_" + b.getBookingId()) != null ? request.getAttribute("store_" + b.getBookingId()) : "−" %></td>
                                     <td><%= b.getMerchandiseName() != null ? b.getMerchandiseName() : "−" %></td>
+                                    <td class="price-cell">
+                                        <%= total > 0 ? "¥" + String.format("%,d", total) : "−" %>
+                                    </td>
                                     <td><%= b.getCount() %></td>
                                     <td><%= b.getPickupTime() != null ? sdf.format(b.getPickupTime()) : "−" %></td>
                                     <td><%= b.getBookingTime() != null ? sdf.format(b.getBookingTime()) : "−" %></td>
