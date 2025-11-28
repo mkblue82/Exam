@@ -187,4 +187,41 @@ public class StoreDAO {
 
         return list;
     }
+
+    public Store selectByEmail(String email) throws SQLException {
+        String sql = "SELECT * FROM T001_store WHERE T001_FD7_store = ?";
+
+        try (PreparedStatement st = con.prepareStatement(sql)) {
+            st.setString(1, email);
+
+            try (ResultSet rs = st.executeQuery()) {
+                if (rs.next()) {
+                    return mapResultSetToStore(rs);
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * 電話番号で店舗を検索
+     * @param phone 電話番号
+     * @return 該当する店舗、存在しない場合はnull
+     * @throws SQLException
+     */
+    public Store selectByPhone(String phone) throws SQLException {
+        String sql = "SELECT * FROM T001_store WHERE T001_FD3_store = ?";
+
+        try (PreparedStatement st = con.prepareStatement(sql)) {
+            st.setString(1, phone);
+
+            try (ResultSet rs = st.executeQuery()) {
+                if (rs.next()) {
+                    return mapResultSetToStore(rs);
+                }
+            }
+        }
+        return null;
+    }
+
 }

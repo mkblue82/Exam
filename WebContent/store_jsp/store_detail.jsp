@@ -112,6 +112,16 @@
         transform: translateY(-3px);
     }
 
+    .btn-edit {
+        background-color: #4CAF50;
+        color: white;
+    }
+
+    .btn-edit:hover {
+        background-color: #45a049;
+        transform: translateY(-2px);
+    }
+
     .back-button {
         margin-top: 30px;
         text-align: center;
@@ -152,6 +162,14 @@
         .detail-label {
             width: 100%;
             margin-bottom: 0.5rem;
+        }
+
+        .button-container {
+            flex-direction: column;
+        }
+
+        .btn {
+            width: 100%;
         }
     }
 </style>
@@ -225,9 +243,14 @@
                     <% } %>
                 </div>
 
-                <!-- ホームに戻るボタン -->
-                <div class="back-button">
-                    <a href="${pageContext.request.contextPath}/foodloss/Menu.action">ホームに戻る</a>
+                <!-- ボタンエリア -->
+                <div class="button-container">
+                    <a href="${pageContext.request.contextPath}/foodloss/StoreEditForm.action" class="btn btn-edit">
+                        情報を編集
+                    </a>
+                    <a href="${pageContext.request.contextPath}/foodloss/Menu.action" class="btn btn-secondary">
+                        ホームに戻る
+                    </a>
                 </div>
 
             </div>
