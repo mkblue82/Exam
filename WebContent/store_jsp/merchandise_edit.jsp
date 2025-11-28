@@ -262,6 +262,10 @@
     <jsp:include page="/jsp/footer.jsp" />
 </div>
 
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="${pageContext.request.contextPath}/js/main.js"></script>
+
+
 <script>
 /* --- 既存画像削除 --- */
 var deletedOldList = [];
