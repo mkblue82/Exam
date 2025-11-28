@@ -59,7 +59,6 @@
 .reserve-section {
     margin: 30px 0;
     padding: 20px;
-    background: #f9f9f9;
     border-radius: 8px;
 }
 
@@ -67,21 +66,29 @@
     text-align: center;
 }
 .reserve-btn button {
+    display: inline-block;
     background: #c07148;
     color: white;
-    padding: 12px 40px;
+    padding: 15px 50px;
     border: none;
     border-radius: 5px;
-    font-size: 1.1rem;
+    font-size: 16px;
+    font-weight: bold;
+    font-family: inherit;
     cursor: pointer;
-    transition: opacity 0.3s;
+    transition: background-color 0.3s, transform 0.1s;
 }
 .reserve-btn button:hover {
-    opacity: 0.8;
+    background-color: #a85d38;
+    transform: translateY(-2px);
+}
+.reserve-btn button:active {
+    transform: scale(0.98);
 }
 .reserve-btn button:disabled {
     background: #ccc;
     cursor: not-allowed;
+    transform: none;
 }
 
 .back-btn {
@@ -89,14 +96,20 @@
     text-align: center;
 }
 .back-btn a {
-    background: #999;
-    color: white;
-    padding: 10px 25px;
+    display: inline-block;
+    background: #ccc;
+    color: #333;
+    padding: 12px 40px;
     border-radius: 5px;
     text-decoration: none;
+    font-size: 16px;
+    font-weight: bold;
+    transition: all 0.3s;
 }
 .back-btn a:hover {
-    opacity: 0.8;
+    background-color: #c07148;
+    color: #fff;
+    transform: translateY(-3px);
 }
 
 .stock-warning {
