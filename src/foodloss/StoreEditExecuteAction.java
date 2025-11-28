@@ -16,6 +16,7 @@ public class StoreEditExecuteAction extends Action {
     @Override
     public void execute(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
+
         HttpSession session = request.getSession(false);
         if (session == null || session.getAttribute("storeId") == null) {
             response.sendRedirect(request.getContextPath() + "/store_jsp/login_store.jsp");
