@@ -16,8 +16,10 @@ import org.apache.tomcat.util.http.fileupload.disk.DiskFileItemFactory;
 import org.apache.tomcat.util.http.fileupload.servlet.ServletFileUpload;
 import org.apache.tomcat.util.http.fileupload.servlet.ServletRequestContext;
 
+import bean.Employee;
 import bean.Merchandise;
 import bean.MerchandiseImage;
+import dao.EmployeeDAO;
 import dao.MerchandiseDAO;
 import dao.MerchandiseImageDAO;
 import tool.Action;
@@ -151,8 +153,20 @@ public class MerchandiseRegisterExecuteAction extends Action {
 
             int price = Integer.parseInt(priceStr);
             int stock = Integer.parseInt(quantityStr);
-            int employeeId = Integer.parseInt(employeeNumberStr);
             java.sql.Date useByDate = java.sql.Date.valueOf(expirationDateStr);
+
+            // ★★★ 修正: 社員番号から社員IDを検索 ★★★
+            EmployeeDAO empDao = new EmployeeDAO();
+            Employee employee = empDao.selectByCode(employeeNumberStr);
+
+            if (employee == null) {
+                request.setAttribute("errorMessage", "社員番号 " + employeeNumberStr + " は存在しません");
+                request.getRequestDispatcher("/store_jsp/merchandise_register_store.jsp").forward(request, response);
+                return;
+            }
+
+            int employeeId = employee.getId();
+            System.out.println("✅ 社員番号 " + employeeNumberStr + " → 社員ID " + employeeId + " に変換");
 
             if (price < 0) {
                 request.setAttribute("errorMessage", "価格は0円以上で入力してください");
@@ -258,7 +272,7 @@ public class MerchandiseRegisterExecuteAction extends Action {
 
         } catch (NumberFormatException e) {
             e.printStackTrace();
-            request.setAttribute("errorMessage", "価格、個数、社員番号は数値で入力してください");
+            request.setAttribute("errorMessage", "価格、個数は数値で入力してください");
             request.getRequestDispatcher("/store_jsp/merchandise_register_store.jsp").forward(request, response);
         } catch (IllegalArgumentException e) {
             e.printStackTrace();

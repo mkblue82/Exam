@@ -9,6 +9,7 @@
     Merchandise m = (Merchandise) request.getAttribute("merchandise");
     List<MerchandiseImage> images = (List<MerchandiseImage>) request.getAttribute("images");
     Employee emp = (Employee) request.getAttribute("employee");
+    List<Employee> employeeList = (List<Employee>) request.getAttribute("employeeList");
 
     String useByDateStr = "";
     if (m.getUseByDate() != null) {
@@ -16,8 +17,10 @@
     }
 
     String employeeCode = "";
+    String employeeName = "";
     if (emp != null) {
         employeeCode = emp.getEmployeeCode();
+        employeeName = emp.getEmployeeName();
     }
 %>
 
@@ -59,10 +62,15 @@
             border-radius: 5px;
         }
 
-        /* 読み取り専用フィールドのスタイル */
-        .form-group input[readonly] {
-            background-color: #f5f5f5;
-            cursor: not-allowed;
+        .form-group select {
+            cursor: pointer;
+        }
+
+        .form-group small {
+            display: block;
+            margin-top: 0.3rem;
+            color: #666;
+            font-size: 0.85rem;
         }
 
         /* 既存画像 ------------------- */
@@ -186,7 +194,6 @@
 
                     <input type="hidden" name="merchandiseId" value="<%= m.getMerchandiseId() %>">
                     <input type="hidden" id="deletedImageIds" name="deletedImageIds">
-                    <input type="hidden" name="employeeId" value="<%= m.getEmployeeId() %>">
 
                     <!-- ① 商品情報入力 ------------------------------------------------------------ -->
                     <div class="form-group">
@@ -210,9 +217,24 @@
                     </div>
 
                     <div class="form-group">
-                        <label>社員番号</label>
-                        <input type="text" value="<%= employeeCode %>" readonly>
-                        <small style="color: #666; font-size: 0.85rem;">※社員番号は編集できません</small>
+                        <label>担当社員 <span>*</span></label>
+                        <select name="employeeId" required>
+                            <%
+                            if (employeeList != null && !employeeList.isEmpty()) {
+                                for (Employee e : employeeList) {
+                            %>
+                                <option value="<%= e.getId() %>"
+                                    <%= (e.getId() == m.getEmployeeId()) ? "selected" : "" %>>
+                                    <%= e.getEmployeeCode() %> - <%= e.getEmployeeName() %>
+                                </option>
+                            <%
+                                }
+                            } else {
+                            %>
+                                <option value="<%= m.getEmployeeId() %>"><%= employeeCode %> - <%= employeeName %></option>
+                            <% } %>
+                        </select>
+                        <small>現在: <%= employeeCode %> - <%= employeeName %> | 変更すると履歴が記録されます</small>
                     </div>
 
                     <div class="form-group">
@@ -278,10 +300,6 @@
     <jsp:include page="/jsp/footer.jsp" />
 </div>
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-<script src="${pageContext.request.contextPath}/js/main.js"></script>
-
-
 <script>
 /* --- 既存画像削除 --- */
 var deletedOldList = [];
@@ -289,11 +307,11 @@ function removeOldImage(imageId) {
     deletedOldList.push(imageId);
     document.getElementById("deletedImageIds").value = deletedOldList.join(",");
 
-    const target = document.getElementById("old_" + imageId);
+    var target = document.getElementById("old_" + imageId);
     if (target) target.remove();
 }
 
-/* --- 新規画像追加（商品登録と同じ） --- */
+/* --- 新規画像追加 --- */
 var imageDataList = [];
 var imageCounter = 0;
 

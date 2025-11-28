@@ -12,8 +12,10 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.Part;
 
+import bean.Employee;
 import bean.Merchandise;
 import bean.MerchandiseImage;
+import dao.EmployeeDAO;
 import dao.MerchandiseDAO;
 import dao.MerchandiseImageDAO;
 import tool.Action;
@@ -51,8 +53,17 @@ public class MerchandiseEditAction extends Action {
                     MerchandiseImageDAO imageDao = new MerchandiseImageDAO(conn);
                     List<MerchandiseImage> images = imageDao.selectByMerchandiseId(merchandiseId);
 
+                    // ★ 現在の担当社員情報を取得
+                    EmployeeDAO empDao = new EmployeeDAO();
+                    Employee employee = empDao.selectById(merchandise.getEmployeeId());
+
+                    // ★ その店舗の社員リストを取得（セレクトボックス用）
+                    List<Employee> employeeList = empDao.selectByStoreCode(String.valueOf(storeId));
+
                     request.setAttribute("merchandise", merchandise);
                     request.setAttribute("images", images);
+                    request.setAttribute("employee", employee);
+                    request.setAttribute("employeeList", employeeList);  // ★追加
 
                     request.getRequestDispatcher("/store_jsp/merchandise_edit.jsp").forward(request, response);
                 }
@@ -104,7 +115,7 @@ public class MerchandiseEditAction extends Action {
                         for (String idStr : ids) {
                             try {
                                 int imageId = Integer.parseInt(idStr.trim());
-                                imageDao.delete(imageId);   // ★DAO側で delete by PK を実装しておく
+                                imageDao.delete(imageId);
                             } catch (NumberFormatException ignored) {}
                         }
                     }
@@ -176,4 +187,3 @@ public class MerchandiseEditAction extends Action {
         }
     }
 }
-
