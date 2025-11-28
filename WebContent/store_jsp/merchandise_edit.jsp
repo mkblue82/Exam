@@ -1,13 +1,24 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="bean.Merchandise" %>
 <%@ page import="bean.MerchandiseImage" %>
+<%@ page import="bean.Employee" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.Base64" %>
 
 <%
     Merchandise m = (Merchandise) request.getAttribute("merchandise");
     List<MerchandiseImage> images = (List<MerchandiseImage>) request.getAttribute("images");
-    String useByDateStr = (m.getUseByDate() != null) ? m.getUseByDate().toString() : "";
+    Employee emp = (Employee) request.getAttribute("employee");
+
+    String useByDateStr = "";
+    if (m.getUseByDate() != null) {
+        useByDateStr = m.getUseByDate().toString();
+    }
+
+    String employeeCode = "";
+    if (emp != null) {
+        employeeCode = emp.getEmployeeCode();
+    }
 %>
 
 <!DOCTYPE html>
@@ -46,6 +57,12 @@
             padding: .8rem;
             border: 1px solid #ccc;
             border-radius: 5px;
+        }
+
+        /* 読み取り専用フィールドのスタイル */
+        .form-group input[readonly] {
+            background-color: #f5f5f5;
+            cursor: not-allowed;
         }
 
         /* 既存画像 ------------------- */
@@ -112,7 +129,7 @@
             object-fit: cover;
         }
 
-        /* ★ ボタン完全統一：見た目もサイズも100%一致 ★ */
+        /* ボタンスタイル */
 		.btn-submit, .btn-cancel {
             width: 100%;
             border: none;
@@ -124,7 +141,6 @@
             font-weight: bold;
         }
 
-		/* 更新ボタン（背景色が茶色） */
 		.btn-submit {
             padding: 1rem;
             font-size: 1.1rem;
@@ -151,7 +167,6 @@
             color: #fff;
         }
 
-
     </style>
 </head>
 
@@ -159,7 +174,6 @@
 <div id="container">
 
     <jsp:include page="/store_jsp/header_store.jsp" />
-
 
     <main class="column">
         <div class="main-contents">
@@ -172,6 +186,7 @@
 
                     <input type="hidden" name="merchandiseId" value="<%= m.getMerchandiseId() %>">
                     <input type="hidden" id="deletedImageIds" name="deletedImageIds">
+                    <input type="hidden" name="employeeId" value="<%= m.getEmployeeId() %>">
 
                     <!-- ① 商品情報入力 ------------------------------------------------------------ -->
                     <div class="form-group">
@@ -195,8 +210,9 @@
                     </div>
 
                     <div class="form-group">
-                        <label>社員番号 <span>*</span></label>
-                        <input type="number" name="employeeId" value="<%= m.getEmployeeId() %>" required>
+                        <label>社員番号</label>
+                        <input type="text" value="<%= employeeCode %>" readonly>
+                        <small style="color: #666; font-size: 0.85rem;">※社員番号は編集できません</small>
                     </div>
 
                     <div class="form-group">
@@ -280,9 +296,11 @@ var imageCounter = 0;
 function addImages(input) {
     if (!input.files.length) return;
 
-    for (let file of input.files) {
-        let id = "img_" + imageCounter++;
-        imageDataList.push({ id, file });
+    var files = input.files;
+    for (var i = 0; i < files.length; i++) {
+        var file = files[i];
+        var id = "img_" + imageCounter++;
+        imageDataList.push({ id: id, file: file });
 
         createFileInput(id, file);
         createPreview(id, file);
@@ -293,14 +311,14 @@ function addImages(input) {
 }
 
 function createFileInput(id, file) {
-    const container = document.getElementById("fileInputsContainer");
-    let input = document.createElement("input");
+    var container = document.getElementById("fileInputsContainer");
+    var input = document.createElement("input");
     input.type = "file";
     input.name = "imageFile";
     input.style.display = "none";
     input.id = "file_" + id;
 
-    let dt = new DataTransfer();
+    var dt = new DataTransfer();
     dt.items.add(file);
     input.files = dt.files;
 
@@ -308,14 +326,14 @@ function createFileInput(id, file) {
 }
 
 function createPreview(id, file) {
-    const container = document.getElementById("imagePreviewContainer");
-    let div = document.createElement("div");
+    var container = document.getElementById("imagePreviewContainer");
+    var div = document.createElement("div");
     div.className = "image-preview-item";
     div.id = "preview_" + id;
 
-    let reader = new FileReader();
+    var reader = new FileReader();
     reader.onload = function(e) {
-        let index = getImageIndex(id);
+        var index = getImageIndex(id);
         div.innerHTML =
             '<img src="' + e.target.result + '">' +
             '<button type="button" class="remove-btn" onclick="removeImage(\'' + id + '\')">×</button>' +
@@ -327,12 +345,12 @@ function createPreview(id, file) {
 }
 
 function removeImage(id) {
-    imageDataList = imageDataList.filter(i => i.id !== id);
+    imageDataList = imageDataList.filter(function(i) { return i.id !== id; });
 
-    const fileInput = document.getElementById("file_" + id);
+    var fileInput = document.getElementById("file_" + id);
     if (fileInput) fileInput.remove();
 
-    const preview = document.getElementById("preview_" + id);
+    var preview = document.getElementById("preview_" + id);
     if (preview) preview.remove();
 
     updateImageNumbers();
@@ -340,21 +358,26 @@ function removeImage(id) {
 }
 
 function getImageIndex(id) {
-    return imageDataList.findIndex(i => i.id === id);
+    for (var i = 0; i < imageDataList.length; i++) {
+        if (imageDataList[i].id === id) {
+            return i;
+        }
+    }
+    return -1;
 }
 
 function updateImageNumbers() {
-    imageDataList.forEach((item, index) => {
-        const div = document.getElementById("preview_" + item.id);
+    for (var i = 0; i < imageDataList.length; i++) {
+        var item = imageDataList[i];
+        var div = document.getElementById("preview_" + item.id);
         if (div) {
-            div.querySelector(".image-number").textContent =
-                index + 1;
+            div.querySelector(".image-number").textContent = i + 1;
         }
-    });
+    }
 }
 
 function updateFileCount() {
-    const count = imageDataList.length;
+    var count = imageDataList.length;
     document.getElementById("fileCount").textContent =
         count > 0 ? count + "枚の画像を選択中" : "";
 }
