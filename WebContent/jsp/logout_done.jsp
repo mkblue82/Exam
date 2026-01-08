@@ -43,6 +43,7 @@
             border: none;
             border-radius: 5px;
             font-size: 1rem;
+            font-family: inherit;
             cursor: pointer;
             transition: 0.3s;
             font-weight: bold;

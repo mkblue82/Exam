@@ -137,6 +137,7 @@
         background: #c07148;
         color: #fff;
         box-shadow: 0 3px 10px rgba(192, 113, 72, 0.3);
+        font-family: inherit;
     }
 
     .btn-submit:hover {
@@ -149,12 +150,34 @@
         background: #fff;
         color: #c07148;
         border: 2px solid #c07148;
+        font-family: inherit;
     }
 
     .btn-cancel:hover {
         background: #c07148;
         color: #fff;
     }
+
+    .btn-back {
+        width: 100%;
+        padding: 0.8rem;
+        border: none;
+        border-radius: 5px;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: 0.3s;
+        font-weight: normal;
+        background: #f5f5f5;
+        color: #666;
+        border: 1px solid #ddd;
+        font-family: inherit;
+     }
+
+     .btn-back:hover {
+        background: #e0e0e0;
+        color: #333;
+     }
+
 </style>
 
 </head>
@@ -219,6 +242,12 @@
                     <button type="submit" class="btn-submit">申請する</button>
                     <button type="button" class="btn-cancel"
                             onclick="location.href='${pageContext.request.contextPath}/store_jsp/login_store.jsp'">ログインに戻る</button>
+
+                     <!--トップページに戻るボタン -->
+                	<button type="button" class="btn-back"
+                        	onclick="location.href='${pageContext.request.contextPath}/jsp/index.jsp'">
+                    	トップページに戻る
+                	</button>
                 </form>
             </div>
         </div>
