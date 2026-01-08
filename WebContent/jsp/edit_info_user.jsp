@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>情報変更 - フードロス削減システム</title>
+    <title>情報変更</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
 
     <style>
@@ -20,7 +20,7 @@
 
         .edit-section h2 {
             font-size: 1.8rem;
-            color: #333;
+            color: #c07148;
             text-align: center;
             margin-bottom: 30px;
         }
@@ -52,31 +52,31 @@
         .button-group {
             display: flex;
             justify-content: center;
-            gap: 40px;
+            gap: 15px;
             flex-wrap: wrap;
             margin-top: 30px;
         }
 
         .button-group button,
         .button-group a {
-            display: block;
-            width: 220px;
-            padding: 15px;
-            text-align: center;
+            padding: 12px 40px;
             background-color: #ccc;
-            border-radius: 8px;
+            border-radius: 5px;
             text-decoration: none;
             color: #333;
             font-weight: bold;
+            font-size: 16px;
             border: none;
             cursor: pointer;
-            transition: background 0.3s;
+            transition: all 0.3s;
+            font-family: inherit;
         }
 
         .button-group button:hover,
         .button-group a:hover {
             background-color: #c07148;
             color: #fff;
+            transform: translateY(-3px);
         }
     </style>
 </head>
@@ -93,20 +93,13 @@
             <div class="main-content">
                 <div class="edit-section">
                     <h2>登録情報の変更</h2>
-					<form action="${pageContext.request.contextPath}/foodloss/EditInfo.action" method="post">
-				    <!-- エラーメッセージ表示 -->
-				    <c:if test="${not empty error}">
-				        <p style="color:red; text-align:center; margin-bottom:20px;">
-				            ${error}
-				        </p>
-				    </c:if>
 
-                    <form action="${pageContext.request.contextPath}/foodloss/EditInfo.action" method="post">
+                    <form action="${pageContext.request.contextPath}/foodloss/EditInfoExecute.action" method="post" id="editForm">
                         <label for="username">ユーザー名</label>
-                        <input type="text" id="name" name="name" value="${user.name}" required>
+                        <input type="text" id="name" name="name" value="${user.name}">
 
                         <label for="email">メールアドレス</label>
-                        <input type="email" id="email" name="email" value="${user.email}" required>
+                        <input type="email" id="email" name="email" value="${user.email}">
 
                         <label for="password">新しいパスワード</label>
                         <input type="password" id="password" name="password" placeholder="変更しない場合は空欄">
@@ -116,6 +109,45 @@
                             <a href="${pageContext.request.contextPath}/jsp/foods.jsp">戻る</a>
                         </div>
                     </form>
+
+                    <%
+                    String error = (String) request.getAttribute("error");
+                    if (error != null) {
+                    %>
+                    <script>
+                        // エラーメッセージを表示（サーバー側からエラーが返された場合のみ）
+                        document.addEventListener('DOMContentLoaded', function() {
+                            var errorMsg = "<%= error %>";
+
+                            // エラー内容に応じて該当フィールドにエラーを設定
+                            if (errorMsg.indexOf("ユーザー名") !== -1) {
+                                var nameField = document.getElementById("name");
+                                nameField.setCustomValidity(errorMsg);
+                                nameField.reportValidity();
+                            } else if (errorMsg.indexOf("メールアドレス") !== -1 && errorMsg.indexOf("使用されています") !== -1) {
+                                // メール重複エラー
+                                var emailField = document.getElementById("email");
+                                emailField.setCustomValidity(errorMsg);
+                                emailField.reportValidity();
+                            } else if (errorMsg.indexOf("メールアドレス") !== -1) {
+                                // メール未入力エラー
+                                var emailField = document.getElementById("email");
+                                emailField.setCustomValidity(errorMsg);
+                                emailField.reportValidity();
+                            } else {
+                                alert(errorMsg);
+                            }
+
+                            // 入力時にエラーをクリア
+                            var inputs = document.querySelectorAll('input');
+                            inputs.forEach(function(input) {
+                                input.addEventListener('input', function() {
+                                    this.setCustomValidity('');
+                                });
+                            });
+                        });
+                    </script>
+                    <% } %>
                 </div>
             </div>
         </div>

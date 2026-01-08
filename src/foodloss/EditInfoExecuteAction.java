@@ -8,19 +8,19 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import bean.User;
+import dao.DAO;
 import dao.UserDAO;
 import tool.Action;
-import tool.DBManager;
-
 
 public class EditInfoExecuteAction extends Action {
 
     @Override
     public void execute(HttpServletRequest request, HttpServletResponse response) throws Exception {
         request.setCharacterEncoding("UTF-8");
-        HttpSession session = request.getSession();
 
+        HttpSession session = request.getSession();
         User loginUser = (User) session.getAttribute("user");
+
         if (loginUser == null) {
             request.getRequestDispatcher("/login.jsp").forward(request, response);
             return;
@@ -30,46 +30,68 @@ public class EditInfoExecuteAction extends Action {
         String email = request.getParameter("email");
         String password = request.getParameter("password");
 
-        if ((name == null || name.isEmpty()) &&
-            (email == null || email.isEmpty()) &&
-            (password == null || password.isEmpty())) {
-            request.setAttribute("error", "変更する内容がありません。");
+        // 未入力チェック（必須項目）
+        if (name == null || name.trim().isEmpty()) {
+            request.setAttribute("user", loginUser);
+            request.setAttribute("error", "ユーザー名を入力してください。");
+            request.getRequestDispatcher("/jsp/edit_info_user.jsp").forward(request, response);
+            return;
+        }
+
+        if (email == null || email.trim().isEmpty()) {
+            request.setAttribute("user", loginUser);
+            request.setAttribute("error", "メールアドレスを入力してください。");
             request.getRequestDispatcher("/jsp/edit_info_user.jsp").forward(request, response);
             return;
         }
 
         Connection con = null;
-        try {
-            con = new DBManager().getConnection();
-            UserDAO dao = new UserDAO(con);
 
+        try {
+            // DAO経由でConnection取得
+            DAO db = new DAO();
+            con = db.getConnection();
+
+            UserDAO dao = new UserDAO(con);
             User dbUser = dao.findById(loginUser.getUserId());
+
             if (dbUser == null) {
+                request.setAttribute("user", loginUser);
                 request.setAttribute("error", "ユーザー情報が見つかりません。");
                 request.getRequestDispatcher("/jsp/edit_info_user.jsp").forward(request, response);
                 return;
             }
 
+            boolean hasChanges = false;
+
             // --- 名前更新 ---
-            if (name != null && !name.isEmpty()) {
+            if (name != null && !name.trim().isEmpty()) {
+                if (!name.equals(dbUser.getName())) {
+                    hasChanges = true;
+                }
                 dbUser.setName(name);
             }
 
             // --- メール重複チェック ---
-            if (email != null && !email.isEmpty()) {
-                User exist = dao.findByEmail(email);
-                if (exist != null && exist.getUserId() != loginUser.getUserId()) {
-                    // 他ユーザーが使っている場合はエラー
-                    request.setAttribute("error", "このメールアドレスは既に使用されています。");
-                    request.getRequestDispatcher("/jsp/edit_info_user.jsp").forward(request, response);
-                    return;
+            if (email != null && !email.trim().isEmpty()) {
+                if (!email.equals(dbUser.getEmail())) {
+                    User exist = dao.findByEmail(email);
+                    if (exist != null && exist.getUserId() != loginUser.getUserId()) {
+                        // 他ユーザーが使っている場合はエラー
+                        request.setAttribute("user", dbUser);
+                        request.setAttribute("error", "このメールアドレスは既に使用されています。");
+                        request.getRequestDispatcher("/jsp/edit_info_user.jsp").forward(request, response);
+                        return;
+                    }
+                    hasChanges = true;
                 }
-                dbUser.setEmail(email); // 自分用の場合は更新
+                dbUser.setEmail(email);
             }
 
             // --- パスワードハッシュ化して更新 ---
-            if (password != null && !password.isEmpty()) {
+            if (password != null && !password.trim().isEmpty()) {
                 dbUser.setPassword(hashPassword(password));
+                hasChanges = true;
             }
 
             // DB更新
@@ -82,8 +104,19 @@ public class EditInfoExecuteAction extends Action {
             request.setAttribute("message", "ユーザー情報を更新しました。");
             request.getRequestDispatcher("/jsp/edit_info_result_user.jsp").forward(request, response);
 
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.setAttribute("user", loginUser);
+            request.setAttribute("error", "エラーが発生しました: " + e.getMessage());
+            request.getRequestDispatcher("/jsp/edit_info_user.jsp").forward(request, response);
         } finally {
-            if (con != null) con.close();
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 
