@@ -73,6 +73,7 @@ public class MerchandiseRegisterExecuteAction extends Action {
                             expirationDateStr = fieldValue;
                         } else if ("employeeNumber".equals(fieldName)) {
                             employeeNumberStr = fieldValue;
+                            System.out.println("★★★ フォームから受信した社員番号: [" + fieldValue + "]");
                         } else if ("tags".equals(fieldName)) {
                             tags = fieldValue;
                         }
@@ -145,6 +146,19 @@ public class MerchandiseRegisterExecuteAction extends Action {
                 return;
             }
 
+            // ★★★ 追加: 社員番号を3桁ゼロ埋めに変換 ★★★
+            employeeNumberStr = employeeNumberStr.trim();
+            System.out.println("★★★ 受信した社員番号（trim後）: [" + employeeNumberStr + "] 長さ: " + employeeNumberStr.length());
+
+            String formattedEmployeeNumber = employeeNumberStr;
+            try {
+                int empNum = Integer.parseInt(employeeNumberStr);
+                formattedEmployeeNumber = String.format("%03d", empNum);
+                System.out.println("★★★ フォーマット後の社員番号: [" + formattedEmployeeNumber + "]");
+            } catch (NumberFormatException e) {
+                System.out.println("★★★ 社員番号は数値変換不可、そのまま使用: [" + employeeNumberStr + "]");
+            }
+
             if (imageFiles.isEmpty()) {
                 request.setAttribute("errorMessage", "少なくとも1枚の画像を選択してください");
                 request.getRequestDispatcher("/store_jsp/merchandise_register_store.jsp").forward(request, response);
@@ -155,18 +169,20 @@ public class MerchandiseRegisterExecuteAction extends Action {
             int stock = Integer.parseInt(quantityStr);
             java.sql.Date useByDate = java.sql.Date.valueOf(expirationDateStr);
 
-            // ★★★ 修正: 社員番号から社員IDを検索 ★★★
+            // ★★★ 修正: フォーマット済み社員番号で検索 ★★★
             EmployeeDAO empDao = new EmployeeDAO();
-            Employee employee = empDao.selectByCode(employeeNumberStr);
+            Employee employee = empDao.selectByCode(formattedEmployeeNumber);
 
             if (employee == null) {
-                request.setAttribute("errorMessage", "社員番号 " + employeeNumberStr + " は存在しません");
+                System.err.println("❌ 社員番号が見つかりません: [" + formattedEmployeeNumber + "]");
+                request.setAttribute("errorMessage", "社員番号 " + employeeNumberStr + " は存在しません。正しい社員番号を入力してください。");
                 request.getRequestDispatcher("/store_jsp/merchandise_register_store.jsp").forward(request, response);
                 return;
             }
 
             int employeeId = employee.getId();
-            System.out.println("✅ 社員番号 " + employeeNumberStr + " → 社員ID " + employeeId + " に変換");
+            System.out.println("✅ 社員番号 " + formattedEmployeeNumber + " → 社員ID " + employeeId + " に変換");
+            System.out.println("✅ 社員名: " + employee.getEmployeeName());
 
             if (price < 0) {
                 request.setAttribute("errorMessage", "価格は0円以上で入力してください");

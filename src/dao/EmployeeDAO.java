@@ -11,8 +11,23 @@ import tool.DBManager;
 
 public class EmployeeDAO {
 
-    // DB接続取得
+    private Connection connection;
+
+    // デフォルトコンストラクタ（新しい接続を取得）
+    public EmployeeDAO() throws Exception {
+        this.connection = new DBManager().getConnection();
+    }
+
+    // 接続を受け取るコンストラクタ（トランザクション管理用）
+    public EmployeeDAO(Connection connection) {
+        this.connection = connection;
+    }
+
+    // DB接続取得（互換性のため残す）
     private Connection getConnection() throws Exception {
+        if (this.connection != null) {
+            return this.connection;
+        }
         return new DBManager().getConnection();
     }
 
@@ -61,20 +76,35 @@ public class EmployeeDAO {
         return list;
     }
 
-
-    // 社員コードで検索
+    // 社員番号で検索（trimを追加してデバッグ強化）
     public Employee selectByCode(String employeeCode) throws Exception {
+        // 前後の空白を削除
+        if (employeeCode != null) {
+            employeeCode = employeeCode.trim();
+        }
+
+        System.out.println("🔍 EmployeeDAO.selectByCode 呼び出し");
+        System.out.println("   検索する社員番号: [" + employeeCode + "]");
+        System.out.println("   社員番号の長さ: " + (employeeCode != null ? employeeCode.length() : "null"));
+
         String sql =
             "SELECT t003_pk1_employee, t003_fd1_employee, t003_fd2_employee, t003_fd3_employee, t001_fd1_store " +
             "FROM t003_employee " +
             "JOIN t001_store ON t003_employee.t003_fd2_employee = t001_store.t001_pk1_store " +
             "WHERE t003_fd3_employee = ?";
 
-        try (Connection con = getConnection();
-             PreparedStatement st = con.prepareStatement(sql)) {
+        Connection con = getConnection();
+        PreparedStatement st = null;
+        ResultSet rs = null;
 
+        try {
+            st = con.prepareStatement(sql);
             st.setString(1, employeeCode);
-            ResultSet rs = st.executeQuery();
+
+            System.out.println("   SQL実行: " + sql);
+            System.out.println("   パラメータ: [" + employeeCode + "]");
+
+            rs = st.executeQuery();
 
             if (rs.next()) {
                 Employee e = new Employee();
@@ -84,9 +114,33 @@ public class EmployeeDAO {
                 e.setEmployeeName(rs.getString("t003_fd1_employee"));
                 e.setStoreCode(String.valueOf(rs.getInt("t003_fd2_employee")));
                 e.setStoreName(rs.getString("t001_fd1_store"));
+
+                System.out.println("✅ 社員が見つかりました！");
+                System.out.println("   社員ID: " + e.getId());
+                System.out.println("   社員名: " + e.getEmployeeName());
+                System.out.println("   DB上の社員番号: [" + e.getEmployeeNumber() + "]");
+
                 return e;
+            } else {
+                System.out.println("❌ 社員が見つかりませんでした");
+
+                // デバッグ: DBに登録されている社員番号を表示
+                String debugSql = "SELECT t003_fd3_employee FROM t003_employee LIMIT 10";
+                try (PreparedStatement debugSt = con.prepareStatement(debugSql);
+                     ResultSet debugRs = debugSt.executeQuery()) {
+                    System.out.println("   📋 DB内の社員番号一覧（最大10件）:");
+                    while (debugRs.next()) {
+                        String dbCode = debugRs.getString("t003_fd3_employee");
+                        System.out.println("      - [" + dbCode + "] (長さ: " + (dbCode != null ? dbCode.length() : "null") + ")");
+                    }
+                }
             }
+        } finally {
+            if (rs != null) rs.close();
+            if (st != null) st.close();
+            // connectionはクローズしない（呼び出し元で管理）
         }
+
         return null;
     }
 
@@ -113,7 +167,6 @@ public class EmployeeDAO {
         }
         return null;
     }
-
 
     // 全社員取得（必要なら）
     public List<Employee> selectAll() throws Exception {

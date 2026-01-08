@@ -1,5 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="java.util.*, bean.Store, bean.Merchandise, bean.MerchandiseImage" %>
+<%@ page import="java.sql.Date" %>
+<%@ page import="java.util.Calendar" %>
 
 <%
     HttpSession userSession = request.getSession(false);
@@ -96,6 +98,17 @@
     color:#c07148;
     margin-bottom:5px;
 }
+
+/* 期限間近バッジ */
+.expiry-badge {
+    background:#ff6b6b;
+    color:#fff;
+    padding:3px 8px;
+    border-radius:5px;
+    font-size:0.75rem;
+    margin-bottom:5px;
+    display:inline-block;
+}
 </style>
 </head>
 
@@ -118,12 +131,16 @@
                 Map<Store, List<Merchandise>> shopMerchMap =
                     (Map<Store, List<Merchandise>>) request.getAttribute("shopMerchMap");
 
+                // 現在日時を取得（消費期限チェック用）
+                Date today = new Date(System.currentTimeMillis());
+
                 // デバッグ出力
                 System.out.println("=== JSP デバッグ ===");
                 System.out.println("itemList: " + (itemList != null ? itemList.size() + "件" : "null"));
                 System.out.println("storeList: " + (storeList != null ? storeList.size() + "件" : "null"));
                 System.out.println("searchKeyword: " + searchKeyword);
                 System.out.println("shopMerchMap: " + (shopMerchMap != null ? "あり" : "null"));
+                System.out.println("今日の日付: " + today);
             %>
 
 				<% if (itemList != null) { %>
@@ -156,8 +173,28 @@
 				                    if (merch.getStock() == 0) {
 				                        continue;
 				                    }
+
+				                    // ========== 消費期限チェック ==========
+				                    Date useByDate = merch.getUseByDate();
+				                    if (useByDate != null && useByDate.before(today)) {
+				                        // 消費期限が切れている場合はスキップ
+				                        continue;
+				                    }
+
+				                    // 消費期限まで3日以内かチェック
+				                    boolean isExpiringSoon = false;
+				                    if (useByDate != null) {
+				                        long diff = useByDate.getTime() - today.getTime();
+				                        long daysUntilExpiry = diff / (1000 * 60 * 60 * 24);
+				                        isExpiringSoon = daysUntilExpiry <= 3;
+				                    }
 				                %>
 				                    <div class="merch-item">
+				                        <!-- 期限間近の警告バッジ -->
+				                        <% if (isExpiringSoon) { %>
+				                            <div class="expiry-badge">🔥 まもなく期限切れ</div>
+				                        <% } %>
+
 				                        <!-- 画像クリック → 商品詳細へ -->
 				                        <a href="<%= request.getContextPath() %>/merch/<%= merch.getMerchandiseId() %>">
 				                            <div class="merch-image">
@@ -230,9 +267,29 @@
                             if (merch.getStock() == 0) {
                                 continue;
                             }
+
+                            // ========== 消費期限チェック ==========
+                            Date useByDate = merch.getUseByDate();
+                            if (useByDate != null && useByDate.before(today)) {
+                                // 消費期限が切れている場合はスキップ
+                                continue;
+                            }
+
+                            // 消費期限まで3日以内かチェック
+                            boolean isExpiringSoon = false;
+                            if (useByDate != null) {
+                                long diff = useByDate.getTime() - today.getTime();
+                                long daysUntilExpiry = diff / (1000 * 60 * 60 * 24);
+                                isExpiringSoon = daysUntilExpiry <= 3;
+                            }
                         %>
 
                             <div class="merch-item">
+                                <!-- 期限間近の警告バッジ -->
+                                <% if (isExpiringSoon) { %>
+                                    <div class="expiry-badge">🔥 まもなく期限切れ</div>
+                                <% } %>
+
                                 <!-- 画像クリック → 商品詳細へ -->
                                 <a href="<%= request.getContextPath() %>/merch/<%= merch.getMerchandiseId() %>">
                                     <div class="merch-image">
@@ -291,3 +348,4 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script src="${pageContext.request.contextPath}/js/main.js"></script>
 </body>
+</html>

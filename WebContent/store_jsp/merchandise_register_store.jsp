@@ -205,7 +205,7 @@
 					            if (empList != null) {
 					                for (bean.Employee emp : empList) {
 					        %>
-					                    <option value="<%= emp.getId() %>"><%= emp.getEmployeeNumber() %></option>
+					                    <option value="<%= emp.getEmployeeNumber() %>"><%= emp.getEmployeeNumber() %></option>
 					        <%
 					                }
 					            }
