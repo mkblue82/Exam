@@ -1,22 +1,54 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="java.util.List" %>
+<%@ page import="java.util.ArrayList" %>
 <%@ page import="bean.Booking" %>
 <%@ page import="java.text.SimpleDateFormat" %>
 
 <%
     List<Booking> bookingList = (List<Booking>) request.getAttribute("bookingList");
 
-    Integer storeId = (session.getAttribute("storeId") != null)
-                        ? (Integer) session.getAttribute("storeId")
-                        : null;
+    Integer storeId = (session.getAttribute("storeId") != null) ? (Integer) session.getAttribute("storeId") : null;
+    String storeName = (session.getAttribute("storeName") != null) ? (String) session.getAttribute("storeName") : null;
 
-    String storeName = (session.getAttribute("storeName") != null)
-                        ? (String) session.getAttribute("storeName")
-                        : null;
-
-    // 日時表示用のフォーマッター（"yyyy-MM-dd HH:mm" 表記）
+    // フォーマット設定
     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
     SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
+
+    // 未受取／受取済 に分割
+    List<Booking> notReceivedList = new ArrayList<>();
+    List<Booking> receivedList = new ArrayList<>();
+    if (bookingList != null) {
+        for (Booking b : bookingList) {
+            if (b.getPickupStatus()) {
+                receivedList.add(b);
+            } else {
+                notReceivedList.add(b);
+            }
+        }
+    }
+
+ 	// ページング設定
+    int pageSize = 5;
+    int currentPage = 1;
+    String pageParam = request.getParameter("currentPage");
+    if (pageParam != null) {
+        try {
+        	currentPage = Integer.parseInt(pageParam);
+        } catch (NumberFormatException e) {
+        	currentPage = 1;
+        }
+    }
+
+    int totalReceived = receivedList.size();
+    int totalPages = (int) Math.ceil(totalReceived / (double) pageSize);
+
+    int startIndex = (currentPage - 1) * pageSize;
+    int endIndex = Math.min(startIndex + pageSize, totalReceived);
+    List<Booking> pagedReceived = new ArrayList<>();
+    if (startIndex < endIndex) {
+        pagedReceived = new ArrayList<>(receivedList.subList(startIndex, endIndex));
+    }
+
 %>
 
 <!DOCTYPE html>
@@ -163,76 +195,117 @@
     <jsp:include page="/store_jsp/header_store.jsp" />
 
     <main class="column">
-        <div class="main-contents">
-            <div class="main-content">
+	    <div class="main-contents">
+	        <div class="main-content">
 
-                <h2>予約一覧</h2>
+	            <h2>予約一覧</h2>
 
-                <div class="store-info">
-                    <% if (storeName != null) { %>
-                        表示中の店舗：<%= storeName %>（ID：<%= storeId %>）
-                    <% } else { %>
-                        店舗ID：<%= storeId != null ? storeId : "不明" %>
-                    <% } %>
-                </div>
+	            <div class="store-info">
+	                <% if (storeName != null) { %>
+	                    表示中の店舗：<%= storeName %>（ID：<%= storeId %>）
+	                <% } else { %>
+	                    店舗ID：<%= storeId != null ? storeId : "不明" %>
+	                <% } %>
+	            </div>
 
-                <% if (bookingList != null && !bookingList.isEmpty()) { %>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>予約ID</th>
-                                <th>商品名</th>
-                                <th>予約ユーザーID</th>
-                                <th>数量</th>
-                                <th>受取予定時刻</th>
-                                <th>予約日時</th>
-                                <th>受取状態</th>
-                                <th>金額</th>
-                                <th>受け取り</th>
-                            </tr>
-                        </thead>
+	            <!-- ▼ 未受取予約 -->
+	            <h3 style="margin-top:30px; color:#c07148; text-align:center;">未受取の予約</h3>
+	            <% if (!notReceivedList.isEmpty()) { %>
+	                <table>
+	                    <thead>
+	                        <tr>
+	                            <th>予約ID</th>
+	                            <th>商品名</th>
+	                            <th>予約ユーザーID</th>
+	                            <th>数量</th>
+	                            <th>受取予定時刻</th>
+	                            <th>予約日時</th>
+	                            <th>受取状態</th>
+	                            <th>金額</th>
+	                            <th>受け取り</th>
+	                        </tr>
+	                    </thead>
+	                    <tbody>
+	                        <% for (Booking b : notReceivedList) { %>
+	                            <tr>
+	                                <td><%= b.getBookingId() %></td>
+	                                <td><%= b.getMerchandiseName() %></td>
+	                                <td><%= b.getUserId() %></td>
+	                                <td><%= b.getCount() %></td>
+	                                <td><%= dateFormat.format(b.getPickupTime()) %><br><%= timeFormat.format(b.getPickupTime()) %></td>
+	                                <td><%= dateFormat.format(b.getBookingTime()) %><br><%= timeFormat.format(b.getBookingTime()) %></td>
+	                                <td>未受取</td>
+	                                <td><%= b.getAmount() %></td>
+	                                <td>
+	                                    <a class="pickup-btn"
+	                                       href="${pageContext.request.contextPath}/foodloss/PickupBooking.action?bookingId=<%= b.getBookingId() %>">
+	                                        受け取り
+	                                    </a>
+	                                </td>
+	                            </tr>
+	                        <% } %>
+	                    </tbody>
+	                </table>
+	            <% } else { %>
+	                <p class="no-data">未受取の予約はありません。</p>
+	            <% } %>
 
-                        <tbody>
-                            <% for (Booking b : bookingList) { %>
-                                <tr>
-                                    <td><%= b.getBookingId() %></td>
-                                    <td><%= b.getMerchandiseName() %></td>
-                                    <td><%= b.getUserId() %></td>
-                                    <td><%= b.getCount() %></td>
-                                    <td><%= dateFormat.format(b.getPickupTime()) %><br>
-    									<%= timeFormat.format(b.getPickupTime()) %></td>
-                                    <td><%= dateFormat.format(b.getBookingTime()) %><br>
-    									<%= timeFormat.format(b.getBookingTime()) %></td>
-                                    <td><%= b.getPickupStatus() ? "受取済" : "未受取" %></td>
-                                    <td><%= b.getAmount() %></td>
-                                    <td>
-                                        <% if (!b.getPickupStatus()) { %>
-                                            <a class="pickup-btn"
-                                               href="${pageContext.request.contextPath}/foodloss/PickupBooking.action?bookingId=<%= b.getBookingId() %>">
-                                                受け取り
-                                            </a>
-                                        <% } else { %>
-                                            ー
-                                        <% } %>
-                                    </td>
-                                </tr>
-                            <% } %>
-                        </tbody>
-                    </table>
+	            <!-- ▼ 受取済予約 -->
+	            <h3 style="margin-top:50px; color:#c07148; text-align:center;">受取済の予約</h3>
+	            <% if (!receivedList.isEmpty()) { %>
+	                <table>
+	                    <thead>
+	                        <tr>
+	                            <th>予約ID</th>
+	                            <th>商品名</th>
+	                            <th>予約ユーザーID</th>
+	                            <th>数量</th>
+	                            <th>受取予定時刻</th>
+	                            <th>予約日時</th>
+	                            <th>受取状態</th>
+	                            <th>金額</th>
+	                            <th>受け取り</th>
+	                        </tr>
+	                    </thead>
+	                    <tbody>
+						    <% for (Booking b : pagedReceived) { %>
+						        <tr>
+						            <td><%= b.getBookingId() %></td>
+						            <td><%= b.getMerchandiseName() %></td>
+						            <td><%= b.getUserId() %></td>
+						            <td><%= b.getCount() %></td>
+						            <td><%= dateFormat.format(b.getPickupTime()) %><br><%= timeFormat.format(b.getPickupTime()) %></td>
+						            <td><%= dateFormat.format(b.getBookingTime()) %><br><%= timeFormat.format(b.getBookingTime()) %></td>
+						            <td>受取済</td>
+						            <td><%= b.getAmount() %></td>
+						            <td>ー</td>
+						        </tr>
+						    <% } %>
+						</tbody>
+	                </table>
 
-                <% } else { %>
-                    <p class="no-data">
-                        現在、予約は登録されていません。
-                    </p>
-                <% } %>
+	                <div class="pagination" style="text-align:center; margin: 20px 0;">
+					    <% for (int i = 1; i <= totalPages; i++) { %>
+					        <% if (i == currentPage) { %>
+					            <strong><%= i %></strong>
+					        <% } else { %>
+					            <a href="?currentPage=<%= i %>"><%= i %></a>
+					        <% } %>
+					        &nbsp;
+					    <% } %>
+					</div>
 
-                <div class="back-button">
-                    <a href="${pageContext.request.contextPath}/foodloss/Menu.action">ホームに戻る</a>
-                </div>
+	            <% } else { %>
+	                <p class="no-data">受取済の予約はありません。</p>
+	            <% } %>
 
-            </div>
-        </div>
-    </main>
+	            <div class="back-button">
+	                <a href="${pageContext.request.contextPath}/foodloss/Menu.action">ホームに戻る</a>
+	            </div>
+
+	        </div>
+	    </div>
+	</main>
 
     <!-- 共通フッター -->
     <jsp:include page="/jsp/footer.jsp" />
