@@ -195,6 +195,7 @@
                         <input type="date" id="expirationDate" name="expirationDate" required>
                     </div>
 
+
                     <div class="form-group">
 					    <label for="employeeNumber">社員番号 <span>*</span></label>
 					    <select id="employeeNumber" name="employeeNumber" required>
