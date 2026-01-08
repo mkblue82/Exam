@@ -112,16 +112,6 @@
         transform: translateY(-3px);
     }
 
-    .btn-edit {
-        background-color: #4CAF50;
-        color: white;
-    }
-
-    .btn-edit:hover {
-        background-color: #45a049;
-        transform: translateY(-2px);
-    }
-
     .back-button {
         margin-top: 30px;
         text-align: center;
@@ -245,7 +235,7 @@
 
                 <!-- ボタンエリア -->
                 <div class="button-container">
-                    <a href="${pageContext.request.contextPath}/foodloss/StoreEditForm.action" class="btn btn-edit">
+                    <a href="${pageContext.request.contextPath}/foodloss/StoreEditForm.action" class="btn btn-secondary">
                         情報を編集
                     </a>
                     <a href="${pageContext.request.contextPath}/foodloss/Menu.action" class="btn btn-secondary">

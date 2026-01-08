@@ -7,7 +7,6 @@
     <button type="submit" class="logout-btn">ログアウト</button>
   </form>
 </header>
-
 <!-- メニューバー -->
 <div id="menubar">
   <nav>
@@ -17,22 +16,19 @@
     </ul>
   </nav>
 </div>
-
 <style>
 .logout-btn {
-  width: 150px;
-  padding: 12px 0;
-  text-align: center;
+  padding: 12px 40px;
   background-color: #ccc;
   border: none;
-  border-radius: 8px;
+  border-radius: 5px;
   color: #333;
   font-weight: bold;
-  font-size: 1rem;
+  font-size: 16px;
   cursor: pointer;
   transition: all 0.3s;
+  font-family: inherit;
 }
-
 .logout-btn:hover {
   background-color: #c07148;
   color: #fff;

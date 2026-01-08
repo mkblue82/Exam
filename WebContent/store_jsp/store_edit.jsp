@@ -56,7 +56,8 @@
 
     .form-group input[type="text"],
     .form-group input[type="email"],
-    .form-group input[type="tel"] {
+    .form-group input[type="tel"],
+    .form-group input[type="password"] {
         width: 100%;
         padding: 12px;
         border: 1px solid #ddd;
@@ -91,9 +92,10 @@
         font-size: 16px;
         cursor: pointer;
         transition: all 0.3s;
-        font-weight: bold;
         text-decoration: none;
         display: inline-block;
+        font-family: inherit;
+        font-weight: bold;
     }
 
     .btn-primary {
@@ -111,11 +113,13 @@
     .btn-secondary {
         background-color: #ccc;
         color: #333;
+        transition: all 0.3s;
     }
 
     .btn-secondary:hover {
-        background-color: #bbb;
-        transform: translateY(-2px);
+        background-color: #c07148;
+        color: #fff;
+        transform: translateY(-3px);
     }
 
     .note {
