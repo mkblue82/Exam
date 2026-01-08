@@ -3,6 +3,8 @@
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="bean.Booking" %>
 <%@ page import="java.text.SimpleDateFormat" %>
+<%@ page import="java.util.Collections" %>
+<%@ page import="java.util.Comparator" %>
 
 <%
     List<Booking> bookingList = (List<Booking>) request.getAttribute("bookingList");
@@ -25,6 +27,12 @@
                 notReceivedList.add(b);
             }
         }
+
+        Collections.sort(receivedList, new Comparator<Booking>() {
+            public int compare(Booking b1, Booking b2) {
+                return b2.getBookingTime().compareTo(b1.getBookingTime());
+            }
+        });
     }
 
  	// ページング設定
@@ -48,6 +56,7 @@
     if (startIndex < endIndex) {
         pagedReceived = new ArrayList<>(receivedList.subList(startIndex, endIndex));
     }
+
 
 %>
 
