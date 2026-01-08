@@ -1,6 +1,8 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="java.util.List" %>
 <%@ page import="bean.Merchandise" %>
+<%@ page import="java.text.SimpleDateFormat" %>
+
 
 <%
     // サーブレットから受け取った商品一覧
@@ -18,6 +20,10 @@
     String storeName = (session.getAttribute("storeName") != null)
                         ? (String) session.getAttribute("storeName")
                         : null;
+
+    SimpleDateFormat datetimeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+
+
 %>
 
 <!DOCTYPE html>
@@ -206,7 +212,7 @@
                                 </td>
                                 <td><%= m.getStock() %></td>
                                 <td><%= m.getUseByDate() %></td>
-                                <td><%= m.getRegistrationTime() %></td>
+                                <td><%= datetimeFormat.format(m.getRegistrationTime()) %></td>
                                 <td>
                                     <a class="btn table-button"
                                        href="${pageContext.request.contextPath}/foodloss/MerchandiseEdit.action?id=<%= m.getMerchandiseId() %>">
