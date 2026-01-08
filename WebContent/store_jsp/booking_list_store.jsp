@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="java.util.List" %>
 <%@ page import="bean.Booking" %>
+<%@ page import="java.text.SimpleDateFormat" %>
 
 <%
     List<Booking> bookingList = (List<Booking>) request.getAttribute("bookingList");
@@ -12,6 +13,10 @@
     String storeName = (session.getAttribute("storeName") != null)
                         ? (String) session.getAttribute("storeName")
                         : null;
+
+    // 日時表示用のフォーマッター（"yyyy-MM-dd HH:mm" 表記）
+    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+    SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
 %>
 
 <!DOCTYPE html>
@@ -145,7 +150,7 @@
 		th:nth-child(3), td:nth-child(3) { width: 130px; }  /* 予約ユーザーID */
 		th:nth-child(4), td:nth-child(4) { width: 80px; }   /* 数量 */
 		th:nth-child(5), td:nth-child(5) { width: 180px; }  /* 受取予定時刻 */
-		th:nth-child(6), td:nth-child(6) { width: 180px; }  /* 予約日時 */
+		th:nth-child(6), td:nth-child(6) { width: 300px; }  /* 予約日時 */
 		th:nth-child(7), td:nth-child(7) { width: 100px; }  /* 受取状態 */
 		th:nth-child(8), td:nth-child(8) { width: 120px; }  /* ボタン */
     </style>
@@ -194,10 +199,12 @@
                                     <td><%= b.getMerchandiseName() %></td>
                                     <td><%= b.getUserId() %></td>
                                     <td><%= b.getCount() %></td>
-                                    <td><%= b.getPickupTime() %></td>
-                                    <td><%= b.getBookingTime() %></td>
+                                    <td><%= dateFormat.format(b.getPickupTime()) %><br>
+    									<%= timeFormat.format(b.getPickupTime()) %></td>
+                                    <td><%= dateFormat.format(b.getBookingTime()) %><br>
+    									<%= timeFormat.format(b.getBookingTime()) %></td>
                                     <td><%= b.getPickupStatus() ? "受取済" : "未受取" %></td>
-                                    <td><%= b.getAmount() %></td>  <!-- ← 金額を表示 -->
+                                    <td><%= b.getAmount() %></td>
                                     <td>
                                         <% if (!b.getPickupStatus()) { %>
                                             <a class="pickup-btn"
