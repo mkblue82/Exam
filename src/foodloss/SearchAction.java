@@ -105,9 +105,9 @@ public class SearchAction extends Action {
             req.setAttribute("errorMessage", "検索中にエラーが発生しました: " + e.getMessage());
         }
 
-        // main_user.jspにフォワード
-        System.out.println("main_user.jspへフォワード");
-        req.getRequestDispatcher("/jsp/main_user.jsp").forward(req, res);
+        // search.jspにフォワード（変更点）
+        System.out.println("search.jspへフォワード");
+        req.getRequestDispatcher("/jsp/search.jsp").forward(req, res);
         System.out.println("===== SearchAction END =====");
     }
 }
