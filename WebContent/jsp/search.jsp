@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="java.util.*, bean.Store, bean.Merchandise, bean.MerchandiseImage" %>
+<%@ page import="java.sql.Date" %>
 
 <%
     HttpSession userSession = request.getSession(false);
@@ -165,6 +166,17 @@
     background:#f9f9f9;
     border-radius:8px;
 }
+
+/* 期限間近バッジ */
+.expiry-badge {
+    background:#ff6b6b;
+    color:#fff;
+    padding:3px 8px;
+    border-radius:5px;
+    font-size:0.75rem;
+    margin-bottom:5px;
+    display:inline-block;
+}
 </style>
 </head>
 
@@ -188,12 +200,16 @@
                 Map<Store, List<Merchandise>> shopMerchMap =
                     (Map<Store, List<Merchandise>>) request.getAttribute("shopMerchMap");
 
+                // 現在日時を取得（消費期限チェック用）
+                Date today = new Date(System.currentTimeMillis());
+
                 // デバッグ出力
                 System.out.println("=== JSP デバッグ ===");
                 System.out.println("itemList: " + (itemList != null ? itemList.size() + "件" : "null"));
                 System.out.println("storeList: " + (storeList != null ? storeList.size() + "件" : "null"));
                 System.out.println("searchKeyword: " + searchKeyword);
                 System.out.println("shopMerchMap: " + (shopMerchMap != null ? "あり" : "null"));
+                System.out.println("今日の日付: " + today);
             %>
 
             <% if (searchKeyword != null && !searchKeyword.trim().isEmpty()) { %>
@@ -233,13 +249,50 @@
                                     if (storeToMerchMap != null) {
                                         storeProducts = storeToMerchMap.get(store);
                                     }
-                                    if (storeProducts != null && !storeProducts.isEmpty()) {
+
+                                    // 表示可能な商品をカウント
+                                    int storeProductCount = 0;
+                                    if (storeProducts != null) {
+                                        for (Merchandise m : storeProducts) {
+                                            if (m.getStock() > 0) {
+                                                Date checkDate = m.getUseByDate();
+                                                if (checkDate == null || !checkDate.before(today)) {
+                                                    storeProductCount++;
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    if (storeProductCount > 0) {
                                 %>
                                     <div style="margin-top:15px; padding-top:15px; border-top:1px solid #ddd;">
                                         <div style="font-weight:bold; margin-bottom:10px; color:#666;">この店舗の商品:</div>
                                         <div class="merch-list">
-                                            <% for (Merchandise merch : storeProducts) { %>
+                                            <% for (Merchandise merch : storeProducts) {
+                                                // 在庫0の商品はスキップ
+                                                if (merch.getStock() == 0) {
+                                                    continue;
+                                                }
+
+                                                // 消費期限チェック
+                                                Date useByDate = merch.getUseByDate();
+                                                if (useByDate != null && useByDate.before(today)) {
+                                                    continue;
+                                                }
+
+                                                // 消費期限まで3日以内かチェック
+                                                boolean isExpiringSoon = false;
+                                                if (useByDate != null) {
+                                                    long diff = useByDate.getTime() - today.getTime();
+                                                    long daysUntilExpiry = diff / (1000 * 60 * 60 * 24);
+                                                    isExpiringSoon = daysUntilExpiry <= 3;
+                                                }
+                                            %>
                                                 <div class="merch-item">
+                                                    <% if (isExpiringSoon) { %>
+                                                        <div class="expiry-badge">🔥 まもなく期限切れ</div>
+                                                    <% } %>
+
                                                     <a href="<%= request.getContextPath() %>/merch/<%= merch.getMerchandiseId() %>">
                                                         <div class="merch-image">
                                                             <%
@@ -276,12 +329,50 @@
                 <div class="search-section">
                     <div class="section-header">🛒 商品検索結果</div>
 
-                    <% if (itemList != null && !itemList.isEmpty()) { %>
-                        <p class="result-count"><%= itemList.size() %>件の商品が見つかりました</p>
+                    <%
+                        // 表示可能な商品をカウント
+                        int displayableItemCount = 0;
+                        if (itemList != null) {
+                            for (Merchandise m : itemList) {
+                                if (m.getStock() > 0) {
+                                    Date checkDate = m.getUseByDate();
+                                    if (checkDate == null || !checkDate.before(today)) {
+                                        displayableItemCount++;
+                                    }
+                                }
+                            }
+                        }
+                    %>
+
+                    <% if (displayableItemCount > 0) { %>
+                        <p class="result-count"><%= displayableItemCount %>件の商品が見つかりました</p>
 
                         <div class="merch-list">
-                            <% for (Merchandise merch : itemList) { %>
+                            <% for (Merchandise merch : itemList) {
+                                // 在庫0の商品はスキップ
+                                if (merch.getStock() == 0) {
+                                    continue;
+                                }
+
+                                // 消費期限チェック
+                                Date useByDate = merch.getUseByDate();
+                                if (useByDate != null && useByDate.before(today)) {
+                                    continue;
+                                }
+
+                                // 消費期限まで3日以内かチェック
+                                boolean isExpiringSoon = false;
+                                if (useByDate != null) {
+                                    long diff = useByDate.getTime() - today.getTime();
+                                    long daysUntilExpiry = diff / (1000 * 60 * 60 * 24);
+                                    isExpiringSoon = daysUntilExpiry <= 3;
+                                }
+                            %>
                                 <div class="merch-item">
+                                    <% if (isExpiringSoon) { %>
+                                        <div class="expiry-badge">🔥 まもなく期限切れ</div>
+                                    <% } %>
+
                                     <a href="<%= request.getContextPath() %>/merch/<%= merch.getMerchandiseId() %>">
                                         <div class="merch-image">
                                             <%
@@ -311,7 +402,12 @@
                 </div>
 
                 <!-- 結果が何もない場合 -->
-                <% if ((itemList == null || itemList.isEmpty()) && (storeList == null || storeList.isEmpty())) { %>
+                <%
+                    boolean hasDisplayableStores = (storeList != null && !storeList.isEmpty());
+                    boolean hasNoResults = (displayableItemCount == 0 && !hasDisplayableStores);
+                %>
+
+                <% if (hasNoResults) { %>
                     <p style="text-align:center; padding:50px; color:#999; font-size:1.2rem;">
                         「<%= searchKeyword %>」に一致する店舗・商品は見つかりませんでした。
                     </p>
@@ -344,13 +440,50 @@
                         </a>
                     </div>
 
-                    <% if (merchList != null && !merchList.isEmpty()) { %>
+                    <%
+                        // 表示可能な商品をカウント
+                        int displayCount = 0;
+                        if (merchList != null) {
+                            for (Merchandise m : merchList) {
+                                if (m.getStock() > 0) {
+                                    Date checkDate = m.getUseByDate();
+                                    if (checkDate == null || !checkDate.before(today)) {
+                                        displayCount++;
+                                    }
+                                }
+                            }
+                        }
+                    %>
 
+                    <% if (displayCount > 0) { %>
                         <div class="merch-list">
 
-                        <% for (Merchandise merch : merchList) { %>
+                        <% for (Merchandise merch : merchList) {
+                            // 在庫0の商品はスキップ
+                            if (merch.getStock() == 0) {
+                                continue;
+                            }
+
+                            // 消費期限チェック
+                            Date useByDate = merch.getUseByDate();
+                            if (useByDate != null && useByDate.before(today)) {
+                                continue;
+                            }
+
+                            // 消費期限まで3日以内かチェック
+                            boolean isExpiringSoon = false;
+                            if (useByDate != null) {
+                                long diff = useByDate.getTime() - today.getTime();
+                                long daysUntilExpiry = diff / (1000 * 60 * 60 * 24);
+                                isExpiringSoon = daysUntilExpiry <= 3;
+                            }
+                        %>
 
                             <div class="merch-item">
+                                <% if (isExpiringSoon) { %>
+                                    <div class="expiry-badge">🔥 まもなく期限切れ</div>
+                                <% } %>
+
                                 <!-- 画像クリック → 商品詳細へ -->
                                 <a href="<%= request.getContextPath() %>/merch/<%= merch.getMerchandiseId() %>">
                                     <div class="merch-image">
@@ -371,7 +504,8 @@
                                     </div>
                                 </a>
 
-                                <!-- 値段のみ表示 -->
+                                <!-- 商品名と値段 -->
+                                <div style="margin-top:8px;"><%= merch.getMerchandiseName() %></div>
                                 <div class="merch-price">
                                     ¥ <%= merch.getPrice() %>
                                 </div>

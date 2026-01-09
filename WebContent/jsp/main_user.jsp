@@ -2,6 +2,7 @@
 <%@ page import="java.util.*, bean.Store, bean.Merchandise, bean.MerchandiseImage" %>
 <%@ page import="java.sql.Date" %>
 <%@ page import="java.util.Calendar" %>
+<%@ page import="java.util.Comparator" %>
 
 <%
     HttpSession userSession = request.getSession(false);
@@ -132,7 +133,7 @@
                     (Map<Store, List<Merchandise>>) request.getAttribute("shopMerchMap");
 
                 // 現在日時を取得（消費期限チェック用）
-                Date today = new Date(System.currentTimeMillis());
+                final Date today = new Date(System.currentTimeMillis());
 
                 // デバッグ出力
                 System.out.println("=== JSP デバッグ ===");
@@ -164,8 +165,21 @@
 				    <% } %>
 
 				    <!-- 商品検索結果（商品がある場合のみ表示） -->
-				    <% if (!itemList.isEmpty()) { %>
-				        <h3 style="color:#c07148; margin:20px 0;">🛒 商品: <%= itemList.size() %>件</h3>
+				    <% if (!itemList.isEmpty()) {
+				        // ========== 表示可能な商品をカウント ==========
+				        int displayableItemCount = 0;
+				        for (Merchandise m : itemList) {
+				            if (m.getStock() > 0) {
+				                Date checkDate = m.getUseByDate();
+				                if (checkDate == null || !checkDate.before(today)) {
+				                    displayableItemCount++;
+				                }
+				            }
+				        }
+				    %>
+
+				        <% if (displayableItemCount > 0) { %>
+				        <h3 style="color:#c07148; margin:20px 0;">🛒 商品: <%= displayableItemCount %>件</h3>
 				        <div class="store-box">
 				            <div class="merch-list">
 				                <% for (Merchandise merch : itemList) {
@@ -222,10 +236,29 @@
 				                <% } %>
 				            </div>
 				        </div>
+				        <% } %>
 				    <% } %>
 
 				    <!-- 結果が何もない場合 -->
-				    <% if (itemList.isEmpty() && (storeList == null || storeList.isEmpty())) { %>
+				    <%
+				        // 表示可能な商品と店舗があるかチェック
+				        int totalDisplayableItems = 0;
+				        if (!itemList.isEmpty()) {
+				            for (Merchandise m : itemList) {
+				                if (m.getStock() > 0) {
+				                    Date checkDate = m.getUseByDate();
+				                    if (checkDate == null || !checkDate.before(today)) {
+				                        totalDisplayableItems++;
+				                    }
+				                }
+				            }
+				        }
+
+				        boolean hasDisplayableStores = (storeList != null && !storeList.isEmpty());
+				        boolean hasNoResults = (totalDisplayableItems == 0 && !hasDisplayableStores);
+				    %>
+
+				    <% if (hasNoResults) { %>
 				        <p style="text-align:center; padding:30px; color:#999;">
 				            「<%= searchKeyword %>」に一致する店舗・商品は見つかりませんでした。
 				        </p>
@@ -243,7 +276,49 @@
                 <!-- ========== 通常の店舗ごと表示 ========== -->
                 <h2 style="text-align:center; margin:30px 0; color:#c07148;">出店店舗と商品一覧</h2>
 
-                <% for (Map.Entry<Store, List<Merchandise>> entry : shopMerchMap.entrySet()) {
+                <%
+                    // ========== 店舗をソート：商品がある店舗を上に ==========
+                    List<Map.Entry<Store, List<Merchandise>>> sortedEntries = new ArrayList<>(shopMerchMap.entrySet());
+
+                    Collections.sort(sortedEntries, new Comparator<Map.Entry<Store, List<Merchandise>>>() {
+                        @Override
+                        public int compare(Map.Entry<Store, List<Merchandise>> e1, Map.Entry<Store, List<Merchandise>> e2) {
+                            List<Merchandise> list1 = e1.getValue();
+                            List<Merchandise> list2 = e2.getValue();
+
+                            // 店舗1の表示可能な商品数をカウント
+                            int count1 = 0;
+                            if (list1 != null) {
+                                for (Merchandise m : list1) {
+                                    if (m.getStock() > 0) {
+                                        Date checkDate = m.getUseByDate();
+                                        if (checkDate == null || !checkDate.before(today)) {
+                                            count1++;
+                                        }
+                                    }
+                                }
+                            }
+
+                            // 店舗2の表示可能な商品数をカウント
+                            int count2 = 0;
+                            if (list2 != null) {
+                                for (Merchandise m : list2) {
+                                    if (m.getStock() > 0) {
+                                        Date checkDate = m.getUseByDate();
+                                        if (checkDate == null || !checkDate.before(today)) {
+                                            count2++;
+                                        }
+                                    }
+                                }
+                            }
+
+                            // 商品数が多い順（降順）
+                            return Integer.compare(count2, count1);
+                        }
+                    });
+                %>
+
+                <% for (Map.Entry<Store, List<Merchandise>> entry : sortedEntries) {
                     Store store = entry.getKey();
                     List<Merchandise> merchList = entry.getValue();
                 %>
@@ -258,8 +333,20 @@
                         </a>
                     </div>
 
-                    <% if (merchList != null && !merchList.isEmpty()) { %>
+                    <% if (merchList != null && !merchList.isEmpty()) {
+                        // ========== 表示可能な商品をカウント ==========
+                        int displayCount = 0;
+                        for (Merchandise m : merchList) {
+                            if (m.getStock() > 0) {
+                                Date checkDate = m.getUseByDate();
+                                if (checkDate == null || !checkDate.before(today)) {
+                                    displayCount++;
+                                }
+                            }
+                        }
+                    %>
 
+                        <% if (displayCount > 0) { %>
                         <div class="merch-list">
 
                         <% for (Merchandise merch : merchList) {
@@ -320,6 +407,12 @@
                         <% } %>
 
                         </div>
+
+                        <% } else { %>
+
+                        <p>この店舗の商品はありません。</p>
+
+                        <% } %>
 
                     <% } else { %>
 
