@@ -69,6 +69,7 @@ main {
 }
 .btn-main:hover {
     background-color: #a85d38;
+    color: #fff;
 }
 /* 下のリンク（加盟店登録 / 新規登録） */
 .sub-link {

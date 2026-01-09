@@ -186,6 +186,7 @@
         background: #c07148;
         color: #fff;
         box-shadow: 0 3px 10px rgba(192, 113, 72, 0.3);
+        font-family: inherit;
     }
 
     .btn-primary:hover {

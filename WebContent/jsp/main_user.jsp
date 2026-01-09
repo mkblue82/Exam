@@ -67,6 +67,18 @@
     background:#fafafa;
     box-shadow:0 1px 5px rgba(0,0,0,0.1);
     text-align:center;
+    transition: transform 0.3s, box-shadow 0.3s;
+    cursor: pointer;
+}
+
+.merch-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.merch-item a {
+    text-decoration: none;
+    color: inherit;
 }
 
 /* 商品画像 */
