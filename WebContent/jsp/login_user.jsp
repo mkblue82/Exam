@@ -202,7 +202,7 @@
                 </button>
 
 
-                <!--トップページに戻るボタン -->
+                <!--トップページに戻ボタン -->
                 <button type="button" class="btn-back"
                         onclick="location.href='${pageContext.request.contextPath}/jsp/index.jsp'">
                     トップページに戻る
