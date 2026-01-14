@@ -1,6 +1,8 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="bean.Store" %>
 <%@ page import="java.sql.Time" %>
+<%@ page import="java.time.LocalTime" %>
+<%@ page import="java.time.format.DateTimeFormatter" %>
 <%
     Store store = (Store) session.getAttribute("store");
 
@@ -8,10 +10,12 @@
     Time discountStartTime = store.getDiscountTime();
     Integer discountRate = store.getDiscountRate();
 
-    // 時間を表示用に変換（例: 18:00:00 → 18時）
+    // 時間を表示用に変換（例: 18:30:00 → 18:30）
     String displayTime = "";
     if (discountStartTime != null) {
-        displayTime = String.valueOf(discountStartTime.toLocalTime().getHour()) + "時";
+        LocalTime localTime = discountStartTime.toLocalTime();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+        displayTime = localTime.format(formatter);
     }
 %>
 <!DOCTYPE html>
@@ -87,12 +91,27 @@
         }
 
         .discount-info p {
-            margin: 0.5rem 0;
+            margin: 0.8rem 0;
             color: #555;
+            font-size: 1.1rem;
         }
 
         .discount-info strong {
             color: #333;
+            display: inline-block;
+            min-width: 100px;
+        }
+
+        .time-value {
+            color: #c07148;
+            font-size: 1.3rem;
+            font-weight: bold;
+        }
+
+        .discount-value {
+            color: #c07148;
+            font-size: 1.3rem;
+            font-weight: bold;
         }
 
         .btn-back {
@@ -126,6 +145,14 @@
             .success-container h1 {
                 font-size: 1.5rem;
             }
+
+            .discount-info p {
+                font-size: 1rem;
+            }
+
+            .time-value, .discount-value {
+                font-size: 1.1rem;
+            }
         }
     </style>
 </head>
@@ -146,8 +173,8 @@
                 </p>
 
                 <div class="discount-info">
-                    <p><strong>開始時間：</strong><%= displayTime %></p>
-                    <p><strong>割引率：</strong><%= discountRate %>%OFF</p>
+                    <p><strong>開始時刻：</strong><span class="time-value"><%= displayTime %></span></p>
+                    <p><strong>割引率：</strong><span class="discount-value"><%= discountRate %>%OFF</span></p>
                 </div>
 
                 <a href="${pageContext.request.contextPath}/foodloss/MerchandiseList.action" class="btn-back">

@@ -98,6 +98,7 @@
             color: #fff;
             box-shadow: 0 3px 10px rgba(192, 113, 72, 0.3);
             margin-bottom: 0.8rem;
+            font-family: inherit;
         }
 
         .btn-update:hover {
@@ -112,6 +113,7 @@
             background: #fff;
             color: #c07148;
             border: 2px solid #c07148;
+            font-family: inherit;
         }
 
         .btn-back:hover {

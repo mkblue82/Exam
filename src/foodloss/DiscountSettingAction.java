@@ -28,27 +28,35 @@ public class DiscountSettingAction extends Action {
         }
 
         // パラメータ取得
-        String timeStr = request.getParameter("time");
+        String hourStr = request.getParameter("hour");
+        String minuteStr = request.getParameter("minute");
         String discountStr = request.getParameter("discount");
 
         // バリデーション
-        if (timeStr == null || discountStr == null ||
-            timeStr.isEmpty() || discountStr.isEmpty()) {
+        if (hourStr == null || minuteStr == null || discountStr == null ||
+            hourStr.isEmpty() || minuteStr.isEmpty() || discountStr.isEmpty()) {
             session.setAttribute("errorMessage", "入力項目が不足しています");
             response.sendRedirect(request.getContextPath() + "/store_jsp/discount_setting.jsp");
             return;
         }
 
-        int startTime = 0;
+        int hour = 0;
+        int minute = 0;
         int discountRate = 0;
 
         try {
-            startTime = Integer.parseInt(timeStr);
+            hour = Integer.parseInt(hourStr);
+            minute = Integer.parseInt(minuteStr);
             discountRate = Integer.parseInt(discountStr);
 
             // 範囲チェック
-            if (startTime < 0 || startTime > 23) {
+            if (hour < 0 || hour > 23) {
                 session.setAttribute("errorMessage", "時間は0〜23の範囲で入力してください");
+                response.sendRedirect(request.getContextPath() + "/store_jsp/discount_setting.jsp");
+                return;
+            }
+            if (minute < 0 || minute > 59) {
+                session.setAttribute("errorMessage", "分は0〜59の範囲で入力してください");
                 response.sendRedirect(request.getContextPath() + "/store_jsp/discount_setting.jsp");
                 return;
             }
@@ -64,8 +72,8 @@ public class DiscountSettingAction extends Action {
             return;
         }
 
-        // 時間をTime型に変換（例: 18時 → 18:00:00）
-        Time discountStartTime = Time.valueOf(String.format("%02d:00:00", startTime));
+        // 時刻をTime型に変換（例: 18時30分 → 18:30:00）
+        Time discountStartTime = Time.valueOf(String.format("%02d:%02d:00", hour, minute));
 
         Connection con = null;
         PreparedStatement ps = null;

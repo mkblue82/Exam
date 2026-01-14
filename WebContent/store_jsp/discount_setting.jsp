@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
     <style>
         .discount-setting-container {
-            max-width: 450px;
+            max-width: 500px;
             margin: 40px auto;
             padding: 2rem;
             background: #fff;
@@ -45,6 +45,20 @@
         .input-wrapper {
             position: relative;
             width: 180px;
+        }
+        .time-input-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .time-input-wrapper {
+            position: relative;
+            width: 80px;
+        }
+        .time-separator {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #666;
         }
         .form-row input[type="number"] {
             width: 100%;
@@ -95,6 +109,7 @@
             border: none;
             border-radius: 5px;
             font-size: 1rem;
+            font-family: inherit;
             cursor: pointer;
             transition: 0.3s;
             font-weight: bold;
@@ -120,6 +135,7 @@
             background: #fff;
             color: #c07148;
             margin-top: 0.8rem;
+            font-family: inherit;
         }
         .btn-back-list:hover {
             background: #c07148;
@@ -143,22 +159,34 @@
                     割引設定が完了しました。
                 </div>
 
-              <form id="discountForm" method="post" action="${pageContext.request.contextPath}/foodloss/DiscountSetting.action">
-                    <!-- 時間入力 -->
+                <form id="discountForm" method="post" action="${pageContext.request.contextPath}/foodloss/DiscountSetting.action">
+                    <!-- 時刻入力 -->
                     <div class="form-group">
                         <div class="form-row">
-                            <label for="time">開始時間</label>
-                            <div class="input-wrapper">
-                                <input type="number"
-                                       id="time"
-                                       name="time"
-                                       min="0"
-                                       max="23"
-                                       placeholder="例: 18"
-                                       required>
+                            <label for="hour">開始時刻</label>
+                            <div class="time-input-group">
+                                <div class="time-input-wrapper">
+                                    <input type="number"
+                                           id="hour"
+                                           name="hour"
+                                           min="0"
+                                           max="23"
+                                           placeholder="18"
+                                           required>
+                                </div>
+                                <span class="time-separator">:</span>
+                                <div class="time-input-wrapper">
+                                    <input type="number"
+                                           id="minute"
+                                           name="minute"
+                                           min="0"
+                                           max="59"
+                                           placeholder="00"
+                                           required>
+                                </div>
                             </div>
                         </div>
-                        <div class="error-message" id="timeError">時間は0〜23の範囲で入力してください</div>
+                        <div class="error-message" id="timeError">時間は0〜23、分は0〜59の範囲で入力してください</div>
                     </div>
 
                     <!-- 割引パーセント入力 -->
@@ -173,6 +201,7 @@
                                        max="100"
                                        placeholder="例: 30"
                                        required>
+                                <span class="unit">%</span>
                             </div>
                         </div>
                         <div class="error-message" id="discountError">割引率は1〜100の範囲で入力してください</div>
@@ -201,22 +230,42 @@
 <script>
     // フォームバリデーション
     const form = document.getElementById('discountForm');
-    const timeInput = document.getElementById('time');
+    const hourInput = document.getElementById('hour');
+    const minuteInput = document.getElementById('minute');
     const discountInput = document.getElementById('discount');
     const timeError = document.getElementById('timeError');
     const discountError = document.getElementById('discountError');
 
     // 時間のバリデーション
-    timeInput.addEventListener('input', function() {
-        const value = parseInt(this.value);
-        if (isNaN(value) || value < 0 || value > 23) {
+    function validateTime() {
+        const hourValue = parseInt(hourInput.value);
+        const minuteValue = parseInt(minuteInput.value);
+
+        let isValid = true;
+
+        if (isNaN(hourValue) || hourValue < 0 || hourValue > 23) {
+            isValid = false;
+        }
+
+        if (isNaN(minuteValue) || minuteValue < 0 || minuteValue > 59) {
+            isValid = false;
+        }
+
+        if (!isValid) {
             timeError.classList.add('show');
-            this.style.borderColor = '#e74c3c';
+            hourInput.style.borderColor = '#e74c3c';
+            minuteInput.style.borderColor = '#e74c3c';
         } else {
             timeError.classList.remove('show');
-            this.style.borderColor = '#ddd';
+            hourInput.style.borderColor = '#ddd';
+            minuteInput.style.borderColor = '#ddd';
         }
-    });
+
+        return isValid;
+    }
+
+    hourInput.addEventListener('input', validateTime);
+    minuteInput.addEventListener('input', validateTime);
 
     // 割引率のバリデーション
     discountInput.addEventListener('input', function() {
@@ -232,17 +281,22 @@
 
     // フォーム送信時の最終チェック
     form.addEventListener('submit', function(e) {
-        const timeValue = parseInt(timeInput.value);
+        const hourValue = parseInt(hourInput.value);
+        const minuteValue = parseInt(minuteInput.value);
         const discountValue = parseInt(discountInput.value);
 
         let hasError = false;
 
-        if (isNaN(timeValue) || timeValue < 0 || timeValue > 23) {
+        // 時刻チェック
+        if (isNaN(hourValue) || hourValue < 0 || hourValue > 23 ||
+            isNaN(minuteValue) || minuteValue < 0 || minuteValue > 59) {
             timeError.classList.add('show');
-            timeInput.style.borderColor = '#e74c3c';
+            hourInput.style.borderColor = '#e74c3c';
+            minuteInput.style.borderColor = '#e74c3c';
             hasError = true;
         }
 
+        // 割引率チェック
         if (isNaN(discountValue) || discountValue < 1 || discountValue > 100) {
             discountError.classList.add('show');
             discountInput.style.borderColor = '#e74c3c';
@@ -264,7 +318,6 @@
         }, 3000);
     }
 </script>
-
 
 </body>
 </html>

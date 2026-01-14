@@ -2,6 +2,7 @@
 <%@ page import="java.util.*, bean.Store, bean.Merchandise, bean.MerchandiseImage" %>
 <%@ page import="java.sql.Date" %>
 <%@ page import="java.util.Calendar" %>
+<%@ page import="java.util.Comparator" %>
 
 <%
     HttpSession userSession = request.getSession(false);
@@ -39,6 +40,18 @@
     margin-bottom:15px;
 }
 
+.store-title a {
+    text-decoration:none;
+    color:#c07148;
+    transition: color 0.2s, opacity 0.2s;
+}
+
+.store-title a:hover {
+    color:#a85d38;
+    opacity: 0.8;
+    text-decoration: underline;
+}
+
 /* 商品横並び全体 */
 .merch-list {
     display:flex;
@@ -54,6 +67,18 @@
     background:#fafafa;
     box-shadow:0 1px 5px rgba(0,0,0,0.1);
     text-align:center;
+    transition: transform 0.3s, box-shadow 0.3s;
+    cursor: pointer;
+}
+
+.merch-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.merch-item a {
+    text-decoration: none;
+    color: inherit;
 }
 
 /* 商品画像 */
@@ -84,21 +109,6 @@
     border-radius:8px;
 }
 
-/* 店舗カード */
-.store-card {
-    background:#f9f9f9;
-    padding:15px;
-    margin:10px 0;
-    border-radius:8px;
-    border:1px solid #e0e0e0;
-}
-
-.store-card-title {
-    font-size:1.2rem;
-    color:#c07148;
-    margin-bottom:5px;
-}
-
 /* 期限間近バッジ */
 .expiry-badge {
     background:#ff6b6b;
@@ -122,144 +132,93 @@
         <div class="main-contents">
 
             <%
-                // 検索結果を取得
-                List<Merchandise> itemList = (List<Merchandise>) request.getAttribute("itemList");
-                List<Store> storeList = (List<Store>) request.getAttribute("storeList");
-                String searchKeyword = (String) request.getAttribute("searchKeyword");
-
                 // 通常の店舗ごとの商品マップを取得
                 Map<Store, List<Merchandise>> shopMerchMap =
                     (Map<Store, List<Merchandise>>) request.getAttribute("shopMerchMap");
 
                 // 現在日時を取得（消費期限チェック用）
-                Date today = new Date(System.currentTimeMillis());
+                final Date today = new Date(System.currentTimeMillis());
 
                 // デバッグ出力
-                System.out.println("=== JSP デバッグ ===");
-                System.out.println("itemList: " + (itemList != null ? itemList.size() + "件" : "null"));
-                System.out.println("storeList: " + (storeList != null ? storeList.size() + "件" : "null"));
-                System.out.println("searchKeyword: " + searchKeyword);
+                System.out.println("=== main_user.jsp デバッグ ===");
                 System.out.println("shopMerchMap: " + (shopMerchMap != null ? "あり" : "null"));
                 System.out.println("今日の日付: " + today);
             %>
 
-				<% if (itemList != null) { %>
-				    <!-- ========== 検索結果表示 ========== -->
-				    <h2 style="text-align:center; margin:30px 0; color:#c07148;">検索結果: "<%= searchKeyword %>"</h2>
-
-				    <!-- 店舗検索結果 -->
-				    <% if (storeList != null && !storeList.isEmpty()) { %>
-				        <h3 style="color:#c07148; margin:20px 0;">🏪 店舗: <%= storeList.size() %>件</h3>
-				        <% for (Store store : storeList) { %>
-				            <div class="store-card">
-				                <div class="store-card-title">
-				                    <a href="StoreInfo.action?storeId=<%= store.getStoreId() %>" style="text-decoration:none; color:#c07148;">
-				                        <%= store.getStoreName() %>
-				                    </a>
-				                </div>
-				                <p style="color:#666; margin:5px 0;">📍 <%= store.getAddress() %></p>
-				                <p style="color:#666; margin:5px 0;">📞 <%= store.getPhone() %></p>
-				            </div>
-				        <% } %>
-				    <% } %>
-
-				    <!-- 商品検索結果（商品がある場合のみ表示） -->
-				    <% if (!itemList.isEmpty()) { %>
-				        <h3 style="color:#c07148; margin:20px 0;">🛒 商品: <%= itemList.size() %>件</h3>
-				        <div class="store-box">
-				            <div class="merch-list">
-				                <% for (Merchandise merch : itemList) {
-				                    // 在庫0の商品はスキップ
-				                    if (merch.getStock() == 0) {
-				                        continue;
-				                    }
-
-				                    // ========== 消費期限チェック ==========
-				                    Date useByDate = merch.getUseByDate();
-				                    if (useByDate != null && useByDate.before(today)) {
-				                        // 消費期限が切れている場合はスキップ
-				                        continue;
-				                    }
-
-				                    // 消費期限まで3日以内かチェック
-				                    boolean isExpiringSoon = false;
-				                    if (useByDate != null) {
-				                        long diff = useByDate.getTime() - today.getTime();
-				                        long daysUntilExpiry = diff / (1000 * 60 * 60 * 24);
-				                        isExpiringSoon = daysUntilExpiry <= 3;
-				                    }
-				                %>
-				                    <div class="merch-item">
-				                        <!-- 期限間近の警告バッジ -->
-				                        <% if (isExpiringSoon) { %>
-				                            <div class="expiry-badge">🔥 まもなく期限切れ</div>
-				                        <% } %>
-
-				                        <!-- 画像クリック → 商品詳細へ -->
-				                        <a href="<%= request.getContextPath() %>/merch/<%= merch.getMerchandiseId() %>">
-				                            <div class="merch-image">
-				                                <%
-				                                List<MerchandiseImage> images = merch.getImages();
-				                                if (images != null && !images.isEmpty()) {
-				                                    MerchandiseImage img = images.get(0);
-				                                %>
-				                                    <img src="<%= request.getContextPath() %>/image/<%= img.getImageId() %>"
-				                                         alt="<%= merch.getMerchandiseName() %>">
-				                                <%
-				                                } else {
-				                                %>
-				                                    <div class="no-image">画像なし</div>
-				                                <%
-				                                }
-				                                %>
-				                            </div>
-				                        </a>
-
-				                        <!-- 商品名と値段 -->
-				                        <div style="margin-top:8px;"><%= merch.getMerchandiseName() %></div>
-				                        <div class="merch-price">¥ <%= merch.getPrice() %></div>
-				                    </div>
-				                <% } %>
-				            </div>
-				        </div>
-				    <% } %>
-
-				    <!-- 結果が何もない場合 -->
-				    <% if (itemList.isEmpty() && (storeList == null || storeList.isEmpty())) { %>
-				        <p style="text-align:center; padding:30px; color:#999;">
-				            「<%= searchKeyword %>」に一致する店舗・商品は見つかりませんでした。
-				        </p>
-				    <% } %>
-
-				    <p style="text-align:center; margin-top:30px;">
-				        <a href="${pageContext.request.contextPath}/foodloss/Menu.action"
-				           style="display:inline-block; padding:12px 30px; background:#c07148; color:#fff;
-				                  text-decoration:none; border-radius:8px; font-weight:bold;">
-				            ホームに戻る
-				        </a>
-				    </p>
-
-            <% } else if (shopMerchMap != null) { %>
+            <% if (shopMerchMap != null) { %>
                 <!-- ========== 通常の店舗ごと表示 ========== -->
                 <h2 style="text-align:center; margin:30px 0; color:#c07148;">出店店舗と商品一覧</h2>
 
-                <% for (Map.Entry<Store, List<Merchandise>> entry : shopMerchMap.entrySet()) {
+                <%
+                    // ========== 店舗をソート：商品がある店舗を上に ==========
+                    List<Map.Entry<Store, List<Merchandise>>> sortedEntries = new ArrayList<>(shopMerchMap.entrySet());
+
+                    Collections.sort(sortedEntries, new Comparator<Map.Entry<Store, List<Merchandise>>>() {
+                        @Override
+                        public int compare(Map.Entry<Store, List<Merchandise>> e1, Map.Entry<Store, List<Merchandise>> e2) {
+                            List<Merchandise> list1 = e1.getValue();
+                            List<Merchandise> list2 = e2.getValue();
+
+                            // 店舗1の表示可能な商品数をカウント
+                            int count1 = 0;
+                            if (list1 != null) {
+                                for (Merchandise m : list1) {
+                                    if (m.getStock() > 0) {
+                                        Date checkDate = m.getUseByDate();
+                                        if (checkDate == null || !checkDate.before(today)) {
+                                            count1++;
+                                        }
+                                    }
+                                }
+                            }
+
+                            // 店舗2の表示可能な商品数をカウント
+                            int count2 = 0;
+                            if (list2 != null) {
+                                for (Merchandise m : list2) {
+                                    if (m.getStock() > 0) {
+                                        Date checkDate = m.getUseByDate();
+                                        if (checkDate == null || !checkDate.before(today)) {
+                                            count2++;
+                                        }
+                                    }
+                                }
+                            }
+
+                            // 商品数が多い順（降順）
+                            return Integer.compare(count2, count1);
+                        }
+                    });
+                %>
+
+                <% for (Map.Entry<Store, List<Merchandise>> entry : sortedEntries) {
                     Store store = entry.getKey();
                     List<Merchandise> merchList = entry.getValue();
                 %>
 
                 <div class="store-box">
 
-                    <!-- 店舗名（クリックで店舗詳細へ） -->
+                    <!-- 店舗名（クリックで店舗商品一覧へ） -->
                     <div class="store-title">
-                        <a href="StoreInfo.action?storeId=<%= store.getStoreId() %>"
-                           style="text-decoration:none;color:#c07148;">
+                        <a href="StoreMerchandise.action?storeId=<%= store.getStoreId() %>">
                            <%= store.getStoreName() %>
                         </a>
                     </div>
 
-                    <% if (merchList != null && !merchList.isEmpty()) { %>
+                    <% if (merchList != null && !merchList.isEmpty()) {
+                        // ========== 表示可能な商品をカウント ==========
+                        int displayCount = 0;
+                        for (Merchandise m : merchList) {
+                            if (m.getStock() > 0) {
+                                Date checkDate = m.getUseByDate();
+                                if (checkDate == null || !checkDate.before(today)) {
+                                    displayCount++;
+                                }
+                            }
+                        }
+                    %>
 
+                        <% if (displayCount > 0) { %>
                         <div class="merch-list">
 
                         <% for (Merchandise merch : merchList) {
@@ -320,6 +279,12 @@
                         <% } %>
 
                         </div>
+
+                        <% } else { %>
+
+                        <p>この店舗の商品はありません。</p>
+
+                        <% } %>
 
                     <% } else { %>
 

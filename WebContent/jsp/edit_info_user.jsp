@@ -106,7 +106,7 @@
 
                         <div class="button-group">
                             <button type="submit">変更を保存</button>
-                            <a href="${pageContext.request.contextPath}/jsp/foods.jsp">戻る</a>
+                            <a href="${pageContext.request.contextPath}/jsp/mypage.jsp">戻る</a>
                         </div>
                     </form>
 

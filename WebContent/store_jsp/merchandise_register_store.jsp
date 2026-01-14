@@ -72,6 +72,7 @@
             border-radius: 5px;
             cursor: pointer;
             font-size: 1rem;
+            font-family: inherit;
         }
         .image-add-btn:hover { background: #a85d38; }
         .file-count {
@@ -137,6 +138,7 @@
             background: #c07148;
             color: #fff;
             box-shadow: 0 3px 10px rgba(192, 113, 72, 0.3);
+            font-family: inherit;
             margin-bottom: 0.8rem;
         }
         .btn-submit:hover {

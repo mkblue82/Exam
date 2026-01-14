@@ -66,6 +66,7 @@
             background: #c07148;
             color: #fff;
             box-shadow: 0 3px 10px rgba(192, 113, 72, 0.3);
+            font-family: inherit;
         }
 
         .btn-confirm-delete:hover {
@@ -78,6 +79,7 @@
             background: #6c757d;
             color: #fff;
             box-shadow: 0 3px 10px rgba(108, 117, 125, 0.3);
+            font-family: inherit;
         }
 
         .btn-cancel:hover {
