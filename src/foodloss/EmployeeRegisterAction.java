@@ -21,17 +21,16 @@ public class EmployeeRegisterAction extends Action {
 
         // ========== POST（登録処理） ==========
         request.setCharacterEncoding("UTF-8");
-        String employeeNumber = request.getParameter("employeeNumber");  // ★変更
+        String employeeNumber = request.getParameter("employeeNumber");
         String employeeName = request.getParameter("employeeName");
 
         // 入力チェック
-        if (employeeNumber == null || employeeNumber.isEmpty()) {  // ★変更
+        if (employeeNumber == null || employeeNumber.isEmpty()) {
             request.setAttribute("error", "社員番号を入力してください。");
             request.getRequestDispatcher("/store_jsp/employee_register_store.jsp")
                    .forward(request, response);
             return;
         }
-
         if (employeeName == null || employeeName.isEmpty()) {
             request.setAttribute("error", "社員名を入力してください。");
             request.getRequestDispatcher("/store_jsp/employee_register_store.jsp")
@@ -41,7 +40,6 @@ public class EmployeeRegisterAction extends Action {
 
         HttpSession session = request.getSession();
         Store store = (Store) session.getAttribute("store");
-
         if (store == null) {
             request.setAttribute("error", "ログイン情報がありません。再ログインしてください。");
             request.getRequestDispatcher("/store_jsp/login_store.jsp")
@@ -49,19 +47,33 @@ public class EmployeeRegisterAction extends Action {
             return;
         }
 
-        // ★ セッションにstore情報を再セット（一覧用）
+        // ★★★ 重複チェック（新しいDAOインスタンスを使用）★★★
+        EmployeeDAO checkDao = new EmployeeDAO();
+        Employee existingEmployee = checkDao.getByEmployeeNumber(employeeNumber, String.valueOf(store.getStoreId()));
+
+        if (existingEmployee != null) {
+            request.setAttribute("error", "この社員番号は既に登録されています。");
+            request.setAttribute("employeeNumber", employeeNumber);
+            request.setAttribute("employeeName", employeeName);
+            request.getRequestDispatcher("/store_jsp/employee_register_store.jsp")
+                   .forward(request, response);
+            return;
+        }
+
+        // セッションにstore情報を再セット（一覧用）
         session.setAttribute("storeCode", String.valueOf(store.getStoreId()));
         session.setAttribute("storeId", store.getStoreId());
         session.setAttribute("storeName", store.getStoreName());
 
         Employee emp = new Employee();
-        emp.setEmployeeNumber(employeeNumber);  // ★追加：社員番号をセット
-        emp.setEmployeeCode(employeeNumber);     // ★変更：社員コードにも同じ値をセット
+        emp.setEmployeeNumber(employeeNumber);
+        emp.setEmployeeCode(employeeNumber);
         emp.setEmployeeName(employeeName);
         emp.setStoreCode(String.valueOf(store.getStoreId()));
 
-        EmployeeDAO dao = new EmployeeDAO();
-        int result = dao.insert(emp);
+        // ★★★ 登録用に新しいDAOインスタンスを使用 ★★★
+        EmployeeDAO insertDao = new EmployeeDAO();
+        int result = insertDao.insert(emp);
 
         if (result > 0) {
             response.sendRedirect(request.getContextPath() + "/foodloss/EmployeeList.action");

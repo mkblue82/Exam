@@ -14,18 +14,35 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
+import javax.servlet.ServletContext;
 
 public class MailSender {
 
-    private static final Properties mailConfig = new Properties();
+    private static Properties mailConfig = new Properties();
+    private static ServletContext servletContext;
+    private static boolean initialized = false;
 
-    static {
-        try (InputStream in = MailSender.class.getClassLoader().getResourceAsStream("config/mail.properties")) {
+    // ServletContextを設定するメソッド
+    public static void setServletContext(ServletContext context) {
+        if (!initialized && context != null) {
+            servletContext = context;
+            loadConfig();
+            initialized = true;
+        }
+    }
+
+    private static void loadConfig() {
+        try {
+            String configPath = "/WEB-INF/classes/config/mail.properties";
+            InputStream in = servletContext.getResourceAsStream(configPath);
             if (in == null) {
-                throw new RuntimeException("mail.propertiesが見つかりません。");
+                throw new RuntimeException("mail.propertiesが見つかりません: " + configPath);
             }
             mailConfig.load(in);
+            in.close();
+            System.out.println("✓ mail.properties読み込み成功");
         } catch (Exception e) {
+            e.printStackTrace();
             throw new RuntimeException("mail.propertiesの読み込みに失敗しました。", e);
         }
     }
@@ -73,7 +90,6 @@ public class MailSender {
         System.out.println("DEBUG: メール送信完了 → " + to);
     }
 
-
     // 添付付きメール送信
     public static void sendEmailWithAttachment(
             String to, String subject, String body,
@@ -104,4 +120,3 @@ public class MailSender {
         System.out.println("DEBUG: 添付メール送信完了 → " + to);
     }
 }
-

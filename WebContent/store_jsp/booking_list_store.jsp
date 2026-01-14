@@ -57,6 +57,32 @@
         pagedReceived = new ArrayList<>(receivedList.subList(startIndex, endIndex));
     }
 
+    // 未受取のページング設定
+    int notPageSize = 5;
+    int notCurrentPage = 1;
+    String notPageParam = request.getParameter("notPage");
+    if (notPageParam != null) {
+        try {
+            notCurrentPage = Integer.parseInt(notPageParam);
+        } catch (NumberFormatException e) {
+            notCurrentPage = 1;
+        }
+    }
+
+    int totalNotReceived = notReceivedList.size();
+    int totalNotPages = (int) Math.ceil(totalNotReceived / (double) notPageSize);
+
+    int notStartIndex = (notCurrentPage - 1) * notPageSize;
+    int notEndIndex = Math.min(notStartIndex + notPageSize, totalNotReceived);
+    List<Booking> pagedNotReceived;
+    if (notStartIndex < notEndIndex) {
+        pagedNotReceived = new ArrayList<Booking>(notReceivedList.subList(notStartIndex, notEndIndex));
+    } else {
+        pagedNotReceived = new ArrayList<Booking>();
+    }
+
+
+
 
 %>
 
@@ -235,7 +261,7 @@
 	                        </tr>
 	                    </thead>
 	                    <tbody>
-	                        <% for (Booking b : notReceivedList) { %>
+	                        <% for (Booking b : pagedNotReceived) { %>
 	                            <tr>
 	                                <td><%= b.getBookingId() %></td>
 	                                <td><%= b.getMerchandiseName() %></td>
@@ -257,11 +283,11 @@
 	                </table>
 
 	                <div class="pagination" style="text-align:center; margin: 20px 0;">
-					    <% for (int i = 1; i <= totalPages; i++) { %>
-					        <% if (i == currentPage) { %>
+					    <% for (int i = 1; i <= totalNotPages; i++) { %>
+					        <% if (i == notCurrentPage) { %>
 					            <strong><%= i %></strong>
 					        <% } else { %>
-					            <a href="?currentPage=<%= i %>"><%= i %></a>
+					            <a href="?notPage=<%= i %>&currentPage=<%= currentPage %>"><%= i %></a>
 					        <% } %>
 					        &nbsp;
 					    <% } %>
