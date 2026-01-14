@@ -1,5 +1,7 @@
 package foodloss;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -60,7 +62,30 @@ public class SignupStoreAction extends Action {
         if (!isValidFileType(permitFileName)) { forwardWithError(req, res, "営業許可書はJPG、PNG、PDF形式でアップロードしてください。"); return; }
         if (permitFilePart.getSize() > 5 * 1024 * 1024) { forwardWithError(req, res, "ファイルサイズは5MB以下にしてください。"); return; }
 
-        // byte配列に変換
+        // ★★★ ファイルをサーバーに保存 ★★★
+        String uploadDir = req.getServletContext().getRealPath("/uploads");
+        File uploadFolder = new File(uploadDir);
+        if (!uploadFolder.exists()) {
+            uploadFolder.mkdirs();
+        }
+
+        String fileExtension = permitFileName.substring(permitFileName.lastIndexOf("."));
+        String savedFileName = "license_" + System.currentTimeMillis() + "_" + UUID.randomUUID().toString() + fileExtension;
+        String filePath = uploadDir + File.separator + savedFileName;
+
+        try (InputStream is = permitFilePart.getInputStream();
+             FileOutputStream fos = new FileOutputStream(filePath)) {
+            byte[] buffer = new byte[1024];
+            int len;
+            while ((len = is.read(buffer)) != -1) {
+                fos.write(buffer, 0, len);
+            }
+        }
+
+        // DBに保存するパス（相対パス）
+        String relativePath = "/uploads/" + savedFileName;
+
+        // メール添付用にbyte配列も読み込む
         byte[] permitFileData;
         try (InputStream is = permitFilePart.getInputStream();
              java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream()) {
@@ -92,7 +117,7 @@ public class SignupStoreAction extends Action {
             app.setStorePhone(phone);
             app.setStoreEmail(email);
             app.setPasswordHash(passwordHash);
-            app.setBusinessLicense(permitFileData);
+            app.setBusinessLicense(relativePath); // ★★★ ファイルパスを保存 ★★★
             app.setApprovalToken(approvalToken);
             app.setStatus("pending");
 
@@ -100,7 +125,7 @@ public class SignupStoreAction extends Action {
             int applicationId = appDAO.insert(app);
             if (applicationId == 0) { forwardWithError(req, res, "申請登録に失敗しました。"); return; }
 
-            // ★★★ 重要：メール送信前にセッションに保存 ★★★
+            // ★★★ 重要:メール送信前にセッションに保存 ★★★
             session.setAttribute("pendingApplication", app);
             session.removeAttribute("csrfToken");
 

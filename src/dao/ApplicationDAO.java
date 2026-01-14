@@ -33,7 +33,7 @@ public class ApplicationDAO extends DAO {
         pstmt.setString(3, app.getStorePhone());          // 店舗電話番号
         pstmt.setString(4, app.getStoreEmail());          // 店舗メールアドレス
         pstmt.setString(5, app.getPasswordHash());        // パスワードハッシュ
-        pstmt.setString(6, app.getBusinessLicensePath()); // 営業許可証パス
+        pstmt.setString(6, app.getBusinessLicense()); // 修正 // 営業許可証パス
         pstmt.setString(7, app.getApprovalToken());       // 承認トークン
         pstmt.setString(8, "pending");                    // ステータス（初期値: pending）
 
@@ -182,7 +182,7 @@ public class ApplicationDAO extends DAO {
         app.setStorePhone(rs.getString("t001_1_fd3_applications"));
         app.setStoreEmail(rs.getString("t001_1_fd4_applications"));
         app.setPasswordHash(rs.getString("t001_1_fd5_applications"));
-        app.setBusinessLicensePath(rs.getString("t001_1_fd6_applications")); // 修正
+        app.setBusinessLicense(rs.getString("t001_1_fd6_applications"));
         app.setApprovalToken(rs.getString("t001_1_fd7_applications"));
         app.setStatus(rs.getString("t001_1_fd8_applications"));
         app.setCreatedAt(rs.getTimestamp("t001_1_fd9_applications"));
