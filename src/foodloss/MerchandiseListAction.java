@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Time;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
@@ -14,6 +15,7 @@ import javax.servlet.http.HttpSession;
 import javax.sql.DataSource;
 
 import bean.Merchandise;
+import dao.FavoriteDAO;
 import dao.MerchandiseDAO;
 import tool.Action;
 
@@ -46,18 +48,21 @@ public class MerchandiseListAction extends Action {
             MerchandiseDAO dao = new MerchandiseDAO(con);
             List<Merchandise> list = dao.selectByStoreId(storeId);
 
-            // 店舗の割引設定を取得
-            String sql = "SELECT t001_fd5_store, t001_fd6_store FROM t001_store WHERE t001_pk1_store = ?";
+            // 店舗の割引設定と店舗名を取得
+            String sql = "SELECT t001_fd1_store, t001_fd5_store, t001_fd6_store FROM t001_store WHERE t001_pk1_store = ?";
             ps = con.prepareStatement(sql);
             ps.setInt(1, storeId);
             rs = ps.executeQuery();
 
+            String storeName = null;
             Time discountStartTime = null;
             Integer discountRate = null;
 
             if (rs.next()) {
+                storeName = rs.getString("t001_fd1_store");
                 discountStartTime = rs.getTime("t001_fd5_store");
                 String discountRateStr = rs.getString("t001_fd6_store");
+
                 if (discountRateStr != null && !discountRateStr.trim().isEmpty()) {
                     try {
                         discountRate = Integer.parseInt(discountRateStr.trim());
@@ -69,6 +74,7 @@ public class MerchandiseListAction extends Action {
 
             // 現在時刻を取得
             LocalTime now = LocalTime.now();
+            LocalDate today = LocalDate.now();
 
             // 割引が適用されるかチェック
             boolean isDiscountApplied = false;
@@ -79,6 +85,54 @@ public class MerchandiseListAction extends Action {
                     isDiscountApplied = true;
                 }
             }
+
+            // ★★★ 値引き通知メール送信処理 ★★★
+            if (isDiscountApplied && discountRate != null) {
+                // セッションから前回の通知状態を取得
+                String lastNotifiedDateKey = "discountNotified_" + storeId;
+                LocalDate lastNotifiedDate = (LocalDate) session.getAttribute(lastNotifiedDateKey);
+
+                // 今日まだ通知していない場合のみ送信
+                if (lastNotifiedDate == null || !lastNotifiedDate.equals(today)) {
+                    try {
+                        System.out.println("★ 値引き開始 - メール通知を送信します");
+
+                        FavoriteDAO favoriteDao = new FavoriteDAO(con);
+                        List<String> notificationEmails = favoriteDao.getNotificationEnabledEmails(storeId);
+
+                        if (!notificationEmails.isEmpty()) {
+                            System.out.println("★ 通知対象メールアドレス数: " + notificationEmails.size());
+
+                            // 店舗名がない場合のデフォルト
+                            String storeNameForEmail = (storeName != null && !storeName.trim().isEmpty())
+                                                     ? storeName
+                                                     : "お気に入り店舗";
+
+                            // メール送信
+                            EmailUtility.sendDiscountNotification(
+                                notificationEmails,
+                                storeNameForEmail,
+                                discountRate,
+                                discountStartTime
+                            );
+
+                            System.out.println("✅ 値引き通知メール送信完了: " + notificationEmails.size() + "件");
+
+                            // 今日通知済みとしてセッションに保存
+                            session.setAttribute(lastNotifiedDateKey, today);
+                        } else {
+                            System.out.println("★ 通知対象ユーザーなし");
+                        }
+                    } catch (Exception emailEx) {
+                        // メール送信エラーは表示処理に影響させない
+                        System.err.println("❌ メール送信エラー: " + emailEx.getMessage());
+                        emailEx.printStackTrace();
+                    }
+                } else {
+                    System.out.println("★ 本日は既に通知済み");
+                }
+            }
+            // ★★★ メール通知処理ここまで ★★★
 
             // 割引情報をリクエストに設定
             request.setAttribute("isDiscountApplied", isDiscountApplied);

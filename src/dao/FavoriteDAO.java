@@ -17,6 +17,29 @@ public class FavoriteDAO {
         this.con = con;
     }
 
+    public List<String> getNotificationEnabledEmails(int storeId) throws SQLException {
+        List<String> emails = new ArrayList<>();
+        String sql = "SELECT u.t004_fd2_user " +
+                     "FROM T006_favorite f " +
+                     "INNER JOIN t004_user u ON f.T006_FD1_favorite = u.t004_pk1_user " +
+                     "WHERE f.T006_FD2_favorite = ? " +
+                     "AND f.T006_FD3_favorite = true " +
+                     "AND u.t004_fd2_user IS NOT NULL";
+
+        try (PreparedStatement pstmt = con.prepareStatement(sql)) {
+            pstmt.setInt(1, storeId);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    String email = rs.getString("t004_fd2_user");
+                    if (email != null && !email.trim().isEmpty()) {
+                        emails.add(email);
+                    }
+                }
+            }
+        }
+        return emails;
+    }
+
     // お気に入りに追加
     public void addFavorite(int userId, int storeId) throws SQLException {
         String sql = "INSERT INTO T006_favorite (T006_FD1_favorite, T006_FD2_favorite, T006_FD3_favorite) "
