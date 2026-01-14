@@ -1,4 +1,9 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%
+    String errorMessage = (String) request.getAttribute("error");
+    String employeeNumber = (String) request.getAttribute("employeeNumber");
+    String employeeName = (String) request.getAttribute("employeeName");
+%>
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -50,14 +55,14 @@
             padding-bottom: 1rem;
         }
 
-        .error-msg {
-            background: #ffebee;
-            color: #c62828;
+        .error-message {
+            background-color: #fee;
+            color: #c00;
             padding: 1rem;
             border-radius: 5px;
             margin-bottom: 1.5rem;
-            border-left: 4px solid #c62828;
-            font-size: 0.9rem;
+            border-left: 4px solid #c00;
+            font-weight: bold;
         }
 
         .form-group {
@@ -69,6 +74,11 @@
             margin-bottom: 0.5rem;
             font-weight: bold;
             color: #555;
+        }
+
+        .form-group label .required {
+            color: red;
+            margin-left: 0.3rem;
         }
 
         .form-group input[type="text"] {
@@ -87,6 +97,11 @@
             box-shadow: 0 0 0 3px rgba(192, 113, 72, 0.1);
         }
 
+        .form-group input.error {
+            border-color: #c00;
+            background-color: #fff5f5;
+        }
+
         .btn-register,
         .btn-back {
             width: 100%;
@@ -95,9 +110,6 @@
             cursor: pointer;
             transition: 0.3s;
             font-weight: bold;
-            text-decoration: none;
-            display: block;
-            text-align: center;
         }
 
         .btn-register {
@@ -153,22 +165,52 @@
             <div class="register-container">
                 <h1>社員登録</h1>
 
+                <!-- エラーメッセージ表示 -->
+                <% if (errorMessage != null) { %>
+                    <div class="error-message">
+                        <%= errorMessage %>
+                    </div>
+                <% } %>
+
                 <form action="${pageContext.request.contextPath}/foodloss/EmployeeRegister.action" method="post">
                     <div class="form-group">
-                        <label for="employeeNumber">社員番号</label>
-                        <input type="text" id="employeeNumber" name="employeeNumber" placeholder="例: 001, S001など" required>
+                        <label for="employeeNumber">
+                            社員番号
+                            <span class="required">*</span>
+                        </label>
+                        <input type="text"
+                               id="employeeNumber"
+                               name="employeeNumber"
+                               value="<%= employeeNumber != null ? employeeNumber : "" %>"
+                               class="<%= (errorMessage != null && errorMessage.contains("社員番号")) ? "error" : "" %>"
+                               required
+                               placeholder="例: 001"
+                               maxlength="20">
                     </div>
 
                     <div class="form-group">
-                        <label for="employeeName">氏名</label>
-                        <input type="text" id="employeeName" name="employeeName" required>
+                        <label for="employeeName">
+                            社員名
+                            <span class="required">*</span>
+                        </label>
+                        <input type="text"
+                               id="employeeName"
+                               name="employeeName"
+                               value="<%= employeeName != null ? employeeName : "" %>"
+                               class="<%= (errorMessage != null && errorMessage.contains("社員名")) ? "error" : "" %>"
+                               required
+                               placeholder="例: 山田太郎"
+                               maxlength="50">
                     </div>
 
                     <button type="submit" class="btn-register">登録</button>
                 </form>
 
                 <!-- 戻るボタン（フォームの外） -->
-                <a href="${pageContext.request.contextPath}/foodloss/EmployeeList.action" class="btn-back">戻る</a>
+                <button type="button" class="btn-back"
+                        onclick="location.href='${pageContext.request.contextPath}/foodloss/EmployeeList.action'">
+                    戻る
+                </button>
             </div>
         </div>
     </main>
