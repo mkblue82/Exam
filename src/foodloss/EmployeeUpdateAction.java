@@ -62,7 +62,7 @@ public class EmployeeUpdateAction extends Action {
         System.out.println("   社員名: " + employeeName);
         System.out.println("   社員番号: " + employeeNumber);
 
-        // 入力チェック
+        // 入チェック
         if (idStr == null || idStr.trim().isEmpty()) {
             request.setAttribute("error", "社員IDが指定されていません。");
             response.sendRedirect(request.getContextPath() + "/foodloss/EmployeeList.action");
