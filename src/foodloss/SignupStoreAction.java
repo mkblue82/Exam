@@ -20,6 +20,7 @@ import dao.StoreDAO;
 import tool.Action;
 import tool.MailSender;
 
+
 public class SignupStoreAction extends Action {
 
     @Override

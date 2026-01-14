@@ -15,6 +15,7 @@ import dao.StoreDAO;
 import tool.Action;
 import tool.MailSender;
 
+
 public class ApproveStoreAction extends Action {
 
     @Override
