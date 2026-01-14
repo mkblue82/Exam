@@ -117,7 +117,6 @@
     font-weight: bold;
 }
 
-/* タグバッジ */
 .tag-container {
     display: inline-flex;
     flex-wrap: wrap;
