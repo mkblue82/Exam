@@ -32,6 +32,54 @@
             }
         }
     }
+
+ // ------------------ 未受取のページング ------------------
+    int pageSize = 5;
+
+    // 未受取ページ番号
+    int activePage = 1;
+    String activePageParam = request.getParameter("activePage");
+    if (activePageParam != null && activePageParam.matches("\\d+")) {
+        activePage = Integer.parseInt(activePageParam);
+    }
+
+    // 未受取リスト総数
+    int totalActive = activeBookings.size();
+    int totalActivePages = (int) Math.ceil(totalActive / (double) pageSize);
+
+    // 未受取の subList
+    int activeStart = (activePage - 1) * pageSize;
+    int activeEnd = Math.min(activeStart + pageSize, totalActive);
+    List<Booking> pagedActive = new ArrayList<Booking>();
+
+    if (activeStart < activeEnd) {
+        pagedActive = new ArrayList<Booking>(
+            activeBookings.subList(activeStart, activeEnd)
+        );
+    }
+
+
+
+    // ------------------ 受取済のページング ------------------
+    int completedPage = 1;
+    String completedPageParam = request.getParameter("completedPage");
+    if (completedPageParam != null && completedPageParam.matches("\\d+")) {
+        completedPage = Integer.parseInt(completedPageParam);
+    }
+
+    int totalCompleted = completedBookings.size();
+    int totalCompletedPages = (int) Math.ceil(totalCompleted / (double) pageSize);
+
+    int compStart = (completedPage - 1) * pageSize;
+    int compEnd = Math.min(compStart + pageSize, totalCompleted);
+    List<Booking> pagedCompleted = new ArrayList<Booking>();
+
+    if (compStart < compEnd) {
+        pagedCompleted = new ArrayList<Booking>(
+            completedBookings.subList(compStart, compEnd)
+        );
+    }
+
 %>
 
 <!DOCTYPE html>
@@ -209,7 +257,7 @@
                         </thead>
 
                         <tbody>
-                            <% for (Booking b : activeBookings) { %>
+                            <% for (Booking b : pagedActive) { %>
                                 <%
                                     Integer price = (Integer) request.getAttribute("price_" + b.getBookingId());
                                     int total = (price != null) ? price * b.getCount() : 0;
@@ -233,6 +281,17 @@
                             <% } %>
                         </tbody>
                     </table>
+                    <div class="pagination" style="text-align:center; margin:20px 0;">
+					    <% for (int i = 1; i <= totalActivePages; i++) { %>
+					        <% if (i == activePage) { %>
+					            <strong><%= i %></strong>
+					        <% } else { %>
+					            <a href="?activePage=<%= i %>&completedPage=<%= completedPage %>"><%= i %></a>
+					        <% } %>
+					        &nbsp;
+					    <% } %>
+					</div>
+
                 <% } else { %>
                     <p class="no-data">未受取の予約はありません。</p>
                 <% } %>
@@ -256,7 +315,7 @@
                         </thead>
 
                         <tbody>
-                            <% for (Booking b : completedBookings) { %>
+                            <% for (Booking b : pagedCompleted) { %>
                                 <%
                                     Integer price = (Integer) request.getAttribute("price_" + b.getBookingId());
                                     int total = (price != null) ? price * b.getCount() : 0;
@@ -275,6 +334,17 @@
                             <% } %>
                         </tbody>
                     </table>
+                    <div class="pagination" style="text-align:center; margin:20px 0;">
+					    <% for (int i = 1; i <= totalCompletedPages; i++) { %>
+					        <% if (i == completedPage) { %>
+					            <strong><%= i %></strong>
+					        <% } else { %>
+					            <a href="?completedPage=<%= i %>&activePage=<%= activePage %>"><%= i %></a>
+					        <% } %>
+					        &nbsp;
+					    <% } %>
+					</div>
+
                 <% } else { %>
                     <p class="no-data">受取済の予約はありません。</p>
                 <% } %>
