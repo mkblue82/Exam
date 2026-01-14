@@ -20,6 +20,7 @@ import bean.Employee;
 import bean.Merchandise;
 import bean.MerchandiseImage;
 import dao.EmployeeDAO;
+import dao.FavoriteDAO;
 import dao.MerchandiseDAO;
 import dao.MerchandiseImageDAO;
 import tool.Action;
@@ -279,6 +280,38 @@ public class MerchandiseRegisterExecuteAction extends Action {
             if (successCount == 0) {
                 throw new Exception("画像の保存に失敗しました");
             }
+
+            // ★★★ メール通知処理 ★★★
+            try {
+                FavoriteDAO favoriteDao = new FavoriteDAO(connection);
+                List<String> notificationEmails = favoriteDao.getNotificationEnabledEmails(storeId);
+
+                if (!notificationEmails.isEmpty()) {
+                    System.out.println("★ 通知対象メールアドレス数: " + notificationEmails.size());
+
+                    // 店舗名を取得
+                    String storeName = (store != null && store.getStoreName() != null)
+                                     ? store.getStoreName()
+                                     : "お気に入り店舗";
+
+                    // メール送信
+                    EmailUtility.sendMerchandiseRegistrationNotification(
+                        notificationEmails,
+                        name,      // 商品名
+                        price,     // 価格
+                        storeName  // 店舗名
+                    );
+
+                    System.out.println("✅ 通知メール送信完了: " + notificationEmails.size() + "件");
+                } else {
+                    System.out.println("★ 通知対象ユーザーなし");
+                }
+            } catch (Exception emailEx) {
+                // メール送信エラーは商品登録自体は成功させる
+                System.err.println("❌ メール送信エラー(商品登録は成功): " + emailEx.getMessage());
+                emailEx.printStackTrace();
+            }
+            // ★★★ メール通知処理ここまで ★★★
 
             m.setMerchandiseId(merchandiseId);
             session.setAttribute("registeredMerchandise", m);
