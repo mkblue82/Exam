@@ -116,6 +116,25 @@
     color: #d9534f;
     font-weight: bold;
 }
+
+/* タグバッジ */
+.tag-container {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+}
+
+.tag-badge {
+    display: inline-block;
+    background: #fff3e0;
+    color: #c07148;
+    padding: 4px 12px;
+    border-radius: 15px;
+    font-size: 0.9rem;
+    font-weight: normal;
+    border: 1px solid #c07148;
+}
 </style>
 </head>
 <body>
@@ -151,6 +170,26 @@
                 </p>
                 <% if (merch.getUseByDate() != null) { %>
                     <p>消費期限：<%= merch.getUseByDate() %></p>
+                <% } %>
+
+                <!-- タグ表示 -->
+                <% if (merch.getMerchandiseTag() != null && !merch.getMerchandiseTag().trim().isEmpty()) { %>
+                    <p>
+                        タグ：
+                        <span class="tag-container">
+                            <%
+                            String[] tags = merch.getMerchandiseTag().split(",");
+                            for (String tag : tags) {
+                                tag = tag.trim();
+                                if (!tag.isEmpty()) {
+                            %>
+                                <span class="tag-badge"><%= tag %></span>
+                            <%
+                                }
+                            }
+                            %>
+                        </span>
+                    </p>
                 <% } %>
             </div>
 

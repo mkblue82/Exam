@@ -90,7 +90,7 @@
             display: inline-block; padding: 8px 25px; background-color: #c07148;
             color: #fff; border-radius: 5px; text-decoration: none; transition: .3s; font-weight: bold;
         }
-        .btn:hover { background-color: #a85d38; transform: translateY(-2px); }
+        .btn:hover { background-color: #a85d38; transform: translateY(-2px); color: #fff; }
 
         .no-data { text-align: center; padding: 40px 20px; color: #999; font-size: 1rem; }
 
@@ -110,8 +110,8 @@
 
         /* 編集・削除ボタン（社員一覧と統一） */
         .table-button { display: inline-block; width: 100px; padding: 8px 0; text-align: center; box-sizing: border-box; }
-        .btn-delete { background-color: #d9534f; }
-        .btn-delete:hover { background-color: #c9302c; }
+        .btn-delete { background-color: #d9534f; color: #fff; }
+        .btn-delete:hover { background-color: #c9302c; color:#fff; }
 
         /* --- 削除確認モーダル（社員一覧と同じ） --- */
         .modal-overlay {
