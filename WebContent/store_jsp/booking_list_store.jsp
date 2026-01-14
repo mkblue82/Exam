@@ -270,6 +270,7 @@
 	                <p class="no-data">未受取の予約はありません。</p>
 	            <% } %>
 
+
 	            <!-- ▼ 受取済予約 -->
 	            <h3 style="margin-top:50px; color:#c07148; text-align:center;">受取済の予約</h3>
 	            <% if (!receivedList.isEmpty()) { %>
