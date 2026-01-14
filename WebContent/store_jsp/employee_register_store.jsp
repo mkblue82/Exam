@@ -153,26 +153,15 @@
             <div class="register-container">
                 <h1>社員登録</h1>
 
-                <%-- ★★★ エラーメッセージ表示部分 ★★★ --%>
-                <% if (request.getAttribute("error") != null) { %>
-                    <div class="error-msg">
-                        <%= request.getAttribute("error") %>
-                    </div>
-                <% } %>
-
                 <form action="${pageContext.request.contextPath}/foodloss/EmployeeRegister.action" method="post">
                     <div class="form-group">
                         <label for="employeeNumber">社員番号</label>
-                        <input type="text" id="employeeNumber" name="employeeNumber"
-                               value="<%= request.getAttribute("employeeNumber") != null ? request.getAttribute("employeeNumber") : "" %>"
-                               placeholder="例: 001, S001など" required>
+                        <input type="text" id="employeeNumber" name="employeeNumber" placeholder="例: 001, S001など" required>
                     </div>
 
                     <div class="form-group">
                         <label for="employeeName">氏名</label>
-                        <input type="text" id="employeeName" name="employeeName"
-                               value="<%= request.getAttribute("employeeName") != null ? request.getAttribute("employeeName") : "" %>"
-                               required>
+                        <input type="text" id="employeeName" name="employeeName" required>
                     </div>
 
                     <button type="submit" class="btn-register">登録</button>
