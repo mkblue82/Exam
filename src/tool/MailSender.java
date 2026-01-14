@@ -33,7 +33,7 @@ public class MailSender {
 
     private static void loadConfig() {
         try {
-            String configPath = "/WEB-INF/config/mail.properties";
+            String configPath = "/WEB-INF/classes/config/mail.properties";
             InputStream in = servletContext.getResourceAsStream(configPath);
             if (in == null) {
                 throw new RuntimeException("mail.propertiesが見つかりません: " + configPath);
