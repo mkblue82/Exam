@@ -54,7 +54,7 @@ public class MerchandiseEditAction extends Action {
                     List<MerchandiseImage> images = imageDao.selectByMerchandiseId(merchandiseId);
 
                     // ★ 現在の担当社員情報を取得
-                    EmployeeDAO empDao = new EmployeeDAO();
+                    EmployeeDAO empDao = new EmployeeDAO(conn);
                     Employee employee = empDao.selectById(merchandise.getEmployeeId());
 
                     // ★ その店舗の社員リストを取得（セレクトボックス用）

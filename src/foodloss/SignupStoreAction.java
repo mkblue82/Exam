@@ -20,10 +20,13 @@ import dao.StoreDAO;
 import tool.Action;
 import tool.MailSender;
 
+
 public class SignupStoreAction extends Action {
 
     @Override
     public void execute(HttpServletRequest req, HttpServletResponse res) throws Exception {
+
+    	MailSender.setServletContext(req.getServletContext());
 
         req.setCharacterEncoding("UTF-8");
         HttpSession session = req.getSession();
