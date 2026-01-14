@@ -55,7 +55,7 @@
     margin-bottom: 15px;
 }
 
-/* 予約ボタン */
+
 .reserve-section {
     margin: 30px 0;
     padding: 20px;
