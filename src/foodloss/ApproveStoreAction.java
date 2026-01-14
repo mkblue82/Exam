@@ -1,5 +1,7 @@
 package foodloss;
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.Timestamp;
 
@@ -56,7 +58,25 @@ public class ApproveStoreAction extends Action {
             store.setPhone(app.getStorePhone());
             store.setEmail(app.getStoreEmail());
             store.setPassword(app.getPasswordHash());
-            store.setLicense(app.getBusinessLicense());
+
+            // ★★★ ここを変更 ★★★
+            // 営業許可書をファイルパスからバイナリデータに変換
+            byte[] licenseData = null;
+            String licensePath = app.getBusinessLicense();
+            if (licensePath != null && !licensePath.isEmpty()) {
+                try {
+                    // サーバー上の実際のファイルパスを取得
+                    String realPath = req.getServletContext().getRealPath(licensePath);
+                    licenseData = Files.readAllBytes(Paths.get(realPath));
+                    System.out.println("✓ 営業許可書読み込み成功: " + realPath);
+                } catch (Exception e) {
+                    System.err.println("✗ 営業許可書の読み込みエラー: " + e.getMessage());
+                    e.printStackTrace();
+                }
+            }
+            store.setLicense(licenseData);
+            // ★★★ ここまで ★★★
+
             store.setDiscountTime(null);
             store.setDiscountRate(0);
 
