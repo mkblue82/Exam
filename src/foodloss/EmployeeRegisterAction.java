@@ -60,7 +60,7 @@ public class EmployeeRegisterAction extends Action {
             return;
         }
 
-        // セッションにstore情報を再セット（一覧用）
+        // セッションにstore情報を再セット（一あ覧用）
         session.setAttribute("storeCode", String.valueOf(store.getStoreId()));
         session.setAttribute("storeId", store.getStoreId());
         session.setAttribute("storeName", store.getStoreName());
