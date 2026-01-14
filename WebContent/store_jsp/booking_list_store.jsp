@@ -255,6 +255,17 @@
 	                        <% } %>
 	                    </tbody>
 	                </table>
+
+	                <div class="pagination" style="text-align:center; margin: 20px 0;">
+					    <% for (int i = 1; i <= totalPages; i++) { %>
+					        <% if (i == currentPage) { %>
+					            <strong><%= i %></strong>
+					        <% } else { %>
+					            <a href="?currentPage=<%= i %>"><%= i %></a>
+					        <% } %>
+					        &nbsp;
+					    <% } %>
+					</div>
 	            <% } else { %>
 	                <p class="no-data">未受取の予約はありません。</p>
 	            <% } %>
