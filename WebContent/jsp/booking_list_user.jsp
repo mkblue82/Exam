@@ -16,7 +16,8 @@
     Integer userId = (user != null) ? user.getUserId() : null;
     String userName = (user != null) ? user.getName() : null;
 
-    SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm");
+    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+    SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
 
     // ========== 予約リストを「未受取」と「受取済」に分ける ==========
     List<Booking> activeBookings = new ArrayList<>();    // 未受取
@@ -43,7 +44,7 @@
 
     <style>
         .main-content {
-            max-width: 1200px;
+            max-width: 1000px;
             margin: 40px auto;
             padding: 2rem;
             background: #fff;
@@ -64,35 +65,8 @@
             text-align: center;
             font-weight: bold;
             color: #c07148;
-            margin-bottom: 30px;
-            font-size: 1rem;
-        }
-
-        /* セクション分け */
-        .booking-section {
-            margin-bottom: 50px;
-        }
-
-        .section-title {
-            font-size: 1.4rem;
-            font-weight: bold;
-            color: #333;
-            padding: 10px 15px;
             margin-bottom: 20px;
-            border-left: 5px solid #c07148;
-            background: #f9f9f9;
-        }
-
-        .section-title.active {
-            border-left-color: #4a90e2;
-            background: #f0f8ff;
-            color: #4a90e2;
-        }
-
-        .section-title.completed {
-            border-left-color: #999;
-            background: #f5f5f5;
-            color: #666;
+            font-size: 1rem;
         }
 
         table {
@@ -107,6 +81,7 @@
             padding: 12px;
             font-weight: bold;
             border: 1px solid #c07148;
+            white-space: nowrap;
         }
 
         td {
@@ -120,46 +95,34 @@
             background-color: #f5f5f5;
         }
 
-        /* 受取済テーブルのスタイル */
-        .completed-section th {
-            background-color: #999;
-            border-color: #999;
-        }
-
-        .completed-section td {
-            color: #666;
-        }
-
         .cancel-btn {
             display: inline-block;
             padding: 8px 25px;
-            background-color: #999;
+            background-color: #c07148;
             color: white;
             border-radius: 5px;
             text-decoration: none;
             transition: 0.3s;
             font-weight: bold;
-            border: none;
-            cursor: pointer;
+            white-space: nowrap;
+            min-width: 120px;
+            text-align: center;
         }
 
         .cancel-btn:hover {
-            background-color: #dc3545;
-            color: white;
+            background-color: #a85d38;
             transform: translateY(-2px);
         }
 
         .no-data {
             text-align: center;
-            padding: 30px 20px;
+            padding: 40px 20px;
             color: #999;
             font-size: 1rem;
-            background: #f9f9f9;
-            border-radius: 5px;
         }
 
         .back-button {
-            margin-top: 40px;
+            margin-top: 30px;
             text-align: center;
         }
 
@@ -180,30 +143,7 @@
             transform: translateY(-3px);
         }
 
-        /* 折りたたみ機能 */
-        .toggle-btn {
-            background: none;
-            border: none;
-            color: #666;
-            cursor: pointer;
-            font-size: 0.9rem;
-            margin-left: 10px;
-            text-decoration: underline;
-        }
-
-        .toggle-btn:hover {
-            color: #c07148;
-        }
-
-        .collapsible-content {
-            display: block;
-        }
-
-        .collapsible-content.hidden {
-            display: none;
-        }
-
-        @media screen and (max-width: 1200px) {
+        @media screen and (max-width: 1000px) {
             .main-content {
                 margin: 20px;
                 padding: 1.5rem;
@@ -217,6 +157,16 @@
                 padding: 8px;
             }
         }
+
+        th:nth-child(1), td:nth-child(1) { width: 80px; }   /* 予約ID */
+        th:nth-child(2), td:nth-child(2) { width: 150px; }  /* 店舗名 */
+        th:nth-child(3), td:nth-child(3) { width: 150px; }  /* 商品名 */
+        th:nth-child(4), td:nth-child(4) { width: 80px; }   /* 数量 */
+        th:nth-child(5), td:nth-child(5) { width: 180px; }  /* 受取予定時刻 */
+        th:nth-child(6), td:nth-child(6) { width: 180px; }  /* 予約日時 */
+        th:nth-child(7), td:nth-child(7) { width: 100px; }  /* 受取状態 */
+        th:nth-child(8), td:nth-child(8) { width: 100px; }  /* 金額 */
+        th:nth-child(9), td:nth-child(9) { width: 120px; }  /* ボタン */
     </style>
 </head>
 
@@ -240,109 +190,94 @@
                     <% } %>
                 </div>
 
-                <!-- ========== 未受取の予約 ========== -->
-                <div class="booking-section">
-                    <h3 class="section-title active">
-                        📋 未受取の予約 (<%= activeBookings.size() %>件)
-                    </h3>
+                <!-- ▼ 未受取の予約 -->
+                <h3 style="margin-top:30px; color:#c07148; text-align:center;">未受取の予約</h3>
+                <% if (!activeBookings.isEmpty()) { %>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>予約ID</th>
+                                <th>店舗名</th>
+                                <th>商品名</th>
+                                <th>数量</th>
+                                <th>受取予定時刻</th>
+                                <th>予約日時</th>
+                                <th>受取状態</th>
+                                <th>金額</th>
+                                <th>予約取消</th>
+                            </tr>
+                        </thead>
 
-                    <% if (!activeBookings.isEmpty()) { %>
-                        <table>
-                            <thead>
+                        <tbody>
+                            <% for (Booking b : activeBookings) { %>
+                                <%
+                                    Integer price = (Integer) request.getAttribute("price_" + b.getBookingId());
+                                    int total = (price != null) ? price * b.getCount() : 0;
+                                %>
                                 <tr>
-                                    <th>予約ID</th>
-                                    <th>店舗名</th>
-                                    <th>商品名</th>
-                                    <th>合計金額</th>
-                                    <th>数量</th>
-                                    <th>受取予定時刻</th>
-                                    <th>予約日時</th>
-                                    <th>予約取消</th>
+                                    <td><%= b.getBookingId() %></td>
+                                    <td><%= request.getAttribute("store_" + b.getBookingId()) != null ? request.getAttribute("store_" + b.getBookingId()) : "−" %></td>
+                                    <td><%= b.getMerchandiseName() != null ? b.getMerchandiseName() : "−" %></td>
+                                    <td><%= b.getCount() %></td>
+                                    <td><%= b.getPickupTime() != null ? dateFormat.format(b.getPickupTime()) + "<br>" + timeFormat.format(b.getPickupTime()) : "−" %></td>
+                                    <td><%= b.getBookingTime() != null ? dateFormat.format(b.getBookingTime()) + "<br>" + timeFormat.format(b.getBookingTime()) : "−" %></td>
+                                    <td>未受取</td>
+                                    <td><%= total > 0 ? "¥" + String.format("%,d", total) : "−" %></td>
+                                    <td>
+                                        <a class="cancel-btn"
+                                           href="${pageContext.request.contextPath}/foodloss/BookingCancel.action?bookingId=<%= b.getBookingId() %>">
+                                            予約取消
+                                        </a>
+                                    </td>
                                 </tr>
-                            </thead>
+                            <% } %>
+                        </tbody>
+                    </table>
+                <% } else { %>
+                    <p class="no-data">未受取の予約はありません。</p>
+                <% } %>
 
-                            <tbody>
-                                <% for (Booking b : activeBookings) { %>
-                                    <%
-                                        Integer price = (Integer) request.getAttribute("price_" + b.getBookingId());
-                                        int total = (price != null) ? price * b.getCount() : 0;
-                                    %>
-                                    <tr>
-                                        <td><%= b.getBookingId() %></td>
-                                        <td><%= request.getAttribute("store_" + b.getBookingId()) != null ? request.getAttribute("store_" + b.getBookingId()) : "−" %></td>
-                                        <td><%= b.getMerchandiseName() != null ? b.getMerchandiseName() : "−" %></td>
-                                        <td class="price-cell">
-                                            <%= total > 0 ? "¥" + String.format("%,d", total) : "−" %>
-                                        </td>
-                                        <td><%= b.getCount() %></td>
-                                        <td><%= b.getPickupTime() != null ? sdf.format(b.getPickupTime()) : "−" %></td>
-                                        <td><%= b.getBookingTime() != null ? sdf.format(b.getBookingTime()) : "−" %></td>
-                                        <td>
-                                            <a class="cancel-btn"
-                                               href="${pageContext.request.contextPath}/foodloss/BookingCancel.action?bookingId=<%= b.getBookingId() %>">
-                                                予約取消
-                                            </a>
-                                        </td>
-                                    </tr>
-                                <% } %>
-                            </tbody>
-                        </table>
-                    <% } else { %>
-                        <p class="no-data">未受取の予約はありません。</p>
-                    <% } %>
-                </div>
+                <!-- ▼ 受取済の予約 -->
+                <h3 style="margin-top:50px; color:#c07148; text-align:center;">受取済の予約</h3>
+                <% if (!completedBookings.isEmpty()) { %>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>予約ID</th>
+                                <th>店舗名</th>
+                                <th>商品名</th>
+                                <th>数量</th>
+                                <th>受取予定時刻</th>
+                                <th>予約日時</th>
+                                <th>受取状態</th>
+                                <th>金額</th>
+                                <th>予約取消</th>
+                            </tr>
+                        </thead>
 
-                <!-- ========== 受取済の予約 ========== -->
-                <div class="booking-section">
-                    <h3 class="section-title completed">
-                        ✓ 受取済の予約 (<%= completedBookings.size() %>件)
-                        <button class="toggle-btn" onclick="toggleCompleted()">
-                            <span id="toggleText">非表示</span>
-                        </button>
-                    </h3>
-
-                    <div id="completedContent" class="collapsible-content">
-                        <% if (!completedBookings.isEmpty()) { %>
-                            <table class="completed-section">
-                                <thead>
-                                    <tr>
-                                        <th>予約ID</th>
-                                        <th>店舗名</th>
-                                        <th>商品名</th>
-                                        <th>合計金額</th>
-                                        <th>数量</th>
-                                        <th>受取予定時刻</th>
-                                        <th>予約日時</th>
-                                        <th>状態</th>
-                                    </tr>
-                                </thead>
-
-                                <tbody>
-                                    <% for (Booking b : completedBookings) { %>
-                                        <%
-                                            Integer price = (Integer) request.getAttribute("price_" + b.getBookingId());
-                                            int total = (price != null) ? price * b.getCount() : 0;
-                                        %>
-                                        <tr>
-                                            <td><%= b.getBookingId() %></td>
-                                            <td><%= request.getAttribute("store_" + b.getBookingId()) != null ? request.getAttribute("store_" + b.getBookingId()) : "−" %></td>
-                                            <td><%= b.getMerchandiseName() != null ? b.getMerchandiseName() : "−" %></td>
-                                            <td class="price-cell">
-                                                <%= total > 0 ? "¥" + String.format("%,d", total) : "−" %>
-                                            </td>
-                                            <td><%= b.getCount() %></td>
-                                            <td><%= b.getPickupTime() != null ? sdf.format(b.getPickupTime()) : "−" %></td>
-                                            <td><%= b.getBookingTime() != null ? sdf.format(b.getBookingTime()) : "−" %></td>
-                                            <td>受取済</td>
-                                        </tr>
-                                    <% } %>
-                                </tbody>
-                            </table>
-                        <% } else { %>
-                            <p class="no-data">受取済の予約はありません。</p>
-                        <% } %>
-                    </div>
-                </div>
+                        <tbody>
+                            <% for (Booking b : completedBookings) { %>
+                                <%
+                                    Integer price = (Integer) request.getAttribute("price_" + b.getBookingId());
+                                    int total = (price != null) ? price * b.getCount() : 0;
+                                %>
+                                <tr>
+                                    <td><%= b.getBookingId() %></td>
+                                    <td><%= request.getAttribute("store_" + b.getBookingId()) != null ? request.getAttribute("store_" + b.getBookingId()) : "−" %></td>
+                                    <td><%= b.getMerchandiseName() != null ? b.getMerchandiseName() : "−" %></td>
+                                    <td><%= b.getCount() %></td>
+                                    <td><%= b.getPickupTime() != null ? dateFormat.format(b.getPickupTime()) + "<br>" + timeFormat.format(b.getPickupTime()) : "−" %></td>
+                                    <td><%= b.getBookingTime() != null ? dateFormat.format(b.getBookingTime()) + "<br>" + timeFormat.format(b.getBookingTime()) : "−" %></td>
+                                    <td>受取済</td>
+                                    <td><%= total > 0 ? "¥" + String.format("%,d", total) : "−" %></td>
+                                    <td>ー</td>
+                                </tr>
+                            <% } %>
+                        </tbody>
+                    </table>
+                <% } else { %>
+                    <p class="no-data">受取済の予約はありません。</p>
+                <% } %>
 
                 <div class="back-button">
                     <a href="${pageContext.request.contextPath}/foodloss/Menu.action">ホームに戻る</a>
@@ -358,22 +293,6 @@
 </div>
 
 <!-- JS -->
-<script>
-    // 受取済セクションの表示/非表示切り替え
-    function toggleCompleted() {
-        const content = document.getElementById('completedContent');
-        const toggleText = document.getElementById('toggleText');
-
-        if (content.classList.contains('hidden')) {
-            content.classList.remove('hidden');
-            toggleText.textContent = '非表示';
-        } else {
-            content.classList.add('hidden');
-            toggleText.textContent = '表示';
-        }
-    }
-</script>
-
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
 <script src="${pageContext.request.contextPath}/js/slick.js"></script>
