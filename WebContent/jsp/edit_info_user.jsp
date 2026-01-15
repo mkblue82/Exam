@@ -4,13 +4,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>情報変更</title>
+    <title>登録情報の変更</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
 
     <style>
-        /* ======= 情報変更ページ専用 ======= */
-        .main-content {
-            max-width: 600px;
+        /* ======= ユーザー情報変更ページ ======= */
+        .edit-container {
+            max-width: 700px;
             margin: 40px auto;
             padding: 2rem;
             background: #fff;
@@ -18,150 +18,194 @@
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
 
-        .edit-section h2 {
-            font-size: 1.8rem;
+        .edit-container h2 {
             color: #c07148;
             text-align: center;
-            margin-bottom: 30px;
+            font-size: 1.8rem;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid #c07148;
+            padding-bottom: 1rem;
         }
 
-        form label {
+        .error-message {
+            background-color: #fee;
+            color: #c00;
+            padding: 12px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border: 1px solid #fcc;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
             display: block;
             font-weight: bold;
-            margin-bottom: 8px;
             color: #333;
+            margin-bottom: 0.5rem;
         }
 
-        form input[type="text"],
-        form input[type="email"],
-        form input[type="password"] {
+        .form-group input[type="text"],
+        .form-group input[type="email"],
+        .form-group input[type="tel"],
+        .form-group input[type="password"] {
             width: 100%;
-            padding: 10px;
-            margin-bottom: 20px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
             box-sizing: border-box;
             transition: border-color 0.3s;
         }
 
-        form input:focus {
-            border-color: #c07148;
+        .form-group input:focus {
             outline: none;
+            border-color: #c07148;
+            box-shadow: 0 0 5px rgba(192, 113, 72, 0.3);
+        }
+
+        .note {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 0.3rem;
         }
 
         .button-group {
             display: flex;
             justify-content: center;
             gap: 15px;
-            flex-wrap: wrap;
             margin-top: 30px;
         }
 
-        .button-group button,
-        .button-group a {
+        .btn {
             padding: 12px 40px;
-            background-color: #ccc;
-            border-radius: 5px;
-            text-decoration: none;
-            color: #333;
-            font-weight: bold;
-            font-size: 16px;
             border: none;
+            border-radius: 5px;
+            font-size: 16px;
             cursor: pointer;
             transition: all 0.3s;
+            text-decoration: none;
             font-family: inherit;
+            font-weight: bold;
         }
 
-        .button-group button:hover,
-        .button-group a:hover {
+        .btn-primary {
+            background: #c07148;
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            background: #a85d38;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background-color: #ccc;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
             background-color: #c07148;
             color: #fff;
             transform: translateY(-3px);
         }
+
+        @media screen and (max-width: 600px) {
+            .edit-container {
+                margin: 20px;
+                padding: 1.5rem;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
     </style>
 </head>
+
 <body>
 <div id="container">
 
-    <!-- ✅ 共通ヘッダー -->
+    <!-- 共通ヘッダー -->
     <jsp:include page="header_user.jsp" />
 
-
-    <!-- ✅ メインエリア -->
     <main class="column">
         <div class="main-contents">
-            <div class="main-content">
-                <div class="edit-section">
-                    <h2>登録情報の変更</h2>
+            <div class="edit-container">
 
-                    <form action="${pageContext.request.contextPath}/foodloss/EditInfoExecute.action" method="post" id="editForm">
-                        <label for="username">ユーザー名</label>
-                        <input type="text" id="name" name="name" value="${user.name}">
+                <h2>登録情報の変更</h2>
 
-                        <label for="email">メールアドレス</label>
-                        <input type="email" id="email" name="email" value="${user.email}">
-
-                        <label for="password">新しいパスワード</label>
-                        <input type="password" id="password" name="password" placeholder="変更しない場合は空欄">
-
-                        <div class="button-group">
-                            <button type="submit">変更を保存</button>
-                            <a href="${pageContext.request.contextPath}/jsp/mypage.jsp">戻る</a>
-                        </div>
-                    </form>
-
-                    <%
-                    String error = (String) request.getAttribute("error");
-                    if (error != null) {
-                    %>
-                    <script>
-                        // エラーメッセージを表示（サーバー側からエラーが返された場合のみ）
-                        document.addEventListener('DOMContentLoaded', function() {
-                            var errorMsg = "<%= error %>";
-
-                            // エラー内容に応じて該当フィールドにエラーを設定
-                            if (errorMsg.indexOf("ユーザー名") !== -1) {
-                                var nameField = document.getElementById("name");
-                                nameField.setCustomValidity(errorMsg);
-                                nameField.reportValidity();
-                            } else if (errorMsg.indexOf("メールアドレス") !== -1 && errorMsg.indexOf("使用されています") !== -1) {
-                                // メール重複エラー
-                                var emailField = document.getElementById("email");
-                                emailField.setCustomValidity(errorMsg);
-                                emailField.reportValidity();
-                            } else if (errorMsg.indexOf("メールアドレス") !== -1) {
-                                // メール未入力エラー
-                                var emailField = document.getElementById("email");
-                                emailField.setCustomValidity(errorMsg);
-                                emailField.reportValidity();
-                            } else {
-                                alert(errorMsg);
-                            }
-
-                            // 入力時にエラーをクリア
-                            var inputs = document.querySelectorAll('input');
-                            inputs.forEach(function(input) {
-                                input.addEventListener('input', function() {
-                                    this.setCustomValidity('');
-                                });
-                            });
-                        });
-                    </script>
-                    <% } %>
+                <%-- エラーメッセージ表示（店舗編集と統一） --%>
+                <%
+                    String errorMessage = (String) request.getAttribute("error");
+                    if (errorMessage != null) {
+                %>
+                <div class="error-message">
+                    <%= errorMessage %>
                 </div>
+                <% } %>
+
+                <form action="${pageContext.request.contextPath}/foodloss/EditInfoExecute.action"
+                      method="post">
+
+                    <div class="form-group">
+                        <label for="name">ユーザー名</label>
+                        <input type="text" id="name" name="name"
+                               value="${user.name}" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">メールアドレス</label>
+                        <input type="email" id="email" name="email"
+                               value="${user.email}" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="phone">電話番号</label>
+                        <input type="tel" id="phone" name="phone"
+                               value="${user.phone}"
+                               placeholder="09012345678"
+                               pattern="[0-9]{10,11}">
+                        <div class="note">※ハイフンなしで入力してください</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">新しいパスワード</label>
+                        <input type="password" id="password" name="password"
+                               placeholder="変更しない場合は空欄">
+                        <div class="note">※空欄の場合はパスワードは変更されません</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="passwordConfirm">パスワード（確認）</label>
+                        <input type="password" id="passwordConfirm"
+                               name="passwordConfirm"
+                               placeholder="確認のため再入力してください">
+                    </div>
+
+                    <div class="button-group">
+                        <button type="submit" class="btn btn-primary">変更を保存</button>
+                        <a href="${pageContext.request.contextPath}/jsp/mypage.jsp"
+                           class="btn btn-secondary">戻る</a>
+                    </div>
+
+                </form>
             </div>
         </div>
     </main>
 
-    <!-- ✅ 共通フッター -->
+    <!-- 共通フッター -->
     <jsp:include page="footer.jsp" />
+
 </div>
 
-<!-- JS -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
-<script src="../js/slick.js"></script>
-<script src="../js/main.js"></script>
-
+<script src="${pageContext.request.contextPath}/js/main.js"></script>
 </body>
 </html>

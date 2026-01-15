@@ -29,6 +29,9 @@ public class EditInfoExecuteAction extends Action {
         String name = request.getParameter("name");
         String email = request.getParameter("email");
         String password = request.getParameter("password");
+        String phone = request.getParameter("phone");
+        String passwordConfirm = request.getParameter("passwordConfirm");
+
 
         // 未入力チェック（必須項目）
         if (name == null || name.trim().isEmpty()) {
@@ -87,6 +90,37 @@ public class EditInfoExecuteAction extends Action {
                 }
                 dbUser.setEmail(email);
             }
+
+         // --- パスワード確認チェック ---
+            if (password != null && !password.trim().isEmpty()) {
+
+                if (passwordConfirm == null || passwordConfirm.trim().isEmpty()) {
+                    request.setAttribute("user", dbUser);
+                    request.setAttribute("error", "パスワード確認を入力してください。");
+                    request.getRequestDispatcher("/jsp/edit_info_user.jsp")
+                           .forward(request, response);
+                    return;
+                }
+
+                if (!password.equals(passwordConfirm)) {
+                    request.setAttribute("user", dbUser);
+                    request.setAttribute("error", "パスワードが一致しません。");
+                    request.getRequestDispatcher("/jsp/edit_info_user.jsp")
+                           .forward(request, response);
+                    return;
+                }
+            }
+
+
+         // --- 電話番号 ---
+            if (phone != null && !phone.trim().isEmpty()) {
+                if (!phone.equals(dbUser.getPhone())) {
+                    hasChanges = true;
+                }
+                dbUser.setPhone(phone);
+            }
+
+
 
             // --- パスワードハッシュ化して更新 ---
             if (password != null && !password.trim().isEmpty()) {
