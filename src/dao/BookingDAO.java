@@ -50,7 +50,7 @@ public class BookingDAO extends DAO {
         PreparedStatement st = con.prepareStatement(
             "select T005_PK1_booking, T005_FD1_booking, " +
             "T005_FD2_booking, T005_FD3_booking, T005_FD4_booking, " +
-            "T005_FD5_booking, T005_FD6_booking " +
+            "T005_FD5_booking, T005_FD6_booking, T005_FD8_booking " +
             "from T005_booking order by T005_PK1_booking"
         );
 
@@ -65,6 +65,7 @@ public class BookingDAO extends DAO {
             b.setProductId(rs.getInt("T005_FD4_booking"));
             b.setBookingTime(rs.getTimestamp("T005_FD5_booking"));
             b.setPickupStatus(rs.getBoolean("T005_FD6_booking"));
+            b.setReceivedTime(rs.getTimestamp("T005_FD8_booking"));
             list.add(b);
         }
 
@@ -294,7 +295,7 @@ public class BookingDAO extends DAO {
 	    PreparedStatement st = con.prepareStatement(
 	        "SELECT b.T005_PK1_booking, b.T005_FD1_booking, b.T005_FD2_booking, " +
 	        "b.T005_FD3_booking, b.T005_FD4_booking, b.T005_FD5_booking, b.T005_FD6_booking, " +
-	        "b.T005_FD7_booking, " +  // ← 金額を追加
+	        "b.T005_FD7_booking, b.T005_FD8_booking, " +  // ← 金額を追加
 	        "m.T002_FD5_merchandise AS merchandiseName " +
 	        "FROM T005_booking b " +
 	        "JOIN T002_merchandise m " +
@@ -316,6 +317,7 @@ public class BookingDAO extends DAO {
 	        b.setBookingTime(rs.getTimestamp("T005_FD5_booking"));
 	        b.setPickupStatus(rs.getBoolean("T005_FD6_booking"));
 	        b.setAmount(rs.getInt("T005_FD7_booking"));  // ← 金額をセット
+	        b.setReceivedTime(rs.getTimestamp("T005_FD8_booking"));  // ★追加
 
 	        // ★ 商品名セット
 	        b.setMerchandiseName(rs.getString("merchandiseName"));
@@ -329,4 +331,21 @@ public class BookingDAO extends DAO {
 
 	    return list;
 	}
+
+	public void updatePickupStatusWithTime(int bookingId) throws Exception {
+	    Connection con = getEffectiveConnection();
+
+	    PreparedStatement st = con.prepareStatement(
+	        "UPDATE T005_booking " +
+	        "SET T005_FD6_booking = TRUE, " +
+	        "T005_FD8_booking = CURRENT_TIMESTAMP " + // ← 今の時刻をセット
+	        "WHERE T005_PK1_booking = ?"
+	    );
+	    st.setInt(1, bookingId);
+	    st.executeUpdate();
+
+	    st.close();
+	    closeIfLocal(con);
+	}
+
 }

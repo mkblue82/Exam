@@ -307,11 +307,10 @@
 	                            <th>商品名</th>
 	                            <th>予約ユーザーID</th>
 	                            <th>数量</th>
-	                            <th>受取予定時刻</th>
+	                            <th>受取時刻</th>
 	                            <th>予約日時</th>
 	                            <th>受取状態</th>
 	                            <th>金額</th>
-	                            <th>受け取り</th>
 	                        </tr>
 	                    </thead>
 	                    <tbody>
@@ -321,11 +320,16 @@
 						            <td><%= b.getMerchandiseName() %></td>
 						            <td><%= b.getUserId() %></td>
 						            <td><%= b.getCount() %></td>
-						            <td><%= dateFormat.format(b.getPickupTime()) %><br><%= timeFormat.format(b.getPickupTime()) %></td>
+						            <td>
+									    <% if (b.getReceivedTime() != null) { %>
+									        <%= dateFormat.format(b.getReceivedTime()) %><br><%= timeFormat.format(b.getReceivedTime()) %>
+									    <% } else { %>
+									        -
+									    <% } %>
+									</td>
 						            <td><%= dateFormat.format(b.getBookingTime()) %><br><%= timeFormat.format(b.getBookingTime()) %></td>
 						            <td>受取済</td>
 						            <td><%= b.getAmount() %></td>
-						            <td>ー</td>
 						        </tr>
 						    <% } %>
 						</tbody>

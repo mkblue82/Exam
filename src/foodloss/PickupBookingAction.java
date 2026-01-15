@@ -54,9 +54,8 @@ public class PickupBookingAction extends HttpServlet {
             if (booking != null && !booking.getPickupStatus()) {
 
                 // ★ 受取済に変更
-                booking.setPickupStatus(true);
-                bookingDAO.update(booking);
-                System.out.println("受取ステータス更新: 完了");
+            	bookingDAO.updatePickupStatusWithTime(bookingId);
+                System.out.println("受取ステータス + 受取時刻 更新: 完了");
 
                 // ★ 在庫処理は削除（予約時に既に減らしているため）
 

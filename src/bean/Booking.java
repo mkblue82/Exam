@@ -12,6 +12,7 @@ public class Booking {
 	private boolean pickupStatus; // 受け取りステータス
 	private String merchandiseName;
 	private int amount;
+	private Timestamp receivedTime;
 
 	public String getMerchandiseName() {
 	    return merchandiseName;
@@ -107,10 +108,14 @@ public class Booking {
     public void setAmount(int amount) {
         this.amount = amount;
     }
+
+    // 実際の受取時刻のゲッター・セッター
+    public Timestamp getReceivedTime() {
+        return receivedTime;
+    }
+
+    public void setReceivedTime(Timestamp receivedTime) {
+        this.receivedTime = receivedTime;
+    }
+
 }
-
-
-
-
-
-
