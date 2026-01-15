@@ -1,15 +1,15 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page import="bean.Employee" %>
 <%
+    Employee employee = (Employee) request.getAttribute("employee");
     String errorMessage = (String) request.getAttribute("error");
-    String employeeNumber = (String) request.getAttribute("employeeNumber");
-    String employeeName = (String) request.getAttribute("employeeName");
 %>
 <!DOCTYPE html>
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>社員登録</title>
+    <title>社員編集</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
     <style>
         body {
@@ -36,7 +36,7 @@
             padding: 20px;
         }
 
-        .register-container {
+        .edit-container {
             max-width: 450px;
             width: 100%;
             margin: 40px auto;
@@ -46,7 +46,7 @@
             box-shadow: 0 5px 20px rgba(0,0,0,0.1);
         }
 
-        .register-container h1 {
+        .edit-container h1 {
             color: #c07148;
             text-align: center;
             margin-bottom: 2rem;
@@ -92,11 +92,12 @@
             box-shadow: 0 0 0 3px rgba(192, 113, 72, 0.1);
         }
 
-        .form-group input.error {
-            border-color: #c00;
+        .form-group input:disabled {
+            background-color: #f5f5f5;
+            cursor: not-allowed;
         }
 
-        .btn-register,
+        .btn-update,
         .btn-back {
             width: 100%;
             border: none;
@@ -106,7 +107,7 @@
             font-weight: bold;
         }
 
-        .btn-register {
+        .btn-update {
             padding: 1rem;
             font-size: 1.1rem;
             background: #c07148;
@@ -116,7 +117,7 @@
             font-family: inherit;
         }
 
-        .btn-register:hover {
+        .btn-update:hover {
             background: #a85d38;
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(192, 113, 72, 0.4);
@@ -137,12 +138,12 @@
         }
 
         @media screen and (max-width: 600px) {
-            .register-container {
+            .edit-container {
                 margin: 20px;
                 padding: 1.5rem;
             }
 
-            .register-container h1 {
+            .edit-container h1 {
                 font-size: 1.5rem;
             }
         }
@@ -156,8 +157,8 @@
     <!-- メインコンテンツ -->
     <main class="column">
         <div class="main-contents">
-            <div class="register-container">
-                <h1>社員登録</h1>
+            <div class="edit-container">
+                <h1>社員編集</h1>
 
                 <!-- エラーメッセージ表示 -->
                 <% if (errorMessage != null) { %>
@@ -166,30 +167,37 @@
                     </div>
                 <% } %>
 
-                <form action="${pageContext.request.contextPath}/foodloss/EmployeeRegister.action" method="post">
-                    <div class="form-group">
-                        <label for="employeeNumber">社員番号 <span style="color: red;">*</span></label>
-                        <input type="text"
-                               id="employeeNumber"
-                               name="employeeNumber"
-                               value="<%= employeeNumber != null ? employeeNumber : "" %>"
-                               class="<%= errorMessage != null && errorMessage.contains("社員番号") ? "error" : "" %>"
-                               required
-                               placeholder="例: 001">
-                    </div>
+                <% if (employee != null) { %>
+                    <form action="${pageContext.request.contextPath}/foodloss/EmployeeEdit.action" method="post">
+                        <!-- 社員IDを隠しフィールドで送信 -->
+                        <input type="hidden" name="employeeId" value="<%= employee.getId() %>">
 
-                    <div class="form-group">
-                        <label for="employeeName">社員名 <span style="color: red;">*</span></label>
-                        <input type="text"
-                               id="employeeName"
-                               name="employeeName"
-                               value="<%= employeeName != null ? employeeName : "" %>"
-                               required
-                               placeholder="例: 山田太郎">
-                    </div>
+                        <div class="form-group">
+                            <label for="employeeNumber">社員番号</label>
+                            <input type="text"
+                                   id="employeeNumber"
+                                   name="employeeNumber"
+                                   value="<%= employee.getEmployeeCode() %>"
+                                   disabled
+                                   style="background-color: #f5f5f5;">
+                            <small style="color: #999;">※社員番号は変更できません</small>
+                        </div>
 
-                    <button type="submit" class="btn-register">登録</button>
-                </form>
+                        <div class="form-group">
+                            <label for="employeeName">社員名 <span style="color: red;">*</span></label>
+                            <input type="text"
+                                   id="employeeName"
+                                   name="employeeName"
+                                   value="<%= employee.getEmployeeName() %>"
+                                   required
+                                   placeholder="例: 山田太郎">
+                        </div>
+
+                        <button type="submit" class="btn-update">更新</button>
+                    </form>
+                <% } else { %>
+                    <p style="text-align: center; color: #999;">社員情報が見つかりません。</p>
+                <% } %>
 
                 <!-- 戻るボタン（フォームの外） -->
                 <button type="button" class="btn-back"

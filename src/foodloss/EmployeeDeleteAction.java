@@ -1,5 +1,4 @@
 package foodloss;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -24,7 +23,7 @@ public class EmployeeDeleteAction extends Action {
 
         if (idParam == null || idParam.isEmpty()) {
             session.setAttribute("errorMessage", "削除対象の社員IDが指定されていません。");
-            res.sendRedirect(req.getContextPath() + "/foodloss/EmployeeList.action");
+            res.sendRedirect(req.getContextPath() + "/foodloss/EmployeeList.action?fromDelete=true");
             return;
         }
 
@@ -35,14 +34,14 @@ public class EmployeeDeleteAction extends Action {
             // 削除対象の社員が自店舗の社員かチェック
             Employee emp = dao.selectById(employeeId);
             if (emp == null) {
-                session.setAttribute("errorMessage", "指定された社員が見つかりませんでした。");
+                session.setAttribute("errorMessage", "対象者の情報はすでに削除されています。");
             } else if (!emp.getStoreCode().equals(storeCode)) {
                 session.setAttribute("errorMessage", "他店舗の社員は削除できません。");
             } else {
                 // 削除実行（戻り値はintで、削除された行数）
                 int result = dao.delete(idParam);
                 if (result > 0) {
-                    session.setAttribute("successMessage", emp.getEmployeeName() + "さんを削除しました。");
+                    session.setAttribute("successMessage", "対象者の情報を削除しました。");
                 } else {
                     session.setAttribute("errorMessage", "社員の削除に失敗しました。");
                 }
@@ -54,7 +53,7 @@ public class EmployeeDeleteAction extends Action {
             session.setAttribute("errorMessage", "社員の削除中にエラーが発生しました。");
         }
 
-        // 社員一覧にリダイレクト
-        res.sendRedirect(req.getContextPath() + "/foodloss/EmployeeList.action");
+        // 社員一覧にリダイレクト（fromDeleteパラメータ付き）
+        res.sendRedirect(req.getContextPath() + "/foodloss/EmployeeList.action?fromDelete=true");
     }
 }

@@ -1,5 +1,4 @@
 package foodloss;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,10 +11,8 @@ import dao.EmployeeDAO;
 import tool.Action;
 
 public class EmployeeListAction extends Action {
-
     @Override
     public void execute(HttpServletRequest req, HttpServletResponse res) throws Exception {
-
         HttpSession session = req.getSession(false);
 
         // ★ ログインチェック（storeCodeがない場合はログインページにリダイレクト）
@@ -26,6 +23,14 @@ public class EmployeeListAction extends Action {
 
         String storeCode = (String) session.getAttribute("storeCode");
         String employeeCode = req.getParameter("employeeCode");
+
+        // ★ 削除・編集後のリダイレクト以外でアクセスされた場合、メッセージをクリア
+        String fromDelete = req.getParameter("fromDelete");
+        String fromEdit = req.getParameter("fromEdit");
+        if (fromDelete == null && fromEdit == null) {
+            session.removeAttribute("successMessage");
+            session.removeAttribute("errorMessage");
+        }
 
         EmployeeDAO dao = new EmployeeDAO();
         List<Employee> list = new ArrayList<>();
@@ -39,11 +44,9 @@ public class EmployeeListAction extends Action {
             } else {
                 list = dao.selectByStoreCode(storeCode);
             }
-
             req.setAttribute("employeeList", list);
             req.setAttribute("employeeCode", employeeCode);
             req.setAttribute("storeCode", storeCode);
-
         } catch (Exception e) {
             e.printStackTrace();
             req.setAttribute("errorMessage", "社員情報の取得中にエラーが発生しました。");

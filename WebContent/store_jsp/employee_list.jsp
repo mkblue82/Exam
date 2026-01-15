@@ -40,6 +40,33 @@
             margin-bottom: 2rem;
         }
 
+        .message-box {
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1rem;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        .success-message {
+            color: #155724;
+            background-color: #d4edda;
+            border: 2px solid #c3e6cb;
+        }
+
+        .error-message {
+            color: #721c24;
+            background-color: #f8d7da;
+            border: 2px solid #f5c6cb;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
         .store-info {
             text-align: center;
             font-weight: bold;
@@ -235,20 +262,20 @@
         }
 
         /* 商品一覧と同じ定義に統一 */
-		.btn.table-button {
-		    width: 100px;
-		    padding: 8px 0;
-		    text-align: center;
-		    box-sizing: border-box;
-		}
+        .btn.table-button {
+            width: 100px;
+            padding: 8px 0;
+            text-align: center;
+            box-sizing: border-box;
+        }
 
-		.btn-delete {
-		    background-color: #d9534f;  /* 商品一覧と同じ */
-		}
+        .btn-delete {
+            background-color: #d9534f;  /* 商品一覧と同じ */
+        }
 
-		.btn-delete:hover {
-		    background-color: #c9302c;  /* 商品一覧と同じ */
-		}
+        .btn-delete:hover {
+            background-color: #c9302c;  /* 商品一覧と同じ */
+        }
 
     </style>
 </head>
@@ -263,6 +290,22 @@
             <div class="main-content">
 
                 <h2>社員一覧</h2>
+
+                <%-- 成功メッセージの表示 --%>
+                <% if (session.getAttribute("successMessage") != null) { %>
+                    <div class="message-box success-message">
+                        <%= session.getAttribute("successMessage") %>
+                    </div>
+                    <% session.removeAttribute("successMessage"); %>
+                <% } %>
+
+                <%-- エラーメッセージの表示 --%>
+                <% if (session.getAttribute("errorMessage") != null) { %>
+                    <div class="message-box error-message">
+                        <%= session.getAttribute("errorMessage") %>
+                    </div>
+                    <% session.removeAttribute("errorMessage"); %>
+                <% } %>
 
                 <div class="store-info">
                     <% if (storeName != null) { %>
@@ -290,18 +333,18 @@
                                     <td><%= emp.getEmployeeCode() %></td>
                                     <td><%= emp.getEmployeeName() %></td>
                                     <td>
-									  <a class="btn table-button"
-									     href="${pageContext.request.contextPath}/foodloss/EmployeeEdit.action?id=<%= emp.getId() %>">
-									     編集
-									  </a>
-									</td>
-									<td>
-									  <a class="btn btn-delete table-button"
-									     href="#"
-									     onclick="showDeleteConfirm(<%= emp.getId() %>, '<%= emp.getEmployeeName() %>'); return false;">
-									     削除
-									  </a>
-									</td>
+                                      <a class="btn table-button"
+                                         href="${pageContext.request.contextPath}/foodloss/EmployeeEdit.action?id=<%= emp.getId() %>">
+                                         編集
+                                      </a>
+                                    </td>
+                                    <td>
+                                      <a class="btn btn-delete table-button"
+                                         href="#"
+                                         onclick="showDeleteConfirm(<%= emp.getId() %>, '<%= emp.getEmployeeName() %>'); return false;">
+                                         削除
+                                      </a>
+                                    </td>
                                 </tr>
                             <% } %>
                         </tbody>
