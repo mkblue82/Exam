@@ -63,7 +63,7 @@
         <p>ユーザー情報の更新が正常に完了しました。</p>
         <div class="button-group">
           <a href="${pageContext.request.contextPath}/jsp/mypage.jsp">マイページに戻る</a>
-          <a href="${pageContext.request.contextPath}/jsp/main_user.jsp">トップページへ</a>
+          <a href="${pageContext.request.contextPath}/foodloss/Menu.action">トップページへ</a>
         </div>
       </div>
     </div>
