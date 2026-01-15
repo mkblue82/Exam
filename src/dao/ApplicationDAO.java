@@ -18,9 +18,7 @@ public class ApplicationDAO extends DAO {
         this.con = con;
     }
 
-    /**
-     * 申請データを新規登録
-     */
+    // ===== 申請データ新規登録 =====
     public int insert(Application app) throws Exception {
 
         String sql =
@@ -54,9 +52,7 @@ public class ApplicationDAO extends DAO {
         return app.getApplicationId();
     }
 
-    /**
-     * 承認トークンで検索（pending 限定）
-     */
+    // ===== 承認トークン検索（pendingのみ） =====
     public Application selectByToken(String token) throws Exception {
 
         String sql =
@@ -79,27 +75,22 @@ public class ApplicationDAO extends DAO {
         return app;
     }
 
-    /**
-     * 承認処理（token 無効化）
-     */
+    // ===== 承認処理（★修正済み） =====
     public void approve(int applicationId) throws Exception {
 
         String sql =
             "UPDATE T001_1_applications SET " +
             "T001_1_FD8_applications = 'approved', " +
-            "T001_1_FD10_applications = CURRENT_TIMESTAMP, " +
-            "T001_1_FD7_applications = NULL " +
+            "T001_1_FD10_applications = CURRENT_TIMESTAMP " +
             "WHERE T001_1_PK1_applications = ?";
 
-        PreparedStatement pstmt = con.prepareStatement(sql);
-        pstmt.setInt(1, applicationId);
-        pstmt.executeUpdate();
-        pstmt.close();
+        try (PreparedStatement pstmt = con.prepareStatement(sql)) {
+            pstmt.setInt(1, applicationId);
+            pstmt.executeUpdate();
+        }
     }
 
-    /**
-     * pending一覧取得
-     */
+    // ===== pending一覧取得 =====
     public List<Application> selectPendingApplications() throws Exception {
 
         List<Application> list = new ArrayList<>();
@@ -121,6 +112,39 @@ public class ApplicationDAO extends DAO {
         return list;
     }
 
+    // ===== メール重複チェック（pendingのみ） =====
+    public boolean existsByEmail(String email) throws SQLException {
+
+        String sql =
+            "SELECT 1 FROM T001_1_applications " +
+            "WHERE T001_1_FD4_applications = ? " +
+            "AND T001_1_FD8_applications = 'pending'";
+
+        try (PreparedStatement st = con.prepareStatement(sql)) {
+            st.setString(1, email);
+            try (ResultSet rs = st.executeQuery()) {
+                return rs.next();
+            }
+        }
+    }
+
+    // ===== 電話番号重複チェック（pendingのみ） =====
+    public boolean existsByPhone(String phone) throws SQLException {
+
+        String sql =
+            "SELECT 1 FROM T001_1_applications " +
+            "WHERE T001_1_FD3_applications = ? " +
+            "AND T001_1_FD8_applications = 'pending'";
+
+        try (PreparedStatement st = con.prepareStatement(sql)) {
+            st.setString(1, phone);
+            try (ResultSet rs = st.executeQuery()) {
+                return rs.next();
+            }
+        }
+    }
+
+    // ===== ResultSet → Application =====
     private Application map(ResultSet rs) throws SQLException {
 
         Application app = new Application();

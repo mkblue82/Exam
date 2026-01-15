@@ -4,7 +4,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.security.MessageDigest;
 import java.sql.Connection;
 import java.util.UUID;
 
@@ -29,50 +28,81 @@ public class SignupStoreAction extends Action {
         HttpSession session = req.getSession();
 
         String storeName = req.getParameter("storeName");
-        String address = req.getParameter("address");
-        String phone = req.getParameter("phone");
-        String email = req.getParameter("email");
-        String password = req.getParameter("password");
+        String address   = req.getParameter("address");
+        String phone     = req.getParameter("phone");
+        String email     = req.getParameter("email");
+        String password  = req.getParameter("password");
 
-        Part permitFilePart = req.getPart("permitFile");
+        /* ===== 入力値を戻す（エラー時用） ===== */
+        req.setAttribute("storeName", storeName);
+        req.setAttribute("address", address);
+        req.setAttribute("phone", phone);
+        req.setAttribute("email", email);
 
-        String uploadDir = req.getServletContext().getRealPath("/uploads");
-        new File(uploadDir).mkdirs();
+        try (Connection conn = getConnection()) {
 
-        String savedName = "license_" + UUID.randomUUID() + ".pdf";
-        String filePath = uploadDir + File.separator + savedName;
-
-        // ===== ファイル保存（Java 8対応）=====
-        try (InputStream is = permitFilePart.getInputStream();
-             FileOutputStream fos = new FileOutputStream(filePath)) {
-
-            byte[] buffer = new byte[4096];
-            int len;
-            while ((len = is.read(buffer)) != -1) {
-                fos.write(buffer, 0, len);
-            }
-        }
-
-        // ===== 添付用 byte[] 作成（Java 8対応）=====
-        byte[] permitFileData;
-        try (InputStream is = permitFilePart.getInputStream();
-             ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-
-            byte[] buffer = new byte[4096];
-            int len;
-            while ((len = is.read(buffer)) != -1) {
-                baos.write(buffer, 0, len);
-            }
-            permitFileData = baos.toByteArray();
-        }
-
-        String passwordHash = hash(password);
-
-        Connection conn = getConnection();
-        try {
+            ApplicationDAO appDAO = new ApplicationDAO(conn);
             StoreDAO storeDAO = new StoreDAO(conn);
-            ApplicationDAO appDAO = new ApplicationDAO();
 
+            /* ===== 重複チェック ===== */
+            if (storeDAO.existsByEmail(email) || appDAO.existsByEmail(email)) {
+                req.setAttribute("formError", "このメールアドレスは既に使用されています。");
+                req.getRequestDispatcher("/store_jsp/signup_store.jsp")
+                   .forward(req, res);
+                return;
+            }
+
+            if (storeDAO.existsByPhone(phone) || appDAO.existsByPhone(phone)) {
+                req.setAttribute("formError", "この電話番号は既に使用されています。");
+                req.getRequestDispatcher("/store_jsp/signup_store.jsp")
+                   .forward(req, res);
+                return;
+            }
+
+            /* ===== 許可証ファイル ===== */
+            Part permitFilePart = req.getPart("permitFile");
+            if (permitFilePart == null || permitFilePart.getSize() == 0) {
+                req.setAttribute("formError", "営業許可証ファイルを選択してください。");
+                req.getRequestDispatcher("/store_jsp/signup_store.jsp")
+                   .forward(req, res);
+                return;
+            }
+
+            String contentType = permitFilePart.getContentType();
+            String ext =
+                    contentType.equals("application/pdf") ? ".pdf" :
+                    contentType.equals("image/jpeg")      ? ".jpg" :
+                    contentType.equals("image/png")       ? ".png" : "";
+
+            if (ext.isEmpty()) {
+                req.setAttribute("formError", "対応していないファイル形式です。");
+                req.getRequestDispatcher("/store_jsp/signup_store.jsp")
+                   .forward(req, res);
+                return;
+            }
+
+            String uploadDir = req.getServletContext().getRealPath("/uploads");
+            new File(uploadDir).mkdirs();
+
+            String savedName = "license_" + UUID.randomUUID() + ext;
+            String filePath = uploadDir + File.separator + savedName;
+
+            byte[] permitFileData;
+            try (InputStream is = permitFilePart.getInputStream();
+                 FileOutputStream fos = new FileOutputStream(filePath);
+                 ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+
+                byte[] buffer = new byte[4096];
+                int len;
+                while ((len = is.read(buffer)) != -1) {
+                    fos.write(buffer, 0, len);
+                    baos.write(buffer, 0, len);
+                }
+                permitFileData = baos.toByteArray();
+            }
+
+            /* ===== 登録処理 ===== */
+            String passwordHash = hash(password);
             String token = UUID.randomUUID().toString();
 
             Application app = new Application();
@@ -86,39 +116,37 @@ public class SignupStoreAction extends Action {
             app.setStatus("pending");
 
             appDAO.insert(app);
+            session.setAttribute("pendingApplication", app);
 
+            /* ===== メール ===== */
             String approvalUrl =
-                    req.getScheme() + "://" +
-                    req.getServerName() + ":" +
-                    req.getServerPort() +
-                    req.getContextPath() +
-                    "/foodloss/ApproveStore.action?token=" + token;
+                req.getScheme() + "://" +
+                req.getServerName() + ":" + req.getServerPort() +
+                req.getContextPath() +
+                "/ApproveStore.action?token=" + token;
 
             String adminBody =
-                    "新規店舗申請がありました。\n\n" +
-                    "店舗名: " + storeName + "\n" +
-                    "住所: " + address + "\n" +
-                    "電話: " + phone + "\n" +
-                    "メール: " + email + "\n\n" +
-                    "▼承認URL\n" + approvalUrl;
+                "新規店舗申請がありました。\n\n" +
+                "店舗名: " + storeName + "\n" +
+                "住所: " + address + "\n" +
+                "電話: " + phone + "\n" +
+                "メール: " + email + "\n\n" +
+                "▼承認URL\n" + approvalUrl;
 
-            MailSender.sendEmailWithAttachmentAndReplyTo(
-                    "ahi559933@gmail.com",
-                    email,
-                    "【要承認】新規店舗申請 - " + storeName,
-                    adminBody,
-                    permitFileData,
-                    storeName + "_permit.pdf"
+            MailSender.sendEmailWithAttachment(
+                "ahi559933@gmail.com",
+                "【要承認】新規店舗申請 - " + storeName,
+                adminBody,
+                permitFileData,
+                storeName + "_permit" + ext,
+                contentType
             );
 
             MailSender.sendEmail(
-                    email,
-                    "【申請受付】" + storeName,
-                    storeName + " 様\n\n申請を受け付けました。"
+                email,
+                "【申請受付】" + storeName,
+                storeName + " 様\n\n店舗申請を受け付けました。"
             );
-
-        } finally {
-            conn.close();
         }
 
         req.getRequestDispatcher("/store_jsp/signup_done_store.jsp")
@@ -126,8 +154,9 @@ public class SignupStoreAction extends Action {
     }
 
     private String hash(String src) throws Exception {
-        MessageDigest md = MessageDigest.getInstance("SHA-256");
-        byte[] b = md.digest(src.getBytes());
+        java.security.MessageDigest md =
+            java.security.MessageDigest.getInstance("SHA-256");
+        byte[] b = md.digest(src.getBytes("UTF-8"));
         StringBuilder sb = new StringBuilder();
         for (byte x : b) sb.append(String.format("%02x", x));
         return sb.toString();
