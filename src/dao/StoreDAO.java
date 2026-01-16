@@ -55,7 +55,7 @@ public class StoreDAO {
         String sql =
             "INSERT INTO T001_store " +
             "(T001_FD1_store, T001_FD2_store, T001_FD3_store, " +
-            " T001_FD4_store, T001_FD7_store, T001_FD8_store) " +
+            " T001_FD4_store, T001_FD7_store, T001_FD8_store, T001_FD9_store) " +
             "VALUES (?, ?, ?, ?, ?, ?) RETURNING T001_PK1_store";
 
         try (PreparedStatement pstmt = con.prepareStatement(sql)) {
@@ -65,6 +65,7 @@ public class StoreDAO {
             pstmt.setString(4, store.getPassword());
             pstmt.setString(5, store.getEmail());
             pstmt.setBytes(6, store.getLicense());
+            pstmt.setString(7, store.getLicenseType());
 
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
@@ -83,7 +84,7 @@ public class StoreDAO {
             "UPDATE T001_store SET " +
             "T001_FD1_store = ?, T001_FD2_store = ?, T001_FD3_store = ?, " +
             "T001_FD4_store = ?, T001_FD5_store = ?, T001_FD6_store = ?, " +
-            "T001_FD7_store = ?, T001_FD8_store = ? " +
+            "T001_FD7_store = ?, T001_FD8_store, T001_FD9_store = ? " +
             "WHERE T001_PK1_store = ?";
 
         try (PreparedStatement st = con.prepareStatement(sql)) {
@@ -96,6 +97,7 @@ public class StoreDAO {
             st.setString(7, store.getEmail());
             st.setBytes(8, store.getLicense());
             st.setInt(9, store.getStoreId());
+            st.setString(10, store.getLicenseType());
 
             st.executeUpdate();
         }
@@ -220,6 +222,20 @@ public class StoreDAO {
         s.setLicense(rs.getBytes("t001_fd8_store"));
         return s;
     }
+
+    public byte[] getLicense(int storeId) throws SQLException {
+        PreparedStatement ps = con.prepareStatement(
+            "SELECT t001_fd8_store FROM T001_store WHERE T001_PK1_store = ?"
+        );
+        ps.setInt(1, storeId);
+
+        ResultSet rs = ps.executeQuery();
+        if (rs.next()) {
+            return rs.getBytes("t001_fd8_store");
+        }
+        return null;
+    }
+
 
     public FileInfo getLicenseFile(int storeId) throws SQLException {
         String sql = "SELECT t001_fd8_store, t001_fd9_store FROM T001_store WHERE T001_PK1_store = ?";
