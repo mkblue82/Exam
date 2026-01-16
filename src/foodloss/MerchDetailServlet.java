@@ -2,6 +2,8 @@ package foodloss;
 
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.Time;
+import java.time.LocalTime;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -100,6 +102,26 @@ public class MerchDetailServlet extends HttpServlet {
             // リクエストに設定
             req.setAttribute("merchandise", merch);
             req.setAttribute("store", store);
+
+            // 割引情報を判定して設定
+            if (store != null) {
+                Time discountTime = store.getDiscountTime();
+                int discountRate = store.getDiscountRate();
+
+                // 現在時刻が割引時間以降かつ割引率が設定されているか判定
+                boolean isDiscountApplied = false;
+                if (discountTime != null && discountRate > 0) {
+                    LocalTime now = LocalTime.now();
+                    LocalTime discountStart = discountTime.toLocalTime();
+                    isDiscountApplied = now.isAfter(discountStart) || now.equals(discountStart);
+                }
+
+                req.setAttribute("isDiscountApplied", isDiscountApplied);
+                req.setAttribute("discountRate", discountRate);
+                System.out.println("Discount time: " + discountTime);
+                System.out.println("Discount applied: " + isDiscountApplied);
+                System.out.println("Discount rate: " + discountRate + "%");
+            }
 
             System.out.println("Forwarding to merchandise detail page");
 

@@ -4,6 +4,10 @@
     Merchandise merch = (Merchandise) request.getAttribute("merchandise");
     Store store = (Store) request.getAttribute("store");
 
+    // 割引情報
+    Boolean isDiscountApplied = (Boolean) request.getAttribute("isDiscountApplied");
+    Integer discountRate = (Integer) request.getAttribute("discountRate");
+
     // デバッグ出力
     System.out.println("=== 商品詳細ページ デバッグ ===");
     System.out.println("merchandise: " + (merch != null ? "あり" : "null"));
@@ -14,6 +18,8 @@
         System.out.println("消費期限: " + merch.getUseByDate());
     }
     System.out.println("store: " + (store != null ? store.getStoreName() : "null"));
+    System.out.println("割引適用: " + isDiscountApplied);
+    System.out.println("割引率: " + discountRate);
 
     if (merch == null) {
         request.setAttribute("errorMessage", "商品情報が取得できませんでした。");
@@ -55,6 +61,22 @@
     margin-bottom: 15px;
 }
 
+
+.price-display {
+    display: inline-flex;
+    flex-direction: column;
+    gap: 3px;
+}
+.discounted-price {
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: #d9534f;
+}
+.original-price {
+    font-size: 0.9rem;
+    color: #999;
+    text-decoration: line-through;
+}
 
 .reserve-section {
     margin: 30px 0;
@@ -134,6 +156,15 @@
     font-weight: normal;
     border: 1px solid #c07148;
 }
+
+.store-link {
+    color: inherit;
+    text-decoration: none;
+    transition: text-decoration 0.3s;
+}
+.store-link:hover {
+    text-decoration: underline;
+}
 </style>
 </head>
 <body>
@@ -159,9 +190,27 @@
             <!-- 商品情報 -->
             <div class="detail-info">
                 <% if (store != null) { %>
-                    <p>店舗名：<%= store.getStoreName() %></p>
+                    <p>店舗名：
+                        <a href="<%= request.getContextPath() %>/foodloss/StoreMerchandise.action?storeId=<%= store.getStoreId() %>"
+                           class="store-link">
+                            <%= store.getStoreName() %>
+                        </a>
+                    </p>
                 <% } %>
-                <p>価格：<strong>¥<%= merch.getPrice() %></strong></p>
+                <p>価格：
+                    <%
+                        int originalPrice = merch.getPrice();
+                        if (isDiscountApplied != null && isDiscountApplied && discountRate != null) {
+                            int discountedPrice = (int)(originalPrice * (100 - discountRate) / 100.0);
+                    %>
+                        <span class="price-display">
+                            <span class="discounted-price">¥<%= discountedPrice %></span>
+                            <span class="original-price">(元価格: ¥<%= originalPrice %>)</span>
+                        </span>
+                    <% } else { %>
+                        <strong>¥<%= originalPrice %></strong>
+                    <% } %>
+                </p>
                 <p>在庫：<strong><%= merch.getStock() %></strong>個
                     <% if (merch.getStock() <= 0) { %>
                         <span class="stock-warning">（在庫切れ）</span>
