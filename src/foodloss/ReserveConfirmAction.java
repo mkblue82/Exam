@@ -1,6 +1,8 @@
 package foodloss;
 
 import java.sql.Connection;
+import java.sql.Time;
+import java.time.LocalTime;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -95,13 +97,37 @@ public class ReserveConfirmAction extends Action {
 
             // 店舗情報取得
             Store store = null;
+            boolean isDiscountApplied = false;
+            int discountRate = 0;
+            int unitPrice = merch.getPrice(); // 元の単価
+            int discountedUnitPrice = unitPrice; // 割引後の単価
+
             if (merch.getStoreId() > 0) {
                 StoreDAO storeDao = new StoreDAO(con);
                 store = storeDao.selectById(merch.getStoreId());
+
+                // 割引情報を判定
+                if (store != null) {
+                    Time discountTime = store.getDiscountTime();
+                    discountRate = store.getDiscountRate();
+
+                    if (discountTime != null && discountRate > 0) {
+                        LocalTime now = LocalTime.now();
+                        LocalTime discountStart = discountTime.toLocalTime();
+                        isDiscountApplied = now.isAfter(discountStart) || now.equals(discountStart);
+                    }
+
+                    // 割引が適用される場合、割引後の単価を計算
+                    if (isDiscountApplied) {
+                        discountedUnitPrice = (int)(unitPrice * (100 - discountRate) / 100.0);
+                        System.out.println("割引適用: " + discountRate + "% OFF");
+                        System.out.println("元の単価: ¥" + unitPrice + " → 割引後: ¥" + discountedUnitPrice);
+                    }
+                }
             }
 
-            // 合計金額計算
-            int totalPrice = merch.getPrice() * quantity;
+            // 合計金額計算（割引後の単価を使用）
+            int totalPrice = discountedUnitPrice * quantity;
 
             // リクエストスコープに設定
             request.setAttribute("merchandise", merch);
@@ -109,6 +135,14 @@ public class ReserveConfirmAction extends Action {
             request.setAttribute("quantity", quantity);
             request.setAttribute("totalPrice", totalPrice);
             request.setAttribute("user", user);
+            request.setAttribute("isDiscountApplied", isDiscountApplied);
+            request.setAttribute("discountRate", discountRate);
+            request.setAttribute("originalUnitPrice", unitPrice);
+            request.setAttribute("discountedUnitPrice", discountedUnitPrice);
+
+            System.out.println("割引適用フラグ: " + isDiscountApplied);
+            System.out.println("割引率: " + discountRate + "%");
+            System.out.println("合計金額: ¥" + totalPrice);
 
             // 確認画面へフォワード
             request.getRequestDispatcher("/jsp/reserve_confirm.jsp")

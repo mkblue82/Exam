@@ -1,8 +1,10 @@
 package foodloss;
 
 import java.sql.Connection;
+import java.sql.Time;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.time.LocalTime;
 import java.util.Date;
 
 import javax.servlet.http.HttpServletRequest;
@@ -11,9 +13,11 @@ import javax.servlet.http.HttpSession;
 
 import bean.Booking;
 import bean.Merchandise;
+import bean.Store;
 import bean.User;
 import dao.BookingDAO;
 import dao.MerchandiseDAO;
+import dao.StoreDAO;
 import dao.UserDAO;
 import tool.Action;
 
@@ -95,8 +99,35 @@ public class ReserveExecuteAction extends Action {
                 return;
             }
 
-            // 合計金額を計算
-            int totalPrice = merchandise.getPrice() * quantity;
+            // 店舗情報を取得して割引情報を判定
+            StoreDAO storeDAO = new StoreDAO(con);
+            Store store = storeDAO.selectById(merchandise.getStoreId());
+
+            boolean isDiscountApplied = false;
+            int discountRate = 0;
+            int originalUnitPrice = merchandise.getPrice();
+            int discountedUnitPrice = originalUnitPrice;
+
+            if (store != null) {
+                Time discountTime = store.getDiscountTime();
+                discountRate = store.getDiscountRate();
+
+                if (discountTime != null && discountRate > 0) {
+                    LocalTime nowTime = LocalTime.now();
+                    LocalTime discountStart = discountTime.toLocalTime();
+                    isDiscountApplied = nowTime.isAfter(discountStart) || nowTime.equals(discountStart);
+                }
+
+                // 割引が適用される場合、割引後の単価を計算
+                if (isDiscountApplied) {
+                    discountedUnitPrice = (int)(originalUnitPrice * (100 - discountRate) / 100.0);
+                    System.out.println("割引適用: " + discountRate + "% OFF");
+                    System.out.println("元の単価: ¥" + originalUnitPrice + " → 割引後: ¥" + discountedUnitPrice);
+                }
+            }
+
+            // 合計金額を計算（割引後の単価を使用）
+            int totalPrice = discountedUnitPrice * quantity;
 
             // ポイント使用のバリデーション
             if (pointsToUse < 0) {
@@ -126,7 +157,7 @@ public class ReserveExecuteAction extends Action {
             // 最終支払い金額を計算
             int finalPrice = totalPrice - pointsToUse;
 
-            // Bookingオブジェクトを作成
+            // Bookingオブジェクトを作成（割引後の金額で保存）
             Booking booking = new Booking();
             booking.setUserId(user.getUserId());
             booking.setProductId(merchandiseId);
@@ -135,7 +166,15 @@ public class ReserveExecuteAction extends Action {
             booking.setBookingTime(new Timestamp(now.getTime()));
             booking.setPickupStatus(false); // 未受取
             booking.setMerchandiseName(merchandise.getMerchandiseName());
-            booking.setAmount(finalPrice);
+            booking.setAmount(finalPrice); // 割引とポイント適用後の最終金額
+
+            System.out.println("予約登録 - 商品: " + merchandise.getMerchandiseName());
+            System.out.println("数量: " + quantity + "個");
+            System.out.println("元の単価: ¥" + originalUnitPrice);
+            System.out.println("割引後単価: ¥" + discountedUnitPrice);
+            System.out.println("小計: ¥" + totalPrice);
+            System.out.println("ポイント使用: " + pointsToUse + "pt");
+            System.out.println("最終金額: ¥" + finalPrice);
 
             // 予約をデータベースに登録
             BookingDAO bookingDAO = new BookingDAO();
@@ -180,6 +219,10 @@ public class ReserveExecuteAction extends Action {
             request.setAttribute("totalPrice", totalPrice);
             request.setAttribute("pointsUsed", pointsToUse);
             request.setAttribute("finalPrice", finalPrice);
+            request.setAttribute("isDiscountApplied", isDiscountApplied);
+            request.setAttribute("discountRate", discountRate);
+            request.setAttribute("originalUnitPrice", originalUnitPrice);
+            request.setAttribute("discountedUnitPrice", discountedUnitPrice);
             request.setAttribute("message", "予約が完了しました。");
 
             request.getRequestDispatcher("/jsp/reserve_success.jsp").forward(request, response);

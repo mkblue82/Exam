@@ -1,6 +1,10 @@
 package foodloss;
+
 import java.sql.Connection;
+import java.sql.Time;
+import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +33,10 @@ public class MenuAction extends Action {
         Map<Store, List<Merchandise>> shopMerchMap = new LinkedHashMap<>();
         List<Merchandise> defaultList = new ArrayList<>();
 
+        // 店舗ごとの割引情報を格納するマップ
+        Map<Integer, Boolean> storeDiscountMap = new HashMap<>();
+        Map<Integer, Integer> storeDiscountRateMap = new HashMap<>();
+
         try (Connection con = new DBManager().getConnection()) {
             StoreDAO storeDAO = new StoreDAO(con);
             MerchandiseDAO merchDAO = new MerchandiseDAO(con);
@@ -40,7 +48,24 @@ public class MenuAction extends Action {
 
             for (Store store : storeList) {
                 try {
-                    // 商品取得 (修正: selectByStoreId2 → selectByStoreId)
+                    // 割引情報を判定
+                    Time discountTime = store.getDiscountTime();
+                    int discountRate = store.getDiscountRate();
+
+                    boolean isDiscountApplied = false;
+                    if (discountTime != null && discountRate > 0) {
+                        LocalTime now = LocalTime.now();
+                        LocalTime discountStart = discountTime.toLocalTime();
+                        isDiscountApplied = now.isAfter(discountStart) || now.equals(discountStart);
+                    }
+
+                    // 店舗IDをキーに割引情報を保存
+                    storeDiscountMap.put(store.getStoreId(), isDiscountApplied);
+                    storeDiscountRateMap.put(store.getStoreId(), discountRate);
+
+                    System.out.println("店舗ID " + store.getStoreId() + " - 割引適用: " + isDiscountApplied + ", 割引率: " + discountRate + "%");
+
+                    // 商品取得
                     List<Merchandise> merchList = merchDAO.selectByStoreId(store.getStoreId());
                     System.out.println("店舗ID " + store.getStoreId() + " の商品数: " + merchList.size());
 
@@ -77,6 +102,8 @@ public class MenuAction extends Action {
 
             req.setAttribute("shopMerchMap", shopMerchMap);
             req.setAttribute("defaultList", defaultList);
+            req.setAttribute("storeDiscountMap", storeDiscountMap);
+            req.setAttribute("storeDiscountRateMap", storeDiscountRateMap);
 
             System.out.println("defaultList件数: " + defaultList.size());
             System.out.println("shopMerchMap店舗数: " + shopMerchMap.size());

@@ -142,6 +142,26 @@
     color:#c07148;
 }
 
+.price-display {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    margin-top: 8px;
+}
+
+.discounted-price {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #d9534f;
+}
+
+.original-price {
+    font-size: 0.8rem;
+    color: #999;
+    text-decoration: line-through;
+}
+
 /* 画像がない場合 */
 .no-image {
     width:180px;
@@ -183,6 +203,12 @@
                 Map<Store, List<Merchandise>> storeToMerchMap = (Map<Store, List<Merchandise>>) request.getAttribute("storeToMerchMap");
                 String searchKeyword = (String) request.getAttribute("searchKeyword");
 
+                // 割引情報マップを取得
+                Map<Integer, Boolean> storeDiscountMap =
+                    (Map<Integer, Boolean>) request.getAttribute("storeDiscountMap");
+                Map<Integer, Integer> storeDiscountRateMap =
+                    (Map<Integer, Integer>) request.getAttribute("storeDiscountRateMap");
+
                 // 現在日時を取得（消費期限チェック用）
                 Date today = new Date(System.currentTimeMillis());
 
@@ -192,6 +218,7 @@
                 System.out.println("storeList: " + (storeList != null ? storeList.size() + "件" : "null"));
                 System.out.println("searchKeyword: " + searchKeyword);
                 System.out.println("storeToMerchMap: " + (storeToMerchMap != null ? storeToMerchMap.size() + "店舗" : "null"));
+                System.out.println("storeDiscountMap: " + (storeDiscountMap != null ? "あり" : "null"));
             %>
 
             <!-- ========== 検索結果表示 ========== -->
@@ -205,7 +232,16 @@
                     <p class="result-count"><%= storeList.size() %>件の店舗が見つかりました</p>
 
                     <div class="store-list">
-                        <% for (Store store : storeList) { %>
+                        <% for (Store store : storeList) {
+                            // この店舗の割引情報を取得
+                            Boolean isDiscountApplied = storeDiscountMap != null ?
+                                storeDiscountMap.get(store.getStoreId()) : false;
+                            Integer discountRate = storeDiscountRateMap != null ?
+                                storeDiscountRateMap.get(store.getStoreId()) : 0;
+
+                            if (isDiscountApplied == null) isDiscountApplied = false;
+                            if (discountRate == null) discountRate = 0;
+                        %>
                             <div class="store-card">
                                 <div class="store-content">
                                     <div class="store-header">
@@ -213,6 +249,7 @@
                                             <div class="store-name"><%= store.getStoreName() %></div>
                                         </a>
                                     </div>
+
                                     <% if (store.getAddress() != null && !store.getAddress().isEmpty()) { %>
                                     <div class="store-info">
                                         📍 <%= store.getAddress() %>
@@ -249,6 +286,14 @@
                                 %>
                                     <div style="margin-top:15px; padding-top:15px; border-top:1px solid #ddd;">
                                         <div style="font-weight:bold; margin-bottom:10px; color:#666;">この店舗の商品:</div>
+
+                                        <!-- 割引適用中の通知 -->
+                                        <% if (isDiscountApplied && discountRate > 0) { %>
+                                            <div style="color:#856404; font-size:1rem; font-weight:bold; margin-bottom:10px;">
+                                                🎉 現在、全商品<%= discountRate %>%OFF！
+                                            </div>
+                                        <% } %>
+
                                         <div class="merch-list">
                                             <%
                                                 int displayedCount = 0;
@@ -305,7 +350,20 @@
                                                         </div>
                                                     </a>
                                                     <div style="margin-top:8px;"><%= merch.getMerchandiseName() %></div>
-                                                    <div class="merch-price">¥ <%= merch.getPrice() %></div>
+
+                                                    <!-- 価格表示（割引対応） -->
+                                                    <%
+                                                        int originalPrice = merch.getPrice();
+                                                        if (isDiscountApplied && discountRate > 0) {
+                                                            int discountedPrice = (int)(originalPrice * (100 - discountRate) / 100.0);
+                                                    %>
+                                                        <div class="price-display">
+                                                            <span class="discounted-price">¥<%= discountedPrice %></span>
+                                                            <span class="original-price">(¥<%= originalPrice %>)</span>
+                                                        </div>
+                                                    <% } else { %>
+                                                        <div class="merch-price">¥ <%= originalPrice %></div>
+                                                    <% } %>
                                                 </div>
                                             <% } %>
                                         </div>
@@ -371,6 +429,15 @@
                                 long daysUntilExpiry = diff / (1000 * 60 * 60 * 24);
                                 isExpiringSoon = daysUntilExpiry <= 3;
                             }
+
+                            // この商品の店舗の割引情報を取得
+                            Boolean isDiscountApplied = storeDiscountMap != null ?
+                                storeDiscountMap.get(merch.getStoreId()) : false;
+                            Integer discountRate = storeDiscountRateMap != null ?
+                                storeDiscountRateMap.get(merch.getStoreId()) : 0;
+
+                            if (isDiscountApplied == null) isDiscountApplied = false;
+                            if (discountRate == null) discountRate = 0;
                         %>
                             <div class="merch-item">
                                 <% if (isExpiringSoon) { %>
@@ -396,7 +463,20 @@
                                     </div>
                                 </a>
                                 <div style="margin-top:8px;"><%= merch.getMerchandiseName() %></div>
-                                <div class="merch-price">¥ <%= merch.getPrice() %></div>
+
+                                <!-- 価格表示（割引対応） -->
+                                <%
+                                    int originalPrice = merch.getPrice();
+                                    if (isDiscountApplied && discountRate > 0) {
+                                        int discountedPrice = (int)(originalPrice * (100 - discountRate) / 100.0);
+                                %>
+                                    <div class="price-display">
+                                        <span class="discounted-price">¥<%= discountedPrice %></span>
+                                        <span class="original-price">(¥<%= originalPrice %>)</span>
+                                    </div>
+                                <% } else { %>
+                                    <div class="merch-price">¥ <%= originalPrice %></div>
+                                <% } %>
                             </div>
                         <% } %>
                     </div>

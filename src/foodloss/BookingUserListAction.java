@@ -58,17 +58,12 @@ public class BookingUserListAction extends Action {
             request.setAttribute("currentPage", 1);
             request.setAttribute("totalPages", 1);
         } else {
-            // 予約情報に商品名・店舗名・価格を追加
+            // 予約情報に商品名・店舗名を追加
             for (Booking booking : allBookingList) {
                 // 商品情報を取得
                 Merchandise merchandise = merchandiseDao.selectById(booking.getProductId());
                 if (merchandise != null) {
                     booking.setMerchandiseName(merchandise.getMerchandiseName());
-                    // 価格情報を設定（int型なので直接取得可能）
-                    int price = merchandise.getPrice();
-                    request.setAttribute("price_" + booking.getBookingId(), price);
-                    // デバッグ用ログ
-                    System.out.println("BookingID: " + booking.getBookingId() + ", Price: " + price);
 
                     // 店舗情報を取得
                     Store store = storeDao.selectById(merchandise.getStoreId());
@@ -76,6 +71,11 @@ public class BookingUserListAction extends Action {
                         request.setAttribute("store_" + booking.getBookingId(), store.getStoreName());
                     }
                 }
+
+                // デバッグ用ログ（予約の金額を確認）
+                System.out.println("BookingID: " + booking.getBookingId() +
+                                   ", Amount: " + booking.getAmount() +
+                                   ", ProductName: " + booking.getMerchandiseName());
             }
 
             // 受取状態でソート（未受取が上、受取済が下）

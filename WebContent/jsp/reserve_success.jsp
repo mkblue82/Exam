@@ -8,6 +8,15 @@
     Integer finalPrice = (Integer) request.getAttribute("finalPrice");
     String message = (String) request.getAttribute("message");
 
+    // 割引情報を取得
+    Boolean isDiscountApplied = (Boolean) request.getAttribute("isDiscountApplied");
+    Integer discountRate = (Integer) request.getAttribute("discountRate");
+    Integer originalUnitPrice = (Integer) request.getAttribute("originalUnitPrice");
+    Integer discountedUnitPrice = (Integer) request.getAttribute("discountedUnitPrice");
+
+    if (isDiscountApplied == null) isDiscountApplied = false;
+    if (discountRate == null) discountRate = 0;
+
     // デフォルト値設定
     if (pointsUsed == null) pointsUsed = 0;
     if (finalPrice == null && totalPrice != null) {
@@ -37,6 +46,8 @@
     margin-bottom: 30px;
     font-weight: bold;
 }
+
+
 .reservation-details {
     background: #f9f9f9;
     padding: 25px;
@@ -61,6 +72,25 @@
     flex: 1;
     color: #333;
 }
+
+.price-display {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.discounted-price {
+    font-size: 1.05rem;
+    font-weight: bold;
+    color: #d9534f;
+}
+
+.original-price {
+    font-size: 0.85rem;
+    color: #999;
+    text-decoration: line-through;
+}
+
 .subtotal-price {
     font-size: 1.1rem;
     color: #333;
@@ -143,7 +173,16 @@
                     </div>
                     <div class="detail-row">
                         <div class="detail-label">単価:</div>
-                        <div class="detail-value">¥<%= merchandise.getPrice() %></div>
+                        <div class="detail-value">
+                            <% if (isDiscountApplied && discountRate > 0 && discountedUnitPrice != null && originalUnitPrice != null) { %>
+                                <div class="price-display">
+                                    <span class="discounted-price">¥<%= discountedUnitPrice %></span>
+                                    <span class="original-price">(元価格: ¥<%= originalUnitPrice %>)</span>
+                                </div>
+                            <% } else { %>
+                                ¥<%= merchandise.getPrice() %>
+                            <% } %>
+                        </div>
                     </div>
                     <div class="detail-row">
                         <div class="detail-label">小計:</div>
@@ -171,6 +210,12 @@
                         <div class="detail-value"><%= booking.getPickupTime() %></div>
                     </div>
                 </div>
+
+                <% if (isDiscountApplied && discountRate > 0) { %>
+                <p style="color:#856404; font-size:0.95rem; margin-top:15px;">
+                    ✓ <%= discountRate %>%の割引が適用されました
+                </p>
+                <% } %>
 
                 <% if (pointsUsed != null && pointsUsed > 0) { %>
                 <p style="color:#4a90e2; font-size:0.95rem; margin-top:15px;">

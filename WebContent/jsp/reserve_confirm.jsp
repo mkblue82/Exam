@@ -14,6 +14,17 @@
     Integer quantity = (Integer) request.getAttribute("quantity");
     Integer totalPrice = (Integer) request.getAttribute("totalPrice");
 
+    // 割引情報を取得
+    Boolean isDiscountApplied = (Boolean) request.getAttribute("isDiscountApplied");
+    Integer discountRate = (Integer) request.getAttribute("discountRate");
+    Integer originalUnitPrice = (Integer) request.getAttribute("originalUnitPrice");
+    Integer discountedUnitPrice = (Integer) request.getAttribute("discountedUnitPrice");
+
+    if (isDiscountApplied == null) isDiscountApplied = false;
+    if (discountRate == null) discountRate = 0;
+    if (originalUnitPrice == null) originalUnitPrice = merch.getPrice();
+    if (discountedUnitPrice == null) discountedUnitPrice = merch.getPrice();
+
     if (merch == null || quantity == null) {
         request.setAttribute("errorMessage", "予約情報が取得できませんでした。");
         request.getRequestDispatcher("/error.jsp").forward(request, response);
@@ -76,6 +87,24 @@
 .info-value {
     flex: 1;
     color: #333;
+}
+
+.price-display {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.discounted-price {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #d9534f;
+}
+
+.original-price {
+    font-size: 0.9rem;
+    color: #999;
+    text-decoration: line-through;
 }
 
 .total-price {
@@ -297,7 +326,16 @@
                     <% } %>
                     <div class="info-row">
                         <div class="info-label">単価:</div>
-                        <div class="info-value">¥<%= merch.getPrice() %></div>
+                        <div class="info-value">
+                            <% if (isDiscountApplied && discountRate > 0) { %>
+                                <div class="price-display">
+                                    <span class="discounted-price">¥<%= discountedUnitPrice %></span>
+                                    <span class="original-price">(元価格: ¥<%= originalUnitPrice %>)</span>
+                                </div>
+                            <% } else { %>
+                                ¥<%= originalUnitPrice %>
+                            <% } %>
+                        </div>
                     </div>
                     <div class="info-row">
                         <div class="info-label">予約数量:</div>
@@ -404,7 +442,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('reserveForm');
     const errorMsg = document.getElementById('errorMsg');
 
-    const unitPrice = <%= merch.getPrice() %>;
+    // 割引後の単価を使用
+    const unitPrice = <%= discountedUnitPrice %>;
     const maxStock = <%= merch.getStock() %>;
     const userPoints = <%= userPoints %>;
     const useByDate = '<%= merch.getUseByDate() %>';

@@ -158,6 +158,8 @@ public class BookingDAO extends DAO {
             b.setProductId(rs.getInt("T005_FD4_booking"));
             b.setBookingTime(rs.getTimestamp("T005_FD5_booking"));
             b.setPickupStatus(rs.getBoolean("T005_FD6_booking"));
+            b.setAmount(rs.getInt("T005_FD7_booking"));
+            b.setReceivedTime(rs.getTimestamp("T005_FD8_booking"));
             list.add(b);
         }
 

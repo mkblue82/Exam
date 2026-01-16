@@ -258,10 +258,6 @@
 
                         <tbody>
                             <% for (Booking b : pagedActive) { %>
-                                <%
-                                    Integer price = (Integer) request.getAttribute("price_" + b.getBookingId());
-                                    int total = (price != null) ? price * b.getCount() : 0;
-                                %>
                                 <tr>
                                     <td><%= b.getBookingId() %></td>
                                     <td><%= request.getAttribute("store_" + b.getBookingId()) != null ? request.getAttribute("store_" + b.getBookingId()) : "−" %></td>
@@ -270,7 +266,7 @@
                                     <td><%= b.getPickupTime() != null ? dateFormat.format(b.getPickupTime()) + "<br>" + timeFormat.format(b.getPickupTime()) : "−" %></td>
                                     <td><%= b.getBookingTime() != null ? dateFormat.format(b.getBookingTime()) + "<br>" + timeFormat.format(b.getBookingTime()) : "−" %></td>
                                     <td>未受取</td>
-                                    <td><%= total > 0 ? "¥" + String.format("%,d", total) : "−" %></td>
+                                    <td><%= b.getAmount() > 0 ? "¥" + String.format("%,d", b.getAmount()) : "−" %></td>
                                     <td>
                                         <a class="cancel-btn"
                                            href="${pageContext.request.contextPath}/foodloss/BookingCancel.action?bookingId=<%= b.getBookingId() %>">
@@ -316,10 +312,6 @@
 
                         <tbody>
                             <% for (Booking b : pagedCompleted) { %>
-                                <%
-                                    Integer price = (Integer) request.getAttribute("price_" + b.getBookingId());
-                                    int total = (price != null) ? price * b.getCount() : 0;
-                                %>
                                 <tr>
                                     <td><%= b.getBookingId() %></td>
                                     <td><%= request.getAttribute("store_" + b.getBookingId()) != null ? request.getAttribute("store_" + b.getBookingId()) : "−" %></td>
@@ -328,7 +320,7 @@
                                     <td><%= b.getPickupTime() != null ? dateFormat.format(b.getPickupTime()) + "<br>" + timeFormat.format(b.getPickupTime()) : "−" %></td>
                                     <td><%= b.getBookingTime() != null ? dateFormat.format(b.getBookingTime()) + "<br>" + timeFormat.format(b.getBookingTime()) : "−" %></td>
                                     <td>受取済</td>
-                                    <td><%= total > 0 ? "¥" + String.format("%,d", total) : "−" %></td>
+                                    <td><%= b.getAmount() > 0 ? "¥" + String.format("%,d", b.getAmount()) : "−" %></td>
                                     <td>ー</td>
                                 </tr>
                             <% } %>
