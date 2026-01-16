@@ -1,6 +1,8 @@
 package foodloss;
 
 import java.sql.Connection;
+import java.sql.Time;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -59,10 +61,27 @@ public class StoreMerchandiseAction extends Action {
                             m.setImages(new ArrayList<>());
                         }
                     }
+
+                    // 割引情報を判定して設定
+                    Time discountTime = store.getDiscountTime();
+                    int discountRate = store.getDiscountRate();
+
+                    boolean isDiscountApplied = false;
+                    if (discountTime != null && discountRate > 0) {
+                        LocalTime now = LocalTime.now();
+                        LocalTime discountStart = discountTime.toLocalTime();
+                        isDiscountApplied = now.isAfter(discountStart) || now.equals(discountStart);
+                    }
+
+                    req.setAttribute("isDiscountApplied", isDiscountApplied);
+                    req.setAttribute("discountRate", discountRate);
+                    System.out.println("割引時間: " + discountTime);
+                    System.out.println("割引適用: " + isDiscountApplied);
+                    System.out.println("割引率: " + discountRate + "%");
+
                 } else {
                     System.out.println("店舗情報が見つかりません: storeId=" + storeId);
                 }
-
             } else {
                 System.out.println("店舗IDがnullまたは空です");
             }
@@ -70,7 +89,6 @@ public class StoreMerchandiseAction extends Action {
             // 結果をリクエストスコープにセット
             req.setAttribute("store", store);
             req.setAttribute("merchandiseList", merchandiseList);
-
             System.out.println("店舗情報セット: " + (store != null ? store.getStoreName() : "null"));
             System.out.println("商品リストセット: " + merchandiseList.size() + "件");
 

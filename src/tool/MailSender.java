@@ -3,6 +3,8 @@ package tool;
 import java.io.InputStream;
 import java.util.Properties;
 
+import javax.activation.DataHandler;
+import javax.activation.DataSource;
 import javax.mail.Authenticator;
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -14,6 +16,8 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
+import javax.mail.internet.MimeUtility;
+import javax.mail.util.ByteArrayDataSource;
 import javax.servlet.ServletContext;
 
 public class MailSender {
@@ -33,14 +37,15 @@ public class MailSender {
     private static void loadConfig() {
         try {
             InputStream in = servletContext.getResourceAsStream(
-                    "/WEB-INF/classes/config/mail.properties");
+                "/WEB-INF/classes/config/mail.properties"
+            );
             if (in == null) {
-                throw new RuntimeException("mail.properties が見つかりません");
+                throw new RuntimeException("mail.propertiesが見つかりません");
             }
             mailConfig.load(in);
             in.close();
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("mail.properties 読み込み失敗", e);
         }
     }
 
@@ -55,23 +60,27 @@ public class MailSender {
         return Session.getInstance(props, new Authenticator() {
             protected PasswordAuthentication getPasswordAuthentication() {
                 return new PasswordAuthentication(
-                        mailConfig.getProperty("smtp.user"),
-                        mailConfig.getProperty("smtp.password")
+                    mailConfig.getProperty("smtp.user"),
+                    mailConfig.getProperty("smtp.password")
                 );
             }
         });
     }
 
-    // ===== 通常メール =====
-    public static void sendEmail(String to, String subject, String body)
-            throws MessagingException {
+    // 本文のみ
+    public static void sendEmail(
+            String to, String subject, String body
+    ) throws MessagingException {
 
         Session session = createSession();
-        MimeMessage message = new MimeMessage(session);
 
+        Message message = new MimeMessage(session);
         message.setFrom(new InternetAddress(mailConfig.getProperty("smtp.user")));
-        message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to));
-        message.setSubject(subject, "UTF-8");
+        message.setRecipients(
+            Message.RecipientType.TO,
+            InternetAddress.parse(to)
+        );
+        message.setSubject(subject);
 
         MimeBodyPart textPart = new MimeBodyPart();
         textPart.setText(body, "UTF-8");
@@ -83,32 +92,42 @@ public class MailSender {
         Transport.send(message);
     }
 
-    // ===== 添付 + Reply-To 対応（今回の主役）=====
-    public static void sendEmailWithAttachmentAndReplyTo(
+    // 添付付き（MIME可変）
+    public static void sendEmailWithAttachment(
             String to,
-            String replyTo,
             String subject,
             String body,
             byte[] attachmentData,
-            String fileName
+            String fileName,
+            String contentType
     ) throws MessagingException {
 
         Session session = createSession();
-        MimeMessage message = new MimeMessage(session);
 
+        Message message = new MimeMessage(session);
         message.setFrom(new InternetAddress(mailConfig.getProperty("smtp.user")));
-        message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to));
-        message.setReplyTo(new InternetAddress[] {
-                new InternetAddress(replyTo)
-        });
-        message.setSubject(subject, "UTF-8");
+        message.setRecipients(
+            Message.RecipientType.TO,
+            InternetAddress.parse(to)
+        );
+        message.setSubject(subject);
 
         MimeBodyPart textPart = new MimeBodyPart();
         textPart.setText(body, "UTF-8");
 
         MimeBodyPart attachmentPart = new MimeBodyPart();
-        attachmentPart.setFileName(fileName);
-        attachmentPart.setContent(attachmentData, "application/octet-stream");
+        DataSource source =
+            new ByteArrayDataSource(attachmentData, contentType);
+        attachmentPart.setDataHandler(new DataHandler(source));
+
+        // ★ ここが修正ポイント
+        try {
+            attachmentPart.setFileName(
+                MimeUtility.encodeText(fileName, "UTF-8", "B")
+            );
+        } catch (java.io.UnsupportedEncodingException e) {
+            attachmentPart.setFileName(fileName); // フォールバック
+        }
 
         Multipart multipart = new MimeMultipart();
         multipart.addBodyPart(textPart);

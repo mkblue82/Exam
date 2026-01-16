@@ -49,6 +49,18 @@
     margin:8px 0;
 }
 
+/* 割引通知 */
+.discount-notice {
+    text-align: center;
+    background-color: #fff3cd;
+    color: #856404;
+    padding: 10px;
+    border-radius: 5px;
+    margin: 20px auto;
+    max-width: 600px;
+    font-weight: bold;
+}
+
 /* 商品一覧 */
 /* 商品横並び全体 */
 .merch-list {
@@ -93,6 +105,26 @@
     font-size:1.1rem;
     font-weight:bold;
     color:#c07148;
+}
+
+.price-display {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    margin-top: 8px;
+}
+
+.discounted-price {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #d9534f;
+}
+
+.original-price {
+    font-size: 0.85rem;
+    color: #999;
+    text-decoration: line-through;
 }
 
 /* 画像がない場合 */
@@ -167,6 +199,10 @@
                 Store store = (Store) request.getAttribute("store");
                 List<Merchandise> merchandiseList = (List<Merchandise>) request.getAttribute("merchandiseList");
 
+                // 割引情報
+                Boolean isDiscountApplied = (Boolean) request.getAttribute("isDiscountApplied");
+                Integer discountRate = (Integer) request.getAttribute("discountRate");
+
                 // 現在日時を取得（消費期限チェック用）
                 Date today = new Date(System.currentTimeMillis());
 
@@ -174,6 +210,8 @@
                 System.out.println("=== store_merchandise.jsp デバッグ ===");
                 System.out.println("store: " + (store != null ? store.getStoreName() : "null"));
                 System.out.println("merchandiseList: " + (merchandiseList != null ? merchandiseList.size() + "件" : "null"));
+                System.out.println("割引適用: " + isDiscountApplied);
+                System.out.println("割引率: " + discountRate);
             %>
 
             <% if (store != null) { %>
@@ -183,6 +221,13 @@
                         <h2 class="store-main-title"><%= store.getStoreName() %></h2>
                     </a>
                 </div>
+
+                <!-- 割引適用中の通知 -->
+                <% if (isDiscountApplied != null && isDiscountApplied && discountRate != null) { %>
+                    <div class="discount-notice">
+                        現在、全商品<%= discountRate %>%OFF！
+                    </div>
+                <% } %>
 
                 <!-- 商品一覧 -->
                 <h3 style="font-size:1.5rem; font-weight:bold; color:#333; border-left:5px solid #c07148; padding-left:15px; margin-bottom:25px;">
@@ -250,7 +295,20 @@
                                     </div>
                                 </a>
                                 <div style="margin-top:8px;"><%= merch.getMerchandiseName() %></div>
-                                <div class="merch-price">¥ <%= merch.getPrice() %></div>
+
+                                <!-- 価格表示（割引対応） -->
+                                <%
+                                    int originalPrice = merch.getPrice();
+                                    if (isDiscountApplied != null && isDiscountApplied && discountRate != null) {
+                                        int discountedPrice = (int)(originalPrice * (100 - discountRate) / 100.0);
+                                %>
+                                    <div class="price-display">
+                                        <span class="discounted-price">¥<%= discountedPrice %></span>
+                                        <span class="original-price">(¥<%= originalPrice %>)</span>
+                                    </div>
+                                <% } else { %>
+                                    <div class="merch-price">¥ <%= originalPrice %></div>
+                                <% } %>
                             </div>
                         <% } %>
                     </div>

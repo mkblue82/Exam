@@ -219,4 +219,7 @@ public class StoreDAO {
         s.setLicense(rs.getBytes("t001_fd8_store"));
         return s;
     }
+
 }
+
+
