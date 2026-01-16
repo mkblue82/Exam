@@ -13,6 +13,7 @@ public class Store implements java.io.Serializable {
     private int discountRate;   // T001_FD6_store（割引率）
     private String email;       // T001_FD7_store（メールアドレス）
     private byte[] license;     // T001_FD8_store（営業許可証）
+    private String licenseType; //T001_FD9_store
 
 
     // --- Getter ---
@@ -73,6 +74,13 @@ public class Store implements java.io.Serializable {
     public void setLicense(byte[] license) {
         this.license = license;
     }
+    public String getLicenseType() {
+        return licenseType;
+    }
+    public void setLicenseType(String licenseType) {
+        this.licenseType = licenseType;
+    }
+
 
 
 }

@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import bean.FileInfo;
 import bean.Store;
 
 public class StoreDAO {
@@ -219,6 +220,23 @@ public class StoreDAO {
         s.setLicense(rs.getBytes("t001_fd8_store"));
         return s;
     }
+
+    public FileInfo getLicenseFile(int storeId) throws SQLException {
+        String sql = "SELECT t001_fd8_store, t001_fd9_store FROM T001_store WHERE T001_PK1_store = ?";
+
+        try (PreparedStatement stmt = con.prepareStatement(sql)) {
+            stmt.setInt(1, storeId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    byte[] data = rs.getBytes("t001_fd8_store");
+                    String type = rs.getString("t001_fd9_store");
+                    return new FileInfo(data, type);
+                }
+            }
+        }
+        return null;
+    }
+
 
 }
 
