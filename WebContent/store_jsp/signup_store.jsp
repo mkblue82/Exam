@@ -188,35 +188,36 @@
             <div class="register-container">
                 <h1>新規店舗登録</h1>
 
-                <% if (request.getAttribute("errorMessage") != null) { %>
-                    <div class="error-message">
-                        <%= request.getAttribute("errorMessage") %>
-                    </div>
-                <% } %>
-
                 <form action="${pageContext.request.contextPath}/foodloss/SignupStore.action"
                       method="post" enctype="multipart/form-data" onsubmit="return checkPasswordMatch()">
                     <!-- CSRFトークン -->
                     <input type="hidden" name="csrfToken" value="<%= session.getAttribute("csrfToken") %>">
 
+                    <!-- ★エラーメッセージを店舗名の上に表示★ -->
+                    <% if (request.getAttribute("formError") != null) { %>
+                        <div class="error-message">
+                            <%= request.getAttribute("formError") %>
+                        </div>
+                    <% } %>
+
                     <div class="form-group">
                         <label for="storeName">店舗名</label>
-                        <input type="text" id="storeName" name="storeName" required placeholder="例:Sample Bakery" value="${param.storeName}">
+                        <input type="text" id="storeName" name="storeName" required placeholder="例:Sample Bakery" value="${storeName}">
                     </div>
 
                     <div class="form-group">
                         <label for="address">住所</label>
-                        <input type="text" id="address" name="address" required placeholder="例:東京都新宿区〇〇1-2-3" value="${param.address}">
+                        <input type="text" id="address" name="address" required placeholder="例:東京都新宿区〇〇1-2-3" value="${address}">
                     </div>
 
                     <div class="form-group">
                         <label for="phone">電話番号</label>
-                        <input type="tel" id="phone" name="phone" required pattern="[0-9]{10,11}" placeholder="0312345678" value="${param.phone}">
+                        <input type="tel" id="phone" name="phone" required pattern="[0-9]{10,11}" placeholder="0312345678" value="${phone}">
                     </div>
 
                     <div class="form-group">
                         <label for="email">メールアドレス</label>
-                        <input type="email" id="email" name="email" required placeholder="store@mail.com" value="${param.email}">
+                        <input type="email" id="email" name="email" required placeholder="store@mail.com" value="${email}">
                     </div>
 
                     <div class="form-group">
@@ -294,4 +295,3 @@
 </script>
 </body>
 </html>
-

@@ -46,7 +46,7 @@ public class ApproveStoreAction extends Action {
                 return;
             }
 
-            // 🔽 店舗テーブルのみで重複チェック
+            // 店舗テーブルのみで重複チェック
             if (storeDAO.existsByPhone(app.getStorePhone())) {
                 sendAlert(res, "この電話番号は既に登録されています。");
                 return;
@@ -92,9 +92,12 @@ public class ApproveStoreAction extends Action {
 
             String body =
                     app.getStoreName() + " 様\n\n" +
-                    "店舗登録が承認されました。\n\n" +
-                    "ログインURL:\n" + loginUrl + "\n\n" +
-                    "メールアドレス: " + app.getStoreEmail() + "\n";
+                    "店舗登録が承認されました。\n" +
+                    "以下の情報でログインできます。\n\n" +
+                    "【ログイン情報】\n" +
+                    "店舗ID: " + storeId + "\n" +
+                    "メールアドレス: " + app.getStoreEmail() + "\n\n" +
+                    "ログインURL:\n" + loginUrl + "\n";
 
             MailSender.sendEmail(
                     app.getStoreEmail(),

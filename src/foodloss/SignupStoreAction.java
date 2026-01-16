@@ -33,7 +33,7 @@ public class SignupStoreAction extends Action {
         String email     = req.getParameter("email");
         String password  = req.getParameter("password");
 
-        /* ===== 入力値を戻す（エラー時用） ===== */
+        /* ===== 入力値を戻す(エラー時用) ===== */
         req.setAttribute("storeName", storeName);
         req.setAttribute("address", address);
         req.setAttribute("phone", phone);
@@ -44,15 +44,28 @@ public class SignupStoreAction extends Action {
             ApplicationDAO appDAO = new ApplicationDAO(conn);
             StoreDAO storeDAO = new StoreDAO(conn);
 
-            /* ===== 重複チェック ===== */
-            if (storeDAO.existsByEmail(email) || appDAO.existsByEmail(email)) {
+            /* ===== 重複チェック（店舗テーブルのみ） ===== */
+            boolean emailExists = storeDAO.existsByEmail(email);
+            boolean phoneExists = storeDAO.existsByPhone(phone);
+
+            // 両方重複している場合
+            if (emailExists && phoneExists) {
+                req.setAttribute("formError", "このメールアドレスと電話番号は既に使用されています。");
+                req.getRequestDispatcher("/store_jsp/signup_store.jsp")
+                   .forward(req, res);
+                return;
+            }
+
+            // メールアドレスのみ重複
+            if (emailExists) {
                 req.setAttribute("formError", "このメールアドレスは既に使用されています。");
                 req.getRequestDispatcher("/store_jsp/signup_store.jsp")
                    .forward(req, res);
                 return;
             }
 
-            if (storeDAO.existsByPhone(phone) || appDAO.existsByPhone(phone)) {
+            // 電話番号のみ重複
+            if (phoneExists) {
                 req.setAttribute("formError", "この電話番号は既に使用されています。");
                 req.getRequestDispatcher("/store_jsp/signup_store.jsp")
                    .forward(req, res);
@@ -118,7 +131,7 @@ public class SignupStoreAction extends Action {
             appDAO.insert(app);
             session.setAttribute("pendingApplication", app);
 
-            /* ===== メール ===== */
+            /* ===== メール（管理者のみ） ===== */
             String approvalUrl =
                 req.getScheme() + "://" +
                 req.getServerName() + ":" + req.getServerPort() +
@@ -140,12 +153,6 @@ public class SignupStoreAction extends Action {
                 permitFileData,
                 storeName + "_permit" + ext,
                 contentType
-            );
-
-            MailSender.sendEmail(
-                email,
-                "【申請受付】" + storeName,
-                storeName + " 様\n\n店舗申請を受け付けました。"
             );
         }
 
