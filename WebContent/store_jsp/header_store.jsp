@@ -1,6 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <header>
-  <h1 id="logo"><span>タイトル募集</span></h1>
+  <h1 id="logo"><span>SEEKER</span></h1>
   <!-- ログアウトボタン -->
   <form action="${pageContext.request.contextPath}/foodloss/Logout.action" method="post"
       style="text-align: right; margin: 10px 20px 0 0;">
