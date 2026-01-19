@@ -352,10 +352,10 @@ public class BookingDAO extends DAO {
 
 	public void deleteExpiredBookings() throws Exception {
 	    String sql =
-	        "DELETE FROM t003_booking " +
-	        "WHERE t003_fk1_merchandise IN ( " +
-	        "  SELECT t002_pk1_merchandise FROM t002_merchandise " +
-	        "  WHERE t002_fd7_merchandise < CURRENT_DATE" +
+	        "DELETE FROM T005_booking " +
+	        "WHERE T005_FD4_booking IN ( " +
+	        "  SELECT T002_PK1_merchandise FROM T002_merchandise " +
+	        "  WHERE T002_FD3_merchandise < CURRENT_DATE" +
 	        ")";
 
 	    try (
