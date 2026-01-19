@@ -170,6 +170,16 @@ public class MerchandiseRegisterExecuteAction extends Action {
             int stock = Integer.parseInt(quantityStr);
             java.sql.Date useByDate = java.sql.Date.valueOf(expirationDateStr);
 
+            java.sql.Date today = new java.sql.Date(System.currentTimeMillis());
+
+
+            if (useByDate.before(today)) {
+                request.setAttribute("errorMessage", "消費期限には本日以降の日付を入力してください");
+                request.getRequestDispatcher("/store_jsp/merchandise_register_store.jsp")
+                       .forward(request, response);
+                return;
+            }
+
             // ★★★ 修正: フォーマット済み社員番号で検索 ★★★
             EmployeeDAO empDao = new EmployeeDAO();
             Employee employee = empDao.selectByCode(formattedEmployeeNumber);

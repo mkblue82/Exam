@@ -3,11 +3,13 @@ package dao;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 import bean.Merchandise;
 import bean.MerchandiseImage;
+import tool.DBManager;
 
 public class MerchandiseDAO {
 
@@ -529,6 +531,20 @@ public class MerchandiseDAO {
 		    st.close();
 		    return line;
 		}
+
+	// 消費期限切れ商品を削除
+	 public void deleteExpiredMerchandise() throws SQLException {
+	     String sql =
+	         "DELETE FROM T002_merchandise " +
+	         "WHERE T002_FD3_merchandise < CURRENT_DATE";
+
+	     try (
+	         Connection conn = new DBManager().getConnection();
+	         PreparedStatement ps = conn.prepareStatement(sql)
+	     ) {
+	         ps.executeUpdate();
+	     }
+	 }
 
 
 

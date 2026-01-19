@@ -350,4 +350,22 @@ public class BookingDAO extends DAO {
 	    closeIfLocal(con);
 	}
 
+	public void deleteExpiredBookings() throws Exception {
+	    String sql =
+	        "DELETE FROM t003_booking " +
+	        "WHERE t003_fk1_merchandise IN ( " +
+	        "  SELECT t002_pk1_merchandise FROM t002_merchandise " +
+	        "  WHERE t002_fd7_merchandise < CURRENT_DATE" +
+	        ")";
+
+	    try (
+	        Connection con = getEffectiveConnection();
+	        PreparedStatement ps = con.prepareStatement(sql)
+	    ) {
+	        ps.executeUpdate();
+	    }
+	}
+
+
+
 }

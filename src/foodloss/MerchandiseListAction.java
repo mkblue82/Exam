@@ -46,6 +46,10 @@ public class MerchandiseListAction extends Action {
 
             // DAO
             MerchandiseDAO dao = new MerchandiseDAO(con);
+
+            // 期限切れ商品を自動削除
+            dao.deleteExpiredMerchandise();
+
             List<Merchandise> list = dao.selectByStoreId(storeId);
 
             // 店舗の割引設定と店舗名を取得

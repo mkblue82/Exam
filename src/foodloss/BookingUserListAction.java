@@ -47,6 +47,9 @@ public class BookingUserListAction extends Action {
         MerchandiseDAO merchandiseDao = new MerchandiseDAO(dao.getConnection());
         StoreDAO storeDao = new StoreDAO(dao.getConnection());
 
+     // ★ 期限切れ商品に紐づく予約を削除
+        bookingDao.deleteExpiredBookings();
+
         // ユーザーIDで予約一覧を取得
         List<Booking> allBookingList = bookingDao.selectByUserId(user.getUserId());
 
