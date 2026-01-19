@@ -211,7 +211,7 @@
         th:nth-child(3), td:nth-child(3) { width: 150px; }  /* 商品名 */
         th:nth-child(4), td:nth-child(4) { width: 80px; }   /* 数量 */
         th:nth-child(5), td:nth-child(5) { width: 180px; }  /* 受取予定時刻 */
-        th:nth-child(6), td:nth-child(6) { width: 180px; }  /* 予約日時 */
+        th:nth-child(6), td:nth-child(6) { width: 300px; }  /* 予約日時 */
         th:nth-child(7), td:nth-child(7) { width: 100px; }  /* 受取状態 */
         th:nth-child(8), td:nth-child(8) { width: 100px; }  /* 金額 */
         th:nth-child(9), td:nth-child(9) { width: 120px; }  /* ボタン */
