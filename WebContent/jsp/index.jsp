@@ -89,7 +89,7 @@ main {
 <div id="container">
     <!-- ヘッダー -->
     <header>
-	   <h1 id="logo"><span>タイトル募集</span></h1>
+	   <h1 id="logo"><span>SEEKER</span></h1>
 	</header>
     <!-- メインコンテンツ -->
     <main>
