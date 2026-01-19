@@ -66,12 +66,14 @@ public class ApproveStoreAction extends Action {
 
             // 営業許可書
             byte[] licenseData = null;
+            String licenseType = null;
             if (app.getBusinessLicense() != null) {
                 String realPath = req.getServletContext()
                         .getRealPath(app.getBusinessLicense());
                 licenseData = Files.readAllBytes(Paths.get(realPath));
             }
             store.setLicense(licenseData);
+            store.setLicenseType(licenseType);
 
             store.setDiscountTime(null);
             store.setDiscountRate(0);

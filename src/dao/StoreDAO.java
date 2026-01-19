@@ -56,7 +56,7 @@ public class StoreDAO {
             "INSERT INTO T001_store " +
             "(T001_FD1_store, T001_FD2_store, T001_FD3_store, " +
             " T001_FD4_store, T001_FD7_store, T001_FD8_store, T001_FD9_store) " +
-            "VALUES (?, ?, ?, ?, ?, ?) RETURNING T001_PK1_store";
+            "VALUES (?, ?, ?, ?, ?, ?, ?) RETURNING T001_PK1_store";
 
         try (PreparedStatement pstmt = con.prepareStatement(sql)) {
             pstmt.setString(1, store.getStoreName());
@@ -84,7 +84,7 @@ public class StoreDAO {
             "UPDATE T001_store SET " +
             "T001_FD1_store = ?, T001_FD2_store = ?, T001_FD3_store = ?, " +
             "T001_FD4_store = ?, T001_FD5_store = ?, T001_FD6_store = ?, " +
-            "T001_FD7_store = ?, T001_FD8_store, T001_FD9_store = ? " +
+            "T001_FD7_store = ?, T001_FD8_store = ?, T001_FD9_store = ? " +
             "WHERE T001_PK1_store = ?";
 
         try (PreparedStatement st = con.prepareStatement(sql)) {
