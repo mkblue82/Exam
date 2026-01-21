@@ -120,6 +120,21 @@ public class EditInfoExecuteAction extends Action {
                 dbUser.setPhone(phone);
             }
 
+         // ===== 電話番号重複チェック =====
+            if (phone != null && !phone.isEmpty()) {
+                if (!phone.equals(dbUser.getPhone())) {
+                    User existPhone = dao.findByPhone(phone);
+                    if (existPhone != null && existPhone.getUserId() != loginUser.getUserId()) {
+                        request.setAttribute("user", dbUser);
+                        request.setAttribute("error", "この電話番号は既に使用されています。");
+                        request.getRequestDispatcher("/jsp/edit_info_user.jsp").forward(request, response);
+                        return;
+                    }
+                    dbUser.setPhone(phone);
+                }
+            }
+
+
 
 
             // --- パスワードハッシュ化して更新 ---
@@ -139,10 +154,37 @@ public class EditInfoExecuteAction extends Action {
             request.getRequestDispatcher("/jsp/edit_info_result_user.jsp").forward(request, response);
 
         } catch (Exception e) {
-            e.printStackTrace();
+        	e.printStackTrace();
+
+            String message = e.getMessage();
+
+            // 電話番号 UNIQUE 制約
+            if (message != null && message.contains("uk_t004_user_phone")) {
+                request.setAttribute("user", loginUser);
+                request.setAttribute("error", "この電話番号は既に使用されています。");
+                request.getRequestDispatcher("/jsp/edit_info_user.jsp")
+                       .forward(request, response);
+                return;
+            }
+
+            // メール UNIQUE 制約（あれば）
+            if (message != null && message.contains("uk_t004_user_email")) {
+                request.setAttribute("user", loginUser);
+                request.setAttribute("error", "このメールアドレスは既に使用されています。");
+                request.getRequestDispatcher("/jsp/edit_info_user.jsp")
+                       .forward(request, response);
+                return;
+            }
+
+            // その他のDBエラー
             request.setAttribute("user", loginUser);
-            request.setAttribute("error", "エラーが発生しました: " + e.getMessage());
-            request.getRequestDispatcher("/jsp/edit_info_user.jsp").forward(request, response);
+            request.setAttribute("error", "データベースエラーが発生しました。");
+            request.getRequestDispatcher("/jsp/edit_info_user.jsp")
+                   .forward(request, response);
+
+
+
+            throw e;
         } finally {
             if (con != null) {
                 try {

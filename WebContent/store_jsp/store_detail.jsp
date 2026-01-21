@@ -220,17 +220,6 @@
                         </div>
                     </div>
 
-                    <% if (store.getLicense() != null) { %>
-                    <div class="detail-row">
-                        <div class="detail-label">ダウンロード</div>
-                        <div class="detail-value">
-                            <a href="${pageContext.request.contextPath}/foodloss/DownloadLicense.action?storeId=<%= store.getStoreId() %>"
-                               class="btn btn-secondary" style="padding: 8px 20px; font-size: 14px;">
-                                営業許可証をダウンロード
-                            </a>
-                        </div>
-                    </div>
-                    <% } %>
                 </div>
 
                 <!-- ボタンエリア -->

@@ -7,7 +7,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import bean.FileInfo;
 import bean.Store;
 
 public class StoreDAO {
@@ -55,7 +54,7 @@ public class StoreDAO {
         String sql =
             "INSERT INTO T001_store " +
             "(T001_FD1_store, T001_FD2_store, T001_FD3_store, " +
-            " T001_FD4_store, T001_FD7_store, T001_FD8_store, T001_FD9_store) " +
+            " T001_FD4_store, T001_FD7_store, T001_FD8_store, ) " +
             "VALUES (?, ?, ?, ?, ?, ?, ?) RETURNING T001_PK1_store";
 
         try (PreparedStatement pstmt = con.prepareStatement(sql)) {
@@ -84,7 +83,7 @@ public class StoreDAO {
             "UPDATE T001_store SET " +
             "T001_FD1_store = ?, T001_FD2_store = ?, T001_FD3_store = ?, " +
             "T001_FD4_store = ?, T001_FD5_store = ?, T001_FD6_store = ?, " +
-            "T001_FD7_store = ?, T001_FD8_store = ?, T001_FD9_store = ? " +
+            "T001_FD7_store = ?, T001_FD8_store = ?, " +
             "WHERE T001_PK1_store = ?";
 
         try (PreparedStatement st = con.prepareStatement(sql)) {
@@ -97,7 +96,6 @@ public class StoreDAO {
             st.setString(7, store.getEmail());
             st.setBytes(8, store.getLicense());
             st.setInt(9, store.getStoreId());
-            st.setString(10, store.getLicenseType());
 
             st.executeUpdate();
         }
@@ -237,21 +235,7 @@ public class StoreDAO {
     }
 
 
-    public FileInfo getLicenseFile(int storeId) throws SQLException {
-        String sql = "SELECT t001_fd8_store, t001_fd9_store FROM T001_store WHERE T001_PK1_store = ?";
 
-        try (PreparedStatement stmt = con.prepareStatement(sql)) {
-            stmt.setInt(1, storeId);
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    byte[] data = rs.getBytes("t001_fd8_store");
-                    String type = rs.getString("t001_fd9_store");
-                    return new FileInfo(data, type);
-                }
-            }
-        }
-        return null;
-    }
 
 
 }
