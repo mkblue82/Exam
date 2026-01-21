@@ -161,7 +161,7 @@
                 </div>
                 <% } %>
 
-                <form action="${pageContext.request.contextPath}/foodloss/StoreEditExecute.action" method="post">
+                <form action="${pageContext.request.contextPath}/foodloss/StoreEditExecute.action" method="post"enctype="multipart/form-data">
 
                     <input type="hidden" name="storeId" value="<%= store.getStoreId() %>">
 
@@ -206,6 +206,16 @@
 					    <label for="passwordConfirm">パスワード確認</label>
 					    <input type="password" id="passwordConfirm" name="passwordConfirm"
 					           maxlength="100" placeholder="確認のため再入力">
+					</div>
+
+					<div class="form-group">
+					    <label for="permitFile">営業許可証（再アップロード）</label>
+					    <input type="file" id="permitFile" name="permitFile"
+					           accept=".pdf,.jpg,.jpeg,.png">
+					    <div class="note">
+					        ※ 未登録の場合、または差し替える場合に選択してください<br>
+					        ※ 再アップロードすると再審査となります
+					    </div>
 					</div>
 
                     <div class="button-container">
