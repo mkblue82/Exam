@@ -208,15 +208,6 @@
 					           maxlength="100" placeholder="確認のため再入力">
 					</div>
 
-					<div class="form-group">
-					    <label for="permitFile">営業許可証（再アップロード）</label>
-					    <input type="file" id="permitFile" name="permitFile"
-					           accept=".pdf,.jpg,.jpeg,.png">
-					    <div class="note">
-					        ※ 未登録の場合、または差し替える場合に選択してください<br>
-					        ※ 再アップロードすると再審査となります
-					    </div>
-					</div>
 
                     <div class="button-container">
                         <button type="submit" class="btn btn-primary">更新する</button>
