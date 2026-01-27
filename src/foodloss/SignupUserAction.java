@@ -26,6 +26,13 @@ public class SignupUserAction extends Action {
         // GETリクエストの場合 - フォーム表示
         if ("GET".equalsIgnoreCase(req.getMethod())) {
             System.out.println("DEBUG: GET request - showing form");
+
+            // CSRFトークンを生成してセッションに保存
+            HttpSession session = req.getSession();
+            String csrfToken = java.util.UUID.randomUUID().toString();
+            session.setAttribute("csrfToken", csrfToken);
+            System.out.println("DEBUG: Generated CSRF token = " + csrfToken);
+
             req.getRequestDispatcher("/jsp/signup_user.jsp").forward(req, res);
             return;
         }
@@ -44,8 +51,7 @@ public class SignupUserAction extends Action {
 
         if (sessionToken == null || !sessionToken.equals(token)) {
             System.out.println("DEBUG: CSRF token mismatch - showing error");
-            req.setAttribute("errorMessage", "不正なアクセスです。");
-            req.getRequestDispatcher("/jsp/signup_user.jsp").forward(req, res);
+            showFormWithError(req, res, "不正なアクセスです。");
             return;
         }
 
@@ -56,9 +62,7 @@ public class SignupUserAction extends Action {
         String email = req.getParameter("email");
         String phone = req.getParameter("phone");
         String passwordRaw = req.getParameter("password");
-
         String passwordConfirm = req.getParameter("confirmPassword");
-
 
         System.out.println("DEBUG: name = " + name);
         System.out.println("DEBUG: email = " + email);
@@ -68,53 +72,45 @@ public class SignupUserAction extends Action {
 
         // --- 未入力チェック ---
         if (name == null || name.trim().isEmpty()) {
-            req.setAttribute("errorMessage", "氏名を入力してください。");
-            req.getRequestDispatcher("/jsp/signup_user.jsp").forward(req, res);
+            showFormWithError(req, res, "氏名を入力してください。");
             return;
         }
 
         if (email == null || email.trim().isEmpty()) {
-            req.setAttribute("errorMessage", "メールアドレスを入力してください。");
-            req.getRequestDispatcher("/jsp/signup_user.jsp").forward(req, res);
+            showFormWithError(req, res, "メールアドレスを入力してください。");
             return;
         }
 
         if (phone == null || phone.trim().isEmpty()) {
-            req.setAttribute("errorMessage", "電話番号を入力してください。");
-            req.getRequestDispatcher("/jsp/signup_user.jsp").forward(req, res);
+            showFormWithError(req, res, "電話番号を入力してください。");
             return;
         }
 
         if (passwordRaw == null || passwordRaw.trim().isEmpty()) {
-            req.setAttribute("errorMessage", "パスワードを入力してください。");
-            req.getRequestDispatcher("/jsp/signup_user.jsp").forward(req, res);
+            showFormWithError(req, res, "パスワードを入力してください。");
             return;
         }
 
         if (passwordConfirm == null || passwordConfirm.trim().isEmpty()) {
-            req.setAttribute("errorMessage", "確認用パスワードを入力してください。");
-            req.getRequestDispatcher("/jsp/signup_user.jsp").forward(req, res);
+            showFormWithError(req, res, "確認用パスワードを入力してください。");
             return;
         }
 
         // --- パスワード一致チェック ---
         if (!passwordRaw.equals(passwordConfirm)) {
-            req.setAttribute("errorMessage", "パスワードが一致しません。");
-            req.getRequestDispatcher("/jsp/signup_user.jsp").forward(req, res);
+            showFormWithError(req, res, "パスワードが一致しません。");
             return;
         }
 
         // パスワードの桁数チェック
         if (passwordRaw.length() < 8) {
-            req.setAttribute("errorMessage", "パスワードは8文字以上で入力してください。");
-            req.getRequestDispatcher("/jsp/signup_user.jsp").forward(req, res);
+            showFormWithError(req, res, "パスワードは8文字以上で入力してください。");
             return;
         }
 
         // 電話番号の形式チェック
         if (!phone.matches("[0-9]{10,11}")) {
-            req.setAttribute("errorMessage", "電話番号は10桁または11桁の数字で入力してください。");
-            req.getRequestDispatcher("/jsp/signup_user.jsp").forward(req, res);
+            showFormWithError(req, res, "電話番号は10桁または11桁の数字で入力してください。");
             return;
         }
 
@@ -131,8 +127,6 @@ public class SignupUserAction extends Action {
         user.setPhone(phone);
         user.setPassword(password);
 
-
-
         System.out.println("DEBUG: User object created");
 
         // --- DB登録 ---
@@ -142,15 +136,13 @@ public class SignupUserAction extends Action {
 
             // 電話番号の重複チェック
             if (isPhoneExists(dao, phone)) {
-                req.setAttribute("errorMessage", "この電話番号は既に登録されています。");
-                req.getRequestDispatcher("/jsp/signup_user.jsp").forward(req, res);
+                showFormWithError(req, res, "この電話番号は既に登録されています。");
                 return;
             }
 
             // メールアドレスの重複チェック
             if (isEmailExists(dao, email)) {
-                req.setAttribute("errorMessage", "このメールアドレスは既に登録されています。");
-                req.getRequestDispatcher("/jsp/signup_user.jsp").forward(req, res);
+                showFormWithError(req, res, "このメールアドレスは既に登録されています。");
                 return;
             }
 
@@ -166,11 +158,24 @@ public class SignupUserAction extends Action {
 
         } catch (SQLException e) {
             e.printStackTrace();
-            req.setAttribute("errorMessage", "システムエラーが発生しました。");
-            req.getRequestDispatcher("/jsp/signup_user.jsp").forward(req, res);
+            showFormWithError(req, res, "システムエラーが発生しました。");
         }
 
         System.out.println("DEBUG: ========== SignupUserAction END ==========");
+    }
+
+    /**
+     * エラー時のフォーム再表示（CSRFトークン再生成付き）
+     */
+    private void showFormWithError(HttpServletRequest req, HttpServletResponse res,
+                                   String errorMessage) throws Exception {
+        HttpSession session = req.getSession();
+        String newToken = java.util.UUID.randomUUID().toString();
+        session.setAttribute("csrfToken", newToken);
+        System.out.println("DEBUG: Regenerated CSRF token = " + newToken);
+
+        req.setAttribute("errorMessage", errorMessage);
+        req.getRequestDispatcher("/jsp/signup_user.jsp").forward(req, res);
     }
 
     /** 電話番号の重複チェック */
