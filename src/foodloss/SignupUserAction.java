@@ -188,6 +188,7 @@ public class SignupUserAction extends Action {
         return false;
     }
 
+
     /** メールアドレスの重複チェック */
     private boolean isEmailExists(UserDAO dao, String email) throws SQLException {
         for (User user : dao.findAll()) {
