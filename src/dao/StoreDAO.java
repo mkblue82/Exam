@@ -76,6 +76,7 @@ public class StoreDAO {
         }
         return 0;
     }
+    
 
 
     // ===== 店舗更新 =====

@@ -15,7 +15,7 @@
 
 /*テンプレート専用cssファイルの読み込み
 ---------------------------------------------------------------------------*/
-@import url("inview.css");
+@import url("/Exam/css/inview.css");
 
 
 /*CSSカスタムプロパティ（サイト全体を一括管理する為の設定）
@@ -450,7 +450,7 @@ a.ddmenu {cursor: default;}
 main {
 	flex: 1;
 	padding-bottom: 200px;	/*下への余白*/
-	background: url('../images/footer_bg.png') repeat-x center bottom / auto 150px;	/*背景画像の読み込み。repeat-x(横軸にリピート)。最後の150pxは画像の高さ設定です。*/
+	background: url('/Exam/images/footer_bg.png') repeat-x center bottom / auto 150px;	/*背景画像の読み込み。repeat-x(横軸にリピート)。最後の150pxは画像の高さ設定です。*/
 	position: relative;
 	bottom: -20px;	/*フッターに少しめり込むようにしたかったのでマイナス指定。この行を削除すれば、フッターの上に位置します。*/
 }
@@ -611,7 +611,7 @@ footer .pr {display: block;}
 	justify-content: space-between;	/*並びかたの種類の指定*/
 	align-items: flex-start;		/*垂直揃えの指定。上に配置されるように。*/
 	padding: 2rem 20vw 2rem 0;		/*ボックス内の余白。上、右、下、左への順番。20vwは下の背景画像の最後の数字に合わせる。*/
-	background: url('../images/logo_footer.png') no-repeat right 2rem / 20vw;	/*背景画像（フッター右側のロゴ）の読み込み。2remは上からの配置。20vwは画像の幅。100vw＝画面幅100%です。*/
+	background: url('/Exam/images/logo_footer.png') no-repeat right 2rem / 20vw;	/*背景画像（フッター右側のロゴ）の読み込み。2remは上からの配置。20vwは画像の幅。100vw＝画面幅100%です。*/
 }
 
 /*ulタグ（メニューの１列あたり）*/
