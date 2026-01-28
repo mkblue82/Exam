@@ -54,8 +54,8 @@ public class StoreDAO {
         String sql =
             "INSERT INTO T001_store " +
             "(T001_FD1_store, T001_FD2_store, T001_FD3_store, " +
-            " T001_FD4_store, T001_FD7_store, T001_FD8_store, ) " +
-            "VALUES (?, ?, ?, ?, ?, ?, ?) RETURNING T001_PK1_store";
+            " T001_FD4_store, T001_FD7_store, T001_FD8_store) " +  // カンマ削除
+            "VALUES (?, ?, ?, ?, ?, ?) RETURNING T001_PK1_store";  // ?を6個に
 
         try (PreparedStatement pstmt = con.prepareStatement(sql)) {
             pstmt.setString(1, store.getStoreName());
@@ -64,7 +64,7 @@ public class StoreDAO {
             pstmt.setString(4, store.getPassword());
             pstmt.setString(5, store.getEmail());
             pstmt.setBytes(6, store.getLicense());
-            pstmt.setString(7, store.getLicenseType());
+            // pstmt.setString(7, store.getLicenseType()); // この行を削除
 
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
@@ -77,13 +77,14 @@ public class StoreDAO {
         return 0;
     }
 
+
     // ===== 店舗更新 =====
     public void update(Store store) throws SQLException {
         String sql =
             "UPDATE T001_store SET " +
             "T001_FD1_store = ?, T001_FD2_store = ?, T001_FD3_store = ?, " +
             "T001_FD4_store = ?, T001_FD5_store = ?, T001_FD6_store = ?, " +
-            "T001_FD7_store = ?, T001_FD8_store = ?, " +
+            "T001_FD7_store = ?, T001_FD8_store = ? " +  // カンマを削除
             "WHERE T001_PK1_store = ?";
 
         try (PreparedStatement st = con.prepareStatement(sql)) {
@@ -239,4 +240,3 @@ public class StoreDAO {
 
 
 }
-
