@@ -37,11 +37,6 @@ public class MerchandiseRegisterExecuteAction extends Action {
         try {
             request.setCharacterEncoding("UTF-8");
 
-            // ★★★ デバッグ出力 ★★★
-            System.out.println("★★★ Content-Type: " + request.getContentType());
-            System.out.println("★★★ Method: " + request.getMethod());
-            System.out.println("★★★ isMultipartContent: " + ServletFileUpload.isMultipartContent(request));
-
             String name = null;
             String priceStr = null;
             String quantityStr = null;
@@ -152,9 +147,9 @@ public class MerchandiseRegisterExecuteAction extends Action {
                 return;
             }
 
-            // ★★★ 追加: 社員番号を3桁ゼロ埋めに変換 ★★★
+            // ★★★ 追加: 社員番号を3桁ゼロ埋に変換 ★★★
             employeeNumberStr = employeeNumberStr.trim();
-            System.out.println("★★★ 受信した社員番号(trim後): [" + employeeNumberStr + "] 長さ: " + employeeNumberStr.length());
+            System.out.println("★★★ 受信した社員番号（trim後）: [" + employeeNumberStr + "] 長さ: " + employeeNumberStr.length());
 
             String formattedEmployeeNumber = employeeNumberStr;
             try {
@@ -176,6 +171,7 @@ public class MerchandiseRegisterExecuteAction extends Action {
             java.sql.Date useByDate = java.sql.Date.valueOf(expirationDateStr);
 
             java.sql.Date today = new java.sql.Date(System.currentTimeMillis());
+
 
             if (useByDate.before(today)) {
                 request.setAttribute("errorMessage", "消費期限には本日以降の日付を入力してください");
@@ -224,15 +220,9 @@ public class MerchandiseRegisterExecuteAction extends Action {
             MerchandiseDAO dao = new MerchandiseDAO(connection);
             dao.insert(m);
 
-            // ★★★ 修正: RETURNING句を使ってIDを取得 ★★★
             int merchandiseId = 0;
-            String sql = "SELECT merchandise_id FROM t002_merchandise " +
-                         "WHERE store_id = ? AND merchandise_name = ? AND registration_time = ? " +
-                         "ORDER BY merchandise_id DESC LIMIT 1";
-            PreparedStatement st = connection.prepareStatement(sql);
-            st.setInt(1, m.getStoreId());
-            st.setString(2, m.getMerchandiseName());
-            st.setTimestamp(3, m.getRegistrationTime());
+            PreparedStatement st = connection.prepareStatement(
+                "SELECT currval('t002_merchandise_t002_pk1_merchandise_seq')");
             ResultSet rs = st.executeQuery();
             if (rs.next()) {
                 merchandiseId = rs.getInt(1);
@@ -240,10 +230,10 @@ public class MerchandiseRegisterExecuteAction extends Action {
             rs.close();
             st.close();
 
-            System.out.println("✅ 商品登録成功! merchandiseId = " + merchandiseId);
+            System.out.println("✅ 商品登録成功！ merchandiseId = " + merchandiseId);
 
-            // 画像をDBに保存(bytea)
-            System.out.println("★ 画像アップロード開始(" + imageFiles.size() + "枚) - DBにbytea保存");
+            // 画像をDBに保存（bytea）
+            System.out.println("★ 画像アップロード開始（" + imageFiles.size() + "枚）- DBにbytea保存");
 
             MerchandiseImageDAO imgDao = new MerchandiseImageDAO(connection);
             int displayOrder = 1;
@@ -295,7 +285,7 @@ public class MerchandiseRegisterExecuteAction extends Action {
                 }
             }
 
-            System.out.println("✅ 画像保存完了! 成功: " + successCount + "/" + imageFiles.size() + "枚");
+            System.out.println("✅ 画像保存完了！ 成功: " + successCount + "/" + imageFiles.size() + "枚");
 
             if (successCount == 0) {
                 throw new Exception("画像の保存に失敗しました");
@@ -336,7 +326,7 @@ public class MerchandiseRegisterExecuteAction extends Action {
             m.setMerchandiseId(merchandiseId);
             session.setAttribute("registeredMerchandise", m);
 
-            session.setAttribute("successMessage", "商品を登録しました(画像" + successCount + "枚)");
+            session.setAttribute("successMessage", "商品を登録しました（画像" + successCount + "枚）");
             response.sendRedirect(request.getContextPath() + "/store_jsp/merchandise_register_store_done.jsp");
 
         } catch (NumberFormatException e) {
