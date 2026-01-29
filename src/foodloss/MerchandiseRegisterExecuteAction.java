@@ -147,7 +147,7 @@ public class MerchandiseRegisterExecuteAction extends Action {
                 return;
             }
 
-            // ★★★ 追加: 社員番号を3桁ゼロ埋めに変換 ★★★
+            // ★★★ 追加: 社員番号を3桁ゼロ埋に変換 ★★★
             employeeNumberStr = employeeNumberStr.trim();
             System.out.println("★★★ 受信した社員番号（trim後）: [" + employeeNumberStr + "] 長さ: " + employeeNumberStr.length());
 
