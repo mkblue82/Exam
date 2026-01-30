@@ -99,6 +99,19 @@
             height: 100%;
             object-fit: cover;
         }
+        .image-preview-item .remove-btn {
+            position: absolute;
+            top: 3px;
+            right: 3px;
+            background: red;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            font-size: 14px;
+        }
         .image-preview-item .image-number {
             position: absolute;
             bottom: 3px;
@@ -166,78 +179,62 @@
 
                     <div class="form-group">
                         <label for="merchandiseName">商品名 <span>*</span></label>
-                        <input type="text" id="merchandiseName" name="merchandiseName"
-                               value="<%= request.getAttribute("merchandiseName") != null ? request.getAttribute("merchandiseName") : "" %>"
-                               required maxlength="100" placeholder="例: トマトジュース">
+                        <input type="text" id="merchandiseName" name="merchandiseName" required maxlength="100" placeholder="例: トマトジュース">
                     </div>
 
                     <div class="form-group">
                         <label for="price">価格（税込） <span>*</span></label>
-                        <input type="number" id="price" name="price"
-                               value="<%= request.getAttribute("price") != null ? request.getAttribute("price") : "" %>"
-                               required min="0" max="999999" placeholder="例: 500">
+                        <input type="number" id="price" name="price" required min="0" max="999999" placeholder="例: 500">
                     </div>
 
                     <div class="form-group">
                         <label for="quantity">個数 <span>*</span></label>
-                        <input type="number" id="quantity" name="quantity"
-                               value="<%= request.getAttribute("quantity") != null ? request.getAttribute("quantity") : "" %>"
-                               required min="1" max="9999" placeholder="例: 10">
+                        <input type="number" id="quantity" name="quantity" required min="1" max="9999" placeholder="例: 10">
                     </div>
 
                     <div class="form-group">
                         <label for="expirationDate">消費期限 <span>*</span></label>
-                        <input type="date" id="expirationDate" name="expirationDate"
-                               value="<%= request.getAttribute("expirationDate") != null ? request.getAttribute("expirationDate") : "" %>"
-                               min="<%= new java.text.SimpleDateFormat("yyyy-MM-dd").format(new java.util.Date()) %>"
-                               required>
+                        <input type="date" id="expirationDate" name="expirationDate" required>
                     </div>
 
                     <div class="form-group">
-                        <label for="employeeNumber">社員番号 <span>*</span></label>
-                        <select id="employeeNumber" name="employeeNumber" required>
-                            <option value="">-- 社員番号を選択 --</option>
-                            <%
-                                String selectedEmployeeNumber = (String) request.getAttribute("employeeNumber");
-                                java.util.List<bean.Employee> empList =
-                                    (java.util.List<bean.Employee>) request.getAttribute("employeeList");
-                                if (empList != null) {
-                                    for (bean.Employee emp : empList) {
-                                        String empNum = emp.getEmployeeNumber();
-                                        boolean isSelected = (selectedEmployeeNumber != null &&
-                                                            selectedEmployeeNumber.equals(empNum));
-                            %>
-                                        <option value="<%= empNum %>" <%= isSelected ? "selected" : "" %>>
-                                            <%= empNum %>
-                                        </option>
-                            <%
-                                    }
-                                }
-                            %>
-                        </select>
-                    </div>
+					    <label for="employeeNumber">社員番号 <span>*</span></label>
+					    <select id="employeeNumber" name="employeeNumber" required>
+					        <option value="">-- 社員番号を選択 --</option>
+					        <%
+					            java.util.List<bean.Employee> empList =
+					                (java.util.List<bean.Employee>) request.getAttribute("employeeList");
+					            if (empList != null) {
+					                for (bean.Employee emp : empList) {
+					        %>
+					                    <option value="<%= emp.getEmployeeNumber() %>"><%= emp.getEmployeeNumber() %></option>
+					        <%
+					                }
+					            }
+					        %>
+					    </select>
+					</div>
 
                     <div class="form-group">
                         <label for="tags">タグ</label>
-                        <input type="text" id="tags" name="tags"
-                               value="<%= request.getAttribute("tags") != null ? request.getAttribute("tags") : "" %>"
-                               maxlength="200" placeholder="例: 野菜, 新鮮, セール">
+                        <input type="text" id="tags" name="tags" maxlength="200" placeholder="例: 野菜, 新鮮, セール">
                     </div>
 
                     <div class="form-group">
                         <label>商品画像 <span>*</span></label>
 
                         <div class="image-add-area">
-                            <label for="imageInput" class="image-add-btn" style="display: inline-block; cursor: pointer;">
-                                📷 画像を選択（複数可）
-                            </label>
+                            <button type="button" class="image-add-btn" onclick="document.getElementById('imageInput').click();">
+                                📷 画像を追加
+                            </button>
                             <p style="margin-top: 0.5rem; font-size: 0.85rem; color: #666;">
-                                複数の画像を一度に選択できます
+                                ボタンをクリックして画像を追加（何度でも追加可能）
                             </p>
                             <div id="fileCount" class="file-count"></div>
                         </div>
 
-                        <input type="file" id="imageInput" name="merchandiseImage" accept="image/*" multiple required onchange="previewImages(this)">
+                        <input type="file" id="imageInput" accept="image/*" style="display:none;" onchange="addImages(this)">
+                        <div id="fileInputsContainer"></div>
                         <div id="imagePreviewContainer" class="image-preview-container"></div>
                     </div>
 
@@ -255,40 +252,96 @@
 <script src="${pageContext.request.contextPath}/js/main.js"></script>
 
 <script>
-function previewImages(input) {
+var imageDataList = [];
+var imageCounter = 0;
+
+function addImages(input) {
+    if (!input.files || input.files.length === 0) return;
+
+    for (var i = 0; i < input.files.length; i++) {
+        var file = input.files[i];
+        var id = 'img_' + imageCounter++;
+
+        imageDataList.push({ id: id, file: file, name: file.name });
+        createFileInput(id, file);
+        createPreview(id, file);
+    }
+
+    updateFileCount();
+    input.value = '';
+}
+
+function createFileInput(id, file) {
+    var container = document.getElementById('fileInputsContainer');
+    var input = document.createElement('input');
+    input.type = 'file';
+    input.name = 'merchandiseImage';
+    input.id = 'file_' + id;
+    input.style.display = 'none';
+
+    var dt = new DataTransfer();
+    dt.items.add(file);
+    input.files = dt.files;
+
+    container.appendChild(input);
+}
+
+function createPreview(id, file) {
     var container = document.getElementById('imagePreviewContainer');
-    var fileCount = document.getElementById('fileCount');
+    var div = document.createElement('div');
+    div.className = 'image-preview-item';
+    div.id = 'preview_' + id;
 
-    container.innerHTML = '';
+    var reader = new FileReader();
+    reader.onload = function(e) {
+        var index = getImageIndex(id);
+        div.innerHTML =
+            '<img src="' + e.target.result + '" alt="プレビュー">' +
+            '<button type="button" class="remove-btn" onclick="removeImage(\'' + id + '\')">×</button>' +
+            '<span class="image-number">' + (index + 1) + '</span>';
+    };
+    reader.readAsDataURL(file);
+    container.appendChild(div);
+}
 
-    if (input.files && input.files.length > 0) {
-        fileCount.textContent = input.files.length + '枚の画像を選択中';
+function removeImage(id) {
+    imageDataList = imageDataList.filter(function(item) { return item.id !== id; });
 
-        for (var i = 0; i < input.files.length; i++) {
-            var file = input.files[i];
-            var reader = new FileReader();
+    var fileInput = document.getElementById('file_' + id);
+    if (fileInput) fileInput.remove();
 
-            reader.onload = (function(index) {
-                return function(e) {
-                    var div = document.createElement('div');
-                    div.className = 'image-preview-item';
-                    div.innerHTML =
-                        '<img src="' + e.target.result + '" alt="プレビュー">' +
-                        '<span class="image-number">' + (index + 1) + '</span>';
-                    container.appendChild(div);
-                };
-            })(i);
+    var preview = document.getElementById('preview_' + id);
+    if (preview) preview.remove();
 
-            reader.readAsDataURL(file);
+    updateImageNumbers();
+    updateFileCount();
+}
+
+function getImageIndex(id) {
+    for (var i = 0; i < imageDataList.length; i++) {
+        if (imageDataList[i].id === id) return i;
+    }
+    return 0;
+}
+
+function updateImageNumbers() {
+    for (var i = 0; i < imageDataList.length; i++) {
+        var preview = document.getElementById('preview_' + imageDataList[i].id);
+        if (preview) {
+            var numSpan = preview.querySelector('.image-number');
+            if (numSpan) numSpan.textContent = (i + 1);
         }
-    } else {
-        fileCount.textContent = '';
     }
 }
 
+function updateFileCount() {
+    var count = imageDataList.length;
+    var elem = document.getElementById('fileCount');
+    elem.textContent = count > 0 ? count + '枚の画像を選択中' : '';
+}
+
 function validateForm() {
-    var input = document.getElementById('imageInput');
-    if (!input.files || input.files.length === 0) {
+    if (imageDataList.length === 0) {
         alert('少なくとも1枚の画像を選択してください');
         return false;
     }
@@ -296,4 +349,3 @@ function validateForm() {
 }
 </script>
 </body>
-</html>
