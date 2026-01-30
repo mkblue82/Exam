@@ -140,6 +140,7 @@ public class MerchandiseRegisterExecuteAction extends Action {
                 return;
             }
 
+
             if (priceStr == null || priceStr.trim().isEmpty()) {
                 request.setAttribute("merchandiseName", name);
                 request.setAttribute("price", priceStr);
