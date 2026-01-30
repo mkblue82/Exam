@@ -78,6 +78,7 @@ public class StoreDAO {
     }
     
 
+
     // ===== 店舗更新 =====
     public void update(Store store) throws SQLException {
         String sql =
@@ -240,4 +241,3 @@ public class StoreDAO {
 
 
 }
-
