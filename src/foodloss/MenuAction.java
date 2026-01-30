@@ -25,7 +25,6 @@ import tool.DBManager;
 public class MenuAction extends Action {
     @Override
     public void execute(HttpServletRequest req, HttpServletResponse res) throws Exception {
-        System.out.println("===== MenuAction START =====");
         HttpSession session = req.getSession();
         Object storeObj = session.getAttribute("store");
         Object userObj = session.getAttribute("user");
@@ -44,7 +43,7 @@ public class MenuAction extends Action {
 
             // 全店舗取得
             List<Store> storeList = storeDAO.selectAll();
-            System.out.println("店舗数: " + storeList.size());
+
 
             for (Store store : storeList) {
                 try {
@@ -63,11 +62,11 @@ public class MenuAction extends Action {
                     storeDiscountMap.put(store.getStoreId(), isDiscountApplied);
                     storeDiscountRateMap.put(store.getStoreId(), discountRate);
 
-                    System.out.println("店舗ID " + store.getStoreId() + " - 割引適用: " + isDiscountApplied + ", 割引率: " + discountRate + "%");
+
 
                     // 商品取得
                     List<Merchandise> merchList = merchDAO.selectByStoreId(store.getStoreId());
-                    System.out.println("店舗ID " + store.getStoreId() + " の商品数: " + merchList.size());
+
 
                     // 商品ごとに画像を取得してセット
                     for (Merchandise m : merchList) {
@@ -105,8 +104,7 @@ public class MenuAction extends Action {
             req.setAttribute("storeDiscountMap", storeDiscountMap);
             req.setAttribute("storeDiscountRateMap", storeDiscountRateMap);
 
-            System.out.println("defaultList件数: " + defaultList.size());
-            System.out.println("shopMerchMap店舗数: " + shopMerchMap.size());
+
 
         } catch (Exception e) {
             System.out.println("MenuActionで例外発生:");
@@ -138,6 +136,6 @@ public class MenuAction extends Action {
             throw fwdEx;
         }
 
-        System.out.println("===== MenuAction END =====");
+
     }
 }
