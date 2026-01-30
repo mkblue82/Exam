@@ -33,16 +33,28 @@ public class MerchandiseRegisterExecuteAction extends Action {
             throws Exception {
 
         Connection connection = null;
+        String name = null;
+        String priceStr = null;
+        String quantityStr = null;
+        String expirationDateStr = null;
+        String employeeNumberStr = null;
+        String tags = null;
 
         try {
             request.setCharacterEncoding("UTF-8");
 
-            String name = null;
-            String priceStr = null;
-            String quantityStr = null;
-            String expirationDateStr = null;
-            String employeeNumberStr = null;
-            String tags = null;
+            // ★★★ 最初に社員リストを取得（エラー時の再表示用） ★★★
+            HttpSession session = request.getSession();
+            bean.Store store = (bean.Store) session.getAttribute("store");
+
+            if (store != null) {
+                String storeCode = String.valueOf(store.getStoreId());
+                EmployeeDAO empDao = new EmployeeDAO();
+                List<Employee> employeeList = empDao.selectByStoreCode(storeCode);
+                request.setAttribute("employeeList", employeeList);
+            }
+            // ★★★ ここまで追加 ★★★
+
             List<FileItem> imageFiles = new ArrayList<>();
 
             if (ServletFileUpload.isMultipartContent(request)) {
@@ -89,8 +101,7 @@ public class MerchandiseRegisterExecuteAction extends Action {
                 }
             }
 
-            HttpSession session = request.getSession();
-            bean.Store store = (bean.Store) session.getAttribute("store");
+            store = (bean.Store) session.getAttribute("store");
 
             int storeId = 0;
 
@@ -118,30 +129,60 @@ public class MerchandiseRegisterExecuteAction extends Action {
 
             // バリデーション
             if (name == null || name.trim().isEmpty()) {
+                request.setAttribute("merchandiseName", name);
+                request.setAttribute("price", priceStr);
+                request.setAttribute("quantity", quantityStr);
+                request.setAttribute("expirationDate", expirationDateStr);
+                request.setAttribute("employeeNumber", employeeNumberStr);
+                request.setAttribute("tags", tags);
                 request.setAttribute("errorMessage", "商品名を入力してください");
                 request.getRequestDispatcher("/store_jsp/merchandise_register_store.jsp").forward(request, response);
                 return;
             }
 
             if (priceStr == null || priceStr.trim().isEmpty()) {
+                request.setAttribute("merchandiseName", name);
+                request.setAttribute("price", priceStr);
+                request.setAttribute("quantity", quantityStr);
+                request.setAttribute("expirationDate", expirationDateStr);
+                request.setAttribute("employeeNumber", employeeNumberStr);
+                request.setAttribute("tags", tags);
                 request.setAttribute("errorMessage", "価格を入力してください");
                 request.getRequestDispatcher("/store_jsp/merchandise_register_store.jsp").forward(request, response);
                 return;
             }
 
             if (quantityStr == null || quantityStr.trim().isEmpty()) {
+                request.setAttribute("merchandiseName", name);
+                request.setAttribute("price", priceStr);
+                request.setAttribute("quantity", quantityStr);
+                request.setAttribute("expirationDate", expirationDateStr);
+                request.setAttribute("employeeNumber", employeeNumberStr);
+                request.setAttribute("tags", tags);
                 request.setAttribute("errorMessage", "個数を入力してください");
                 request.getRequestDispatcher("/store_jsp/merchandise_register_store.jsp").forward(request, response);
                 return;
             }
 
             if (expirationDateStr == null || expirationDateStr.trim().isEmpty()) {
+                request.setAttribute("merchandiseName", name);
+                request.setAttribute("price", priceStr);
+                request.setAttribute("quantity", quantityStr);
+                request.setAttribute("expirationDate", expirationDateStr);
+                request.setAttribute("employeeNumber", employeeNumberStr);
+                request.setAttribute("tags", tags);
                 request.setAttribute("errorMessage", "消費期限を入力してください");
                 request.getRequestDispatcher("/store_jsp/merchandise_register_store.jsp").forward(request, response);
                 return;
             }
 
             if (employeeNumberStr == null || employeeNumberStr.trim().isEmpty()) {
+                request.setAttribute("merchandiseName", name);
+                request.setAttribute("price", priceStr);
+                request.setAttribute("quantity", quantityStr);
+                request.setAttribute("expirationDate", expirationDateStr);
+                request.setAttribute("employeeNumber", employeeNumberStr);
+                request.setAttribute("tags", tags);
                 request.setAttribute("errorMessage", "社員番号を入力してください");
                 request.getRequestDispatcher("/store_jsp/merchandise_register_store.jsp").forward(request, response);
                 return;
@@ -161,6 +202,12 @@ public class MerchandiseRegisterExecuteAction extends Action {
             }
 
             if (imageFiles.isEmpty()) {
+                request.setAttribute("merchandiseName", name);
+                request.setAttribute("price", priceStr);
+                request.setAttribute("quantity", quantityStr);
+                request.setAttribute("expirationDate", expirationDateStr);
+                request.setAttribute("employeeNumber", employeeNumberStr);
+                request.setAttribute("tags", tags);
                 request.setAttribute("errorMessage", "少なくとも1枚の画像を選択してください");
                 request.getRequestDispatcher("/store_jsp/merchandise_register_store.jsp").forward(request, response);
                 return;
@@ -170,10 +217,24 @@ public class MerchandiseRegisterExecuteAction extends Action {
             int stock = Integer.parseInt(quantityStr);
             java.sql.Date useByDate = java.sql.Date.valueOf(expirationDateStr);
 
-            java.sql.Date today = new java.sql.Date(System.currentTimeMillis());
+            // ★★★ 修正: 当日を含む過去の日付を拒否するため、時刻を00:00:00にリセット ★★★
+            java.util.Calendar cal = java.util.Calendar.getInstance();
+            cal.set(java.util.Calendar.HOUR_OF_DAY, 0);
+            cal.set(java.util.Calendar.MINUTE, 0);
+            cal.set(java.util.Calendar.SECOND, 0);
+            cal.set(java.util.Calendar.MILLISECOND, 0);
+            java.sql.Date today = new java.sql.Date(cal.getTimeInMillis());
 
+            System.out.println("★ 今日の日付: " + today);
+            System.out.println("★ 消費期限: " + useByDate);
 
             if (useByDate.before(today)) {
+                request.setAttribute("merchandiseName", name);
+                request.setAttribute("price", priceStr);
+                request.setAttribute("quantity", quantityStr);
+                request.setAttribute("expirationDate", expirationDateStr);
+                request.setAttribute("employeeNumber", employeeNumberStr);
+                request.setAttribute("tags", tags);
                 request.setAttribute("errorMessage", "消費期限には本日以降の日付を入力してください");
                 request.getRequestDispatcher("/store_jsp/merchandise_register_store.jsp")
                        .forward(request, response);
@@ -181,11 +242,17 @@ public class MerchandiseRegisterExecuteAction extends Action {
             }
 
             // ★★★ 修正: フォーマット済み社員番号で検索 ★★★
-            EmployeeDAO empDao = new EmployeeDAO();
-            Employee employee = empDao.selectByCode(formattedEmployeeNumber);
+            EmployeeDAO empDao2 = new EmployeeDAO();
+            Employee employee = empDao2.selectByCode(formattedEmployeeNumber);
 
             if (employee == null) {
                 System.err.println("❌ 社員番号が見つかりません: [" + formattedEmployeeNumber + "]");
+                request.setAttribute("merchandiseName", name);
+                request.setAttribute("price", priceStr);
+                request.setAttribute("quantity", quantityStr);
+                request.setAttribute("expirationDate", expirationDateStr);
+                request.setAttribute("employeeNumber", employeeNumberStr);
+                request.setAttribute("tags", tags);
                 request.setAttribute("errorMessage", "社員番号 " + employeeNumberStr + " は存在しません。正しい社員番号を入力してください。");
                 request.getRequestDispatcher("/store_jsp/merchandise_register_store.jsp").forward(request, response);
                 return;
@@ -196,6 +263,12 @@ public class MerchandiseRegisterExecuteAction extends Action {
             System.out.println("✅ 社員名: " + employee.getEmployeeName());
 
             if (price < 0) {
+                request.setAttribute("merchandiseName", name);
+                request.setAttribute("price", priceStr);
+                request.setAttribute("quantity", quantityStr);
+                request.setAttribute("expirationDate", expirationDateStr);
+                request.setAttribute("employeeNumber", employeeNumberStr);
+                request.setAttribute("tags", tags);
                 request.setAttribute("errorMessage", "価格は0円以上で入力してください");
                 request.getRequestDispatcher("/store_jsp/merchandise_register_store.jsp").forward(request, response);
                 return;
@@ -331,14 +404,32 @@ public class MerchandiseRegisterExecuteAction extends Action {
 
         } catch (NumberFormatException e) {
             e.printStackTrace();
+            request.setAttribute("merchandiseName", name);
+            request.setAttribute("price", priceStr);
+            request.setAttribute("quantity", quantityStr);
+            request.setAttribute("expirationDate", expirationDateStr);
+            request.setAttribute("employeeNumber", employeeNumberStr);
+            request.setAttribute("tags", tags);
             request.setAttribute("errorMessage", "価格、個数は数値で入力してください");
             request.getRequestDispatcher("/store_jsp/merchandise_register_store.jsp").forward(request, response);
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
+            request.setAttribute("merchandiseName", name);
+            request.setAttribute("price", priceStr);
+            request.setAttribute("quantity", quantityStr);
+            request.setAttribute("expirationDate", expirationDateStr);
+            request.setAttribute("employeeNumber", employeeNumberStr);
+            request.setAttribute("tags", tags);
             request.setAttribute("errorMessage", "消費期限の形式が正しくありません");
             request.getRequestDispatcher("/store_jsp/merchandise_register_store.jsp").forward(request, response);
         } catch (Exception e) {
             e.printStackTrace();
+            request.setAttribute("merchandiseName", name);
+            request.setAttribute("price", priceStr);
+            request.setAttribute("quantity", quantityStr);
+            request.setAttribute("expirationDate", expirationDateStr);
+            request.setAttribute("employeeNumber", employeeNumberStr);
+            request.setAttribute("tags", tags);
             request.setAttribute("errorMessage", "商品登録中にエラーが発生しました: " + e.getMessage());
             request.getRequestDispatcher("/store_jsp/merchandise_register_store.jsp").forward(request, response);
         } finally {

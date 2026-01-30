@@ -166,22 +166,31 @@
 
                     <div class="form-group">
                         <label for="merchandiseName">商品名 <span>*</span></label>
-                        <input type="text" id="merchandiseName" name="merchandiseName" required maxlength="100" placeholder="例: トマトジュース">
+                        <input type="text" id="merchandiseName" name="merchandiseName"
+                               value="<%= request.getAttribute("merchandiseName") != null ? request.getAttribute("merchandiseName") : "" %>"
+                               required maxlength="100" placeholder="例: トマトジュース">
                     </div>
 
                     <div class="form-group">
                         <label for="price">価格（税込） <span>*</span></label>
-                        <input type="number" id="price" name="price" required min="0" max="999999" placeholder="例: 500">
+                        <input type="number" id="price" name="price"
+                               value="<%= request.getAttribute("price") != null ? request.getAttribute("price") : "" %>"
+                               required min="0" max="999999" placeholder="例: 500">
                     </div>
 
                     <div class="form-group">
                         <label for="quantity">個数 <span>*</span></label>
-                        <input type="number" id="quantity" name="quantity" required min="1" max="9999" placeholder="例: 10">
+                        <input type="number" id="quantity" name="quantity"
+                               value="<%= request.getAttribute("quantity") != null ? request.getAttribute("quantity") : "" %>"
+                               required min="1" max="9999" placeholder="例: 10">
                     </div>
 
                     <div class="form-group">
                         <label for="expirationDate">消費期限 <span>*</span></label>
-                        <input type="date" id="expirationDate" name="expirationDate" required>
+                        <input type="date" id="expirationDate" name="expirationDate"
+                               value="<%= request.getAttribute("expirationDate") != null ? request.getAttribute("expirationDate") : "" %>"
+                               min="<%= new java.text.SimpleDateFormat("yyyy-MM-dd").format(new java.util.Date()) %>"
+                               required>
                     </div>
 
                     <div class="form-group">
@@ -189,12 +198,18 @@
                         <select id="employeeNumber" name="employeeNumber" required>
                             <option value="">-- 社員番号を選択 --</option>
                             <%
+                                String selectedEmployeeNumber = (String) request.getAttribute("employeeNumber");
                                 java.util.List<bean.Employee> empList =
                                     (java.util.List<bean.Employee>) request.getAttribute("employeeList");
                                 if (empList != null) {
                                     for (bean.Employee emp : empList) {
+                                        String empNum = emp.getEmployeeNumber();
+                                        boolean isSelected = (selectedEmployeeNumber != null &&
+                                                            selectedEmployeeNumber.equals(empNum));
                             %>
-                                        <option value="<%= emp.getEmployeeNumber() %>"><%= emp.getEmployeeNumber() %></option>
+                                        <option value="<%= empNum %>" <%= isSelected ? "selected" : "" %>>
+                                            <%= empNum %>
+                                        </option>
                             <%
                                     }
                                 }
@@ -204,7 +219,9 @@
 
                     <div class="form-group">
                         <label for="tags">タグ</label>
-                        <input type="text" id="tags" name="tags" maxlength="200" placeholder="例: 野菜, 新鮮, セール">
+                        <input type="text" id="tags" name="tags"
+                               value="<%= request.getAttribute("tags") != null ? request.getAttribute("tags") : "" %>"
+                               maxlength="200" placeholder="例: 野菜, 新鮮, セール">
                     </div>
 
                     <div class="form-group">
