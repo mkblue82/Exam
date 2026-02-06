@@ -140,7 +140,9 @@ public class StoreEditExecuteAction extends Action {
 
             // パスワードが入力されている場合のみ更新
             if (password != null && !password.trim().isEmpty()) {
-                store.setPassword(password);
+                // ★★★ SHA-256でハッシュ化 ★★★
+                String hashedPassword = hashPassword(password);
+                store.setPassword(hashedPassword);
             }
 
             storeDAO.update(store);
@@ -157,5 +159,18 @@ public class StoreEditExecuteAction extends Action {
             request.setAttribute("errorMessage", "更新処理中にエラーが発生しました: " + e.getMessage());
             request.getRequestDispatcher("/error.jsp").forward(request, response);
         }
+    }
+
+    // ★★★ SHA-256ハッシュ化メソッド ★★★
+    private String hashPassword(String password) throws Exception {
+        java.security.MessageDigest md = java.security.MessageDigest.getInstance("SHA-256");
+        byte[] hash = md.digest(password.getBytes("UTF-8"));
+        StringBuilder hexString = new StringBuilder();
+        for (byte b : hash) {
+            String hex = Integer.toHexString(0xff & b);
+            if (hex.length() == 1) hexString.append('0');
+            hexString.append(hex);
+        }
+        return hexString.toString();
     }
 }
