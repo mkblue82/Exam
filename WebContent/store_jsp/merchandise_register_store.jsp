@@ -66,7 +66,8 @@
         }
         .image-add-btn {
             background: #c07148;
-            color: white;
+            color: #fff !important;
+    		opacity: 1 !important;
             padding: 0.8rem 1.5rem;
             border: none;
             border-radius: 5px;
@@ -237,7 +238,7 @@
                             <div id="fileCount" class="file-count"></div>
                         </div>
 
-                        <input type="file" id="imageInput" name="merchandiseImage" accept="image/*" multiple required onchange="previewImages(this)">
+                        <input type="file" id="imageInput" name="merchandiseImage" accept="image/*" multiple required onchange="previewImages(this)" style="display: none;">
                         <div id="imagePreviewContainer" class="image-preview-container"></div>
                     </div>
 

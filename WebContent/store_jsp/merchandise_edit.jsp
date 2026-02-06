@@ -288,7 +288,7 @@
                     </div>
 
                     <!-- ④ 更新ボタン ----------------------------------------------------------- -->
-                    <button type="submit" class="btn-submit">更新</button>
+                    <button type="submit" class="btn-submit" onclick="return validateEditForm();">更新</button>
                     <a href="${pageContext.request.contextPath}/foodloss/MerchandiseList.action"
                        class="btn-cancel">戻る</a>
 
@@ -301,6 +301,7 @@
 </div>
 
 <script>
+var initialOldImageCount = <%= (images != null ? images.size() : 0) %>;
 /* --- 既存画像削除 --- */
 var deletedOldList = [];
 function removeOldImage(imageId) {
@@ -402,6 +403,25 @@ function updateFileCount() {
     var count = imageDataList.length;
     document.getElementById("fileCount").textContent =
         count > 0 ? count + "枚の画像を選択中" : "";
+}
+
+function validateEditForm() {
+
+    // 残っている既存画像数
+    // 初期枚数 - 削除された枚数
+    var remainingOldImages =
+        initialOldImageCount - deletedOldList.length;
+
+    // 新しく追加された画像数
+    var newImagesCount = imageDataList.length;
+
+    // 合計が0なら更新不可
+    if (remainingOldImages + newImagesCount <= 0) {
+        alert("商品画像は最低1枚以上必要です。");
+        return false; // ← 更新を止める
+    }
+
+    return true; // ← 更新OK
 }
 </script>
 
