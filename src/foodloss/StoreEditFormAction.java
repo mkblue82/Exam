@@ -26,7 +26,7 @@ public class StoreEditFormAction extends Action {
 
         Integer storeId = (Integer) session.getAttribute("storeId");
 
-        // デバッグ: storeIdチェック
+        // デバッstoreIdチェック
         if (storeId == null) {
             System.out.println("DEBUG: セッションにstoreIdが存在しません");
             response.sendRedirect(request.getContextPath() + "/store_jsp/login_store.jsp");
